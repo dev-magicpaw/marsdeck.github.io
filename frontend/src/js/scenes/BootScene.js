@@ -37,15 +37,21 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('mountainTile1', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_03.png'));
         this.load.image('mountainTile2', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_04.png'));
         
-        this.load.image('ironMine', 'https://via.placeholder.com/64x64/8B4513/fff?text=Mine');
-        this.load.image('droneDepo', 'https://via.placeholder.com/64x64/7CFC00/fff?text=Drone');
-        this.load.image('steelworks', 'https://via.placeholder.com/64x64/B0C4DE/fff?text=Steel');
-        this.load.image('concreteMixer', 'https://via.placeholder.com/64x64/A9A9A9/fff?text=Cement');
-        this.load.image('waterPump', 'https://via.placeholder.com/64x64/1E90FF/fff?text=Water');
-        this.load.image('fuelRefinery', 'https://via.placeholder.com/64x64/FF4500/fff?text=Fuel');
-        this.load.image('windTurbine', 'https://via.placeholder.com/64x64/00FFFF/fff?text=Wind');
-        this.load.image('solarPanel', 'https://via.placeholder.com/64x64/FFD700/fff?text=Solar');
-        this.load.image('launchPad', 'https://via.placeholder.com/64x64/9370DB/fff?text=Rocket');
+        // Load building textures
+        this.load.image('concreteMixer', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_09.png'));
+        this.load.image('droneDepo', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_06.png'));
+        this.load.image('fuelRefinery', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_15.png'));
+        this.load.image('ironMine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_07.png'));
+        this.load.image('launchPad', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_14.png'));
+        this.load.image('solarPanel', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_12.png'));
+        this.load.image('steelworks', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_08.png'));
+        this.load.image('waterPump', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_11.png'));
+        this.load.image('windTurbine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_01.png'));
+        
+        // Terrain types
+        this.load.image('terrainMetal', 'https://via.placeholder.com/64x64/CD853F/fff?text=Metal');
+        this.load.image('terrainWater', 'https://via.placeholder.com/64x64/ADD8E6/fff?text=Water');
+        this.load.image('terrainMountain', 'https://via.placeholder.com/64x64/A0522D/fff?text=Mount');
     }
 
     create() {
