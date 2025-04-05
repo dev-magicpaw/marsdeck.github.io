@@ -111,6 +111,12 @@ export default class GridManager {
             return false;
         }
         
+        // Remove any terrain feature when a building is placed
+        // Exception: if the building has a terrain requirement, keep the feature
+        if (!building.terrainRequirement) {
+            this.grid[y][x].feature = null;
+        }
+        
         this.grid[y][x].building = building.id;
         return true;
     }
