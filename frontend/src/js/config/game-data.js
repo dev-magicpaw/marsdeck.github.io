@@ -62,7 +62,7 @@ export const BUILDINGS = {
             [RESOURCES.STEEL]: 1,
         },
         production: {
-            [RESOURCES.DRONES]: 10
+            [RESOURCES.DRONES]: 7
         },
         consumption: {},
         terrainRequirement: null, // Can be built anywhere
