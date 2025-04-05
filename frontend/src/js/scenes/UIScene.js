@@ -532,7 +532,7 @@ export default class UIScene extends Phaser.Scene {
         this.clearInfoPanel();
         
         if (card.type === 'building') {
-            this.infoTitle.setText(`${card.building.name} (Selected)`);
+            this.infoTitle.setText(`${card.building.name} (Card)`);
             
             // Building description
             let content = card.building.description + "\n\n";
