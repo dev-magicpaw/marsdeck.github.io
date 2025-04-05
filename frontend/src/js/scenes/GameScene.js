@@ -267,6 +267,12 @@ export default class GameScene extends Phaser.Scene {
         // Consume resources
         this.resourceManager.consumeResources(building.cost);
         
+        // Remove feature sprite if it exists and the building doesn't require it
+        if (cell.featureSprite && !building.terrainRequirement) {
+            cell.featureSprite.destroy();
+            cell.featureSprite = null;
+        }
+        
         // Place building on grid
         this.gridManager.placeBuilding(x, y, building);
         
