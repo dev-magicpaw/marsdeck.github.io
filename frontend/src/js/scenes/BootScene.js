@@ -20,6 +20,20 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('terrainPlain1', require('../../assets/images/rts_sci_fi/Tile/scifiTile_41.png'));
         this.load.image('terrainPlain2', require('../../assets/images/rts_sci_fi/Tile/scifiTile_42.png'));
         
+        // Load iron deposit textures
+        this.load.image('ironDeposit1', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_08.png'));
+        this.load.image('ironDeposit2', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_09.png'));
+        this.load.image('ironDeposit3', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_10.png'));
+        this.load.image('ironDeposit4', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_11.png'));
+        
+        // Load water textures (use some sci-fi tiles that look watery/icy)
+        this.load.image('waterTile1', require('../../assets/images/rts_sci_fi/Tile/scifiTile_15.png'));
+        this.load.image('waterTile2', require('../../assets/images/rts_sci_fi/Tile/scifiTile_16.png'));
+        
+        // Load mountain textures (use environment assets that look like rocky formations)
+        this.load.image('mountainTile1', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_03.png'));
+        this.load.image('mountainTile2', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_04.png'));
+        
         this.load.image('ironMine', 'https://via.placeholder.com/64x64/8B4513/fff?text=Mine');
         this.load.image('droneDepo', 'https://via.placeholder.com/64x64/7CFC00/fff?text=Drone');
         this.load.image('steelworks', 'https://via.placeholder.com/64x64/B0C4DE/fff?text=Steel');

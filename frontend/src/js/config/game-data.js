@@ -32,19 +32,22 @@ export const TERRAIN_FEATURES = {
         id: 'metal',
         name: 'Metal Deposit',
         description: 'Rich in iron ore',
-        texture: 'terrainMetal'
+        textures: ['ironDeposit1', 'ironDeposit2', 'ironDeposit3', 'ironDeposit4'],
+        texture: 'ironDeposit1' // Default texture for UI
     },
     WATER: {
         id: 'water',
         name: 'Water Deposit',
         description: 'Frozen water under the surface',
-        texture: 'terrainWater'
+        textures: ['waterTile1', 'waterTile2'],
+        texture: 'waterTile1' // Default texture for UI
     },
     MOUNTAIN: {
         id: 'mountain',
         name: 'Mountain',
         description: 'Rough terrain, difficult to build on',
-        texture: 'terrainMountain'
+        textures: ['mountainTile1', 'mountainTile2'],
+        texture: 'mountainTile1' // Default texture for UI
     }
 };
 
