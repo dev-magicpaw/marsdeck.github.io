@@ -1,4 +1,4 @@
-import { CELL_SIZE, GRID_SIZE, TERRAIN_TYPES } from '../config/game-data';
+import { CELL_SIZE, GRID_SIZE, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
 
 export default class GridManager {
     constructor(scene) {
@@ -23,8 +23,11 @@ export default class GridManager {
                     x: x,
                     y: y,
                     terrain: TERRAIN_TYPES.PLAIN.id, // Default terrain
+                    feature: null, // Terrain feature (metal, water, mountain)
                     building: null, // No building initially
-                    sprite: null // Will store the Phaser sprite reference
+                    terrainSprite: null, // Sprite for terrain
+                    featureSprite: null, // Sprite for terrain feature
+                    buildingSprite: null // Sprite for building
                 });
             }
             this.grid.push(row);
@@ -39,7 +42,7 @@ export default class GridManager {
             this.initializeGrid(); // Recreate grid with new size
         }
         
-        // Apply terrain and building configurations
+        // Apply terrain, features and building configurations
         if (mapConfig.cells && Array.isArray(mapConfig.cells)) {
             mapConfig.cells.forEach(cell => {
                 if (cell.x >= 0 && cell.x < this.gridSize && 
@@ -48,6 +51,11 @@ export default class GridManager {
                     // Set terrain
                     if (cell.terrain) {
                         this.grid[cell.y][cell.x].terrain = cell.terrain;
+                    }
+                    
+                    // Set terrain feature
+                    if (cell.feature) {
+                        this.grid[cell.y][cell.x].feature = cell.feature;
                     }
                     
                     // Set building (if any)
@@ -79,10 +87,19 @@ export default class GridManager {
             return false; // Cell already has a building
         }
         
-        // Check terrain requirements
-        if (building.terrainRequirement && 
-            cell.terrain !== building.terrainRequirement) {
-            return false; // Terrain requirements not met
+        // Check terrain feature requirements
+        if (building.terrainRequirement) {
+            if (!cell.feature) {
+                return false; // No feature but requirement exists
+            }
+            if (cell.feature !== building.terrainRequirement) {
+                return false; // Feature doesn't match requirement
+            }
+        }
+        
+        // Can't build on mountains
+        if (cell.feature === TERRAIN_FEATURES.MOUNTAIN.id) {
+            return false;
         }
         
         return true;
@@ -107,6 +124,10 @@ export default class GridManager {
         }
         
         cell.building = null;
+        if (cell.buildingSprite) {
+            cell.buildingSprite.destroy();
+            cell.buildingSprite = null;
+        }
         return true;
     }
     
@@ -129,7 +150,7 @@ export default class GridManager {
         return buildings;
     }
     
-    // Generate a random map with various terrain types
+    // Generate a random map with various terrain features
     generateRandomMap(metalPercentage = 10, waterPercentage = 10, mountainPercentage = 5) {
         this.initializeGrid(); // Start with a clean grid
         
@@ -139,22 +160,22 @@ export default class GridManager {
         const mountainCells = Math.floor(totalCells * (mountainPercentage / 100));
         
         // Helper to place random terrain features
-        const placeTerrain = (terrainType, count) => {
+        const placeFeature = (featureType, count) => {
             let placed = 0;
             while (placed < count) {
                 const x = Math.floor(Math.random() * this.gridSize);
                 const y = Math.floor(Math.random() * this.gridSize);
                 
-                if (this.grid[y][x].terrain === TERRAIN_TYPES.PLAIN.id) {
-                    this.grid[y][x].terrain = terrainType;
+                if (!this.grid[y][x].feature) {
+                    this.grid[y][x].feature = featureType;
                     placed++;
                 }
             }
         };
         
         // Place terrain features
-        placeTerrain(TERRAIN_TYPES.METAL.id, metalCells);
-        placeTerrain(TERRAIN_TYPES.WATER.id, waterCells);
-        placeTerrain(TERRAIN_TYPES.MOUNTAIN.id, mountainCells);
+        placeFeature(TERRAIN_FEATURES.METAL.id, metalCells);
+        placeFeature(TERRAIN_FEATURES.WATER.id, waterCells);
+        placeFeature(TERRAIN_FEATURES.MOUNTAIN.id, mountainCells);
     }
 } 

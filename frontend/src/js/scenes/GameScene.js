@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_TYPES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -57,32 +57,43 @@ export default class GameScene extends Phaser.Scene {
                 const xPos = x * CELL_SIZE;
                 const yPos = y * CELL_SIZE;
                 
-                // Create cell background based on terrain
-                let terrainSprite;
-                if (cell.terrain === TERRAIN_TYPES.METAL.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMetal');
-                } else if (cell.terrain === TERRAIN_TYPES.WATER.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainWater');
-                } else if (cell.terrain === TERRAIN_TYPES.MOUNTAIN.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMountain');
-                } else {
-                    // Use alternating sci-fi tiles for plain terrain to create visual variety
-                    const tileTexture = (x + y) % 2 === 0 ? 'terrainPlain1' : 'terrainPlain2';
-                    terrainSprite = this.add.sprite(xPos, yPos, tileTexture);
-                }
+                // Create base terrain (always PLAIN)
+                // Use alternating sci-fi tiles for plain terrain to create visual variety
+                const tileTexture = (x + y) % 2 === 0 ? 'terrainPlain1' : 'terrainPlain2';
+                const terrainSprite = this.add.sprite(xPos, yPos, tileTexture);
                 
                 terrainSprite.setOrigin(0, 0);
                 terrainSprite.setInteractive();
                 terrainSprite.data = { x, y }; // Store grid coordinates
                 
                 this.gridContainer.add(terrainSprite);
+                cell.terrainSprite = terrainSprite;
+                
+                // Add terrain feature if present
+                if (cell.feature) {
+                    let featureTexture;
+                    if (cell.feature === TERRAIN_FEATURES.METAL.id) {
+                        featureTexture = 'terrainMetal';
+                    } else if (cell.feature === TERRAIN_FEATURES.WATER.id) {
+                        featureTexture = 'terrainWater';
+                    } else if (cell.feature === TERRAIN_FEATURES.MOUNTAIN.id) {
+                        featureTexture = 'terrainMountain';
+                    }
+                    
+                    if (featureTexture) {
+                        const featureSprite = this.add.sprite(xPos, yPos, featureTexture);
+                        featureSprite.setOrigin(0, 0);
+                        this.gridContainer.add(featureSprite);
+                        cell.featureSprite = featureSprite;
+                    }
+                }
                 
                 // If the cell has a building, add its sprite
                 if (cell.building) {
                     const buildingSprite = this.add.sprite(xPos, yPos, cell.building);
                     buildingSprite.setOrigin(0, 0);
                     this.gridContainer.add(buildingSprite);
-                    cell.sprite = buildingSprite;
+                    cell.buildingSprite = buildingSprite;
                 }
             }
         }
@@ -146,7 +157,7 @@ export default class GameScene extends Phaser.Scene {
         const buildingSprite = this.add.sprite(xPos, yPos, building.texture);
         buildingSprite.setOrigin(0, 0);
         this.gridContainer.add(buildingSprite);
-        cell.sprite = buildingSprite;
+        cell.buildingSprite = buildingSprite;
         
         // Remove card from hand (already done in UI when selecting card)
         this.selectedCard = null;

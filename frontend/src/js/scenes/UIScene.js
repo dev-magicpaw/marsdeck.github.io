@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, RESOURCES, TERRAIN_TYPES } from '../config/game-data';
+import { BUILDINGS, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -341,18 +341,36 @@ export default class UIScene extends Phaser.Scene {
         // Clear current info
         this.clearInfoPanel();
         
-        // Display terrain info
+        // First get terrain info
         const terrain = Object.values(TERRAIN_TYPES).find(t => t.id === cell.terrain);
         
-        if (terrain) {
-            this.infoTitle.setText(terrain.name);
-            this.infoContent.setText(terrain.description);
-            
-            // Show terrain sprite if available
-            if (terrain.texture) {
-                this.infoSprite.setTexture(terrain.texture);
-                this.infoSprite.setVisible(true);
+        // Set title based on feature or terrain
+        let title = '';
+        let description = '';
+        let texture = '';
+        
+        // Check if there's a terrain feature
+        if (cell.feature) {
+            const feature = Object.values(TERRAIN_FEATURES).find(f => f.id === cell.feature);
+            if (feature) {
+                title = feature.name;
+                description = feature.description;
+                texture = feature.texture;
             }
+        } else {
+            // Just plain terrain
+            title = terrain.name;
+            description = terrain.description;
+            texture = terrain.texture;
+        }
+        
+        this.infoTitle.setText(title);
+        this.infoContent.setText(description);
+        
+        // Show terrain/feature sprite
+        if (texture) {
+            this.infoSprite.setTexture(texture);
+            this.infoSprite.setVisible(true);
         }
         
         // If there's a building, show building info instead
