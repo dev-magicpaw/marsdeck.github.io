@@ -9,7 +9,7 @@ export default class ResourceManager {
             [RESOURCES.CONCRETE]: 10,
             [RESOURCES.WATER]: 0,
             [RESOURCES.FUEL]: 0,
-            [RESOURCES.DRONES]: 5,
+            [RESOURCES.DRONES]: 10,
             [RESOURCES.ENERGY]: 0,
             [RESOURCES.VICTORY_POINTS]: 0
         };
