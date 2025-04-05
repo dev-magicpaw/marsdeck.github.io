@@ -8,28 +8,24 @@
 // - Brown cliff areas for mountains
 
 export const TILE_INDICES = {
-    // Plain terrain (sand/desert) - brown area in top-left
     PLAIN: {
-        CENTER: 8, // Center of desert tile
-        VARIANTS: [8, 9, 10, 16, 17, 18] // Different variants of desert tiles
+        CENTER: 600,
+        VARIANTS: [600, 601, 602, 603]
     },
     
-    // Metal deposit (using stone/mountain tiles) - darker stone areas
     METAL: {
-        CENTER: 40, // Center of metal deposit
-        VARIANTS: [40, 41, 48, 49] // Different variants
+        CENTER: 574,
+        VARIANTS: [574, 575]
     },
     
-    // Water deposit - blue water tiles
     WATER: {
-        CENTER: 177, // Center of water
-        VARIANTS: [177, 178, 185, 186] // Different variants
+        CENTER: 27,
+        VARIANTS: [27, 59]
     },
     
-    // Mountain - using the brown cliff/rock tiles
     MOUNTAIN: {
-        CENTER: 96, // Mountain center
-        VARIANTS: [96, 97, 104, 105] // Different variants
+        CENTER: 606,
+        VARIANTS: [606, 607]
     }
 };
 
