@@ -55,6 +55,7 @@ export const BUILDINGS = {
     DRONE_DEPO: {
         id: 'droneDepo',
         name: 'Drone Depo',
+        shortName: 'Drone Depo',
         description: 'Produces drones for construction',
         cost: {
             [RESOURCES.CONCRETE]: 1,
@@ -71,6 +72,7 @@ export const BUILDINGS = {
     IRON_MINE: {
         id: 'ironMine',
         name: 'Iron Mine',
+        shortName: 'Iron Mine',
         description: 'Extracts iron from metal deposits',
         cost: {
             [RESOURCES.CONCRETE]: 2,
@@ -89,6 +91,7 @@ export const BUILDINGS = {
     STEELWORKS: {
         id: 'steelworks',
         name: 'Steelworks',
+        shortName: 'Steelworks',
         description: 'Converts iron to steel',
         cost: {
             [RESOURCES.CONCRETE]: 2,
@@ -108,6 +111,7 @@ export const BUILDINGS = {
     CONCRETE_HARVESTER: {
         id: 'concreteMixer',
         name: 'Concrete Harvester',
+        shortName: 'Concrete',
         description: 'Produces concrete from regolith',
         cost: {
             [RESOURCES.CONCRETE]: 1,
@@ -126,6 +130,7 @@ export const BUILDINGS = {
     WATER_PUMP: {
         id: 'waterPump',
         name: 'Water Pump',
+        shortName: 'Water Pump',
         description: 'Extracts water from deposits',
         cost: {
             [RESOURCES.CONCRETE]: 1,
@@ -144,6 +149,7 @@ export const BUILDINGS = {
     FUEL_REFINERY: {
         id: 'fuelRefinery',
         name: 'Fuel Refinery',
+        shortName: 'Fuel',
         description: 'Converts water to rocket fuel',
         cost: {
             [RESOURCES.CONCRETE]: 3,
@@ -163,6 +169,7 @@ export const BUILDINGS = {
     WIND_TURBINE: {
         id: 'windTurbine',
         name: 'Wind Turbine',
+        shortName: 'Wind',
         description: 'Generates energy from wind',
         cost: {
             [RESOURCES.CONCRETE]: 1,
@@ -179,6 +186,7 @@ export const BUILDINGS = {
     SOLAR_PANELS: {
         id: 'solarPanel',
         name: 'Solar Panels',
+        shortName: 'Solar',
         description: 'Generates energy from sunlight',
         cost: {
             [RESOURCES.CONCRETE]: 1,
@@ -195,6 +203,7 @@ export const BUILDINGS = {
     LAUNCH_PAD: {
         id: 'launchPad',
         name: 'Launch Pad',
+        shortName: 'Launcher',
         description: 'Allows rocket launches for victory points',
         cost: {
             [RESOURCES.CONCRETE]: 4,

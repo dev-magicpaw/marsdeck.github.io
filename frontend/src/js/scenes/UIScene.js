@@ -305,11 +305,11 @@ export default class UIScene extends Phaser.Scene {
         
         // Card content (if it's a building card)
         if (card.type === 'building') {
-            // Building name
+            // Building name - use short name for card display
             const nameText = this.add.text(
                 cardWidth / 2, 
                 10, 
-                card.building.name, 
+                card.building.shortName, 
                 { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
             );
             nameText.setOrigin(0.5, 0);
