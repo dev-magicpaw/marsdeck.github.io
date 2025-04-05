@@ -143,21 +143,17 @@ export default class GameScene extends Phaser.Scene {
                 const yPos = y * CELL_SIZE;
                 
                 // Create cell background based on terrain
-                let tileIndex;
-                
-                // Get the appropriate tile index based on terrain type
-                switch(cell.terrain) {
-                    case TERRAIN_TYPES.METAL.id:
-                        tileIndex = getRandomTileVariant('METAL');
-                        break;
-                    case TERRAIN_TYPES.WATER.id:
-                        tileIndex = getRandomTileVariant('WATER');
-                        break;
-                    case TERRAIN_TYPES.MOUNTAIN.id:
-                        tileIndex = getRandomTileVariant('MOUNTAIN');
-                        break;
-                    default: // Plain terrain
-                        tileIndex = getRandomTileVariant('PLAIN');
+                let terrainSprite;
+                if (cell.terrain === TERRAIN_TYPES.METAL.id) {
+                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMetal');
+                } else if (cell.terrain === TERRAIN_TYPES.WATER.id) {
+                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainWater');
+                } else if (cell.terrain === TERRAIN_TYPES.MOUNTAIN.id) {
+                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMountain');
+                } else {
+                    // Use alternating sci-fi tiles for plain terrain to create visual variety
+                    const tileTexture = (x + y) % 2 === 0 ? 'terrainPlain1' : 'terrainPlain2';
+                    terrainSprite = this.add.sprite(xPos, yPos, tileTexture);
                 }
                 
                 // Create the terrain sprite using the frame from our tileset
