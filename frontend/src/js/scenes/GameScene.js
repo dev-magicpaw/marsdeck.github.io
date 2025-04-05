@@ -133,6 +133,30 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
+
+        // Handle clicks on empty area (background)
+        this.input.on('pointerdown', (pointer) => {
+            // Check if the click was not on any game object
+            if (pointer.downElement.nodeName === 'CANVAS' && !this.input.hitTestPointer(pointer).length) {
+                // Clear any existing selection
+                this.clearSelection();
+            }
+        });
+    }
+    
+    // Clear any current selection
+    clearSelection() {
+        // Clear selected card
+        if (this.selectedCard !== null) {
+            this.selectedCard = null;
+            this.selectedCardIndex = undefined;
+        }
+        
+        // Clear info panel and refresh UI regardless of what was selected
+        if (this.uiScene) {
+            this.uiScene.clearInfoPanel();
+            this.uiScene.refreshUI();
+        }
     }
     
     // Try to place a building from a card
