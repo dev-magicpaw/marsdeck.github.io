@@ -23,7 +23,11 @@ export const TERRAIN_TYPES = {
         name: 'Plain Ground',
         description: 'Regular Martian surface',
         texture: 'terrainPlain1'
-    },
+    }
+};
+
+// Terrain features that can be placed on terrain
+export const TERRAIN_FEATURES = {
     METAL: {
         id: 'metal',
         name: 'Metal Deposit',
@@ -77,7 +81,7 @@ export const BUILDINGS = {
         consumption: {
             [RESOURCES.ENERGY]: 1
         },
-        terrainRequirement: TERRAIN_TYPES.METAL.id,
+        terrainRequirement: TERRAIN_FEATURES.METAL.id,
         texture: 'ironMine'
     },
     STEELWORKS: {
@@ -132,7 +136,7 @@ export const BUILDINGS = {
         consumption: {
             [RESOURCES.ENERGY]: 1
         },
-        terrainRequirement: TERRAIN_TYPES.WATER.id,
+        terrainRequirement: TERRAIN_FEATURES.WATER.id,
         texture: 'waterPump'
     },
     FUEL_REFINERY: {
