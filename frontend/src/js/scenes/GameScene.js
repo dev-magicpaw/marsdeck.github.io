@@ -184,6 +184,17 @@ export default class GameScene extends Phaser.Scene {
         this.gridContainer.add(buildingSprite);
         cell.buildingSprite = buildingSprite;
         
+        // Immediate production for certain buildings
+        if (building.id === 'droneDepo' || building.id === 'solarPanel' || building.id === 'windTurbine') {
+            for (const resource in building.production) {
+                this.resourceManager.modifyResource(resource, building.production[resource]);
+                
+                // Show message about production
+                const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                this.uiScene.showMessage(`${building.name} produced ${building.production[resource]} ${resourceName}`);
+            }
+        }
+        
         // Remove the card from hand now that it's actually been used
         if (this.selectedCardIndex !== undefined) {
             this.cardManager.playCard(this.selectedCardIndex);
@@ -269,39 +280,72 @@ export default class GameScene extends Phaser.Scene {
     processProduction() {
         const buildings = this.gridManager.getAllBuildings();
         
-        // First process consumption requirements
-        const buildingsToProcess = [];
+        // First wave: resource extraction (iron, water, concrete)
+        this.processFirstWaveProduction(buildings);
+        
+        // Second wave: resource transformation (steelworks, fuel refinery)
+        this.processSecondWaveProduction(buildings);
+    }
+    
+    // Process first wave - resource extraction buildings
+    processFirstWaveProduction(buildings) {
+        const firstWaveBuildings = ['ironMine', 'waterPump', 'concreteMixer'];
         
         buildings.forEach(building => {
             const buildingData = Object.values(BUILDINGS).find(b => b.id === building.buildingId);
             
-            if (buildingData) {
-                // Check if we have resources for consumption
-                const canConsume = this.resourceManager.hasSufficientResources(buildingData.consumption);
+            if (buildingData && firstWaveBuildings.includes(buildingData.id)) {
+                // Add production without consuming energy
+                for (const resource in buildingData.production) {
+                    this.resourceManager.modifyResource(resource, buildingData.production[resource]);
+                    
+                    // Show message
+                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    this.uiScene.showMessage(`${buildingData.name} produced ${buildingData.production[resource]} ${resourceName}`);
+                }
+            }
+        });
+    }
+    
+    // Process second wave - resource transformation buildings
+    processSecondWaveProduction(buildings) {
+        const secondWaveBuildings = ['steelworks', 'fuelRefinery'];
+        
+        buildings.forEach(building => {
+            const buildingData = Object.values(BUILDINGS).find(b => b.id === building.buildingId);
+            
+            if (buildingData && secondWaveBuildings.includes(buildingData.id)) {
+                // Create a consumption object without energy requirement
+                const resourceConsumption = {};
+                for (const resource in buildingData.consumption) {
+                    if (resource !== RESOURCES.ENERGY) {
+                        resourceConsumption[resource] = buildingData.consumption[resource];
+                    }
+                }
+                
+                // Check if we have resources for consumption (excluding energy)
+                const canConsume = this.resourceManager.hasSufficientResources(resourceConsumption);
                 
                 if (canConsume) {
-                    buildingsToProcess.push({
-                        building: buildingData,
-                        x: building.x,
-                        y: building.y
-                    });
+                    // Consume resources (excluding energy)
+                    this.resourceManager.consumeResources(resourceConsumption);
+                    
+                    // Add production
+                    for (const resource in buildingData.production) {
+                        this.resourceManager.modifyResource(resource, buildingData.production[resource]);
+                        
+                        // Show message
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        this.uiScene.showMessage(`${buildingData.name} produced ${buildingData.production[resource]} ${resourceName}`);
+                    }
                 }
             }
         });
         
-        // Now process production for eligible buildings
-        buildingsToProcess.forEach(item => {
-            // Consume resources
-            this.resourceManager.consumeResources(item.building.consumption);
-            
-            // Add production
-            for (const resource in item.building.production) {
-                this.resourceManager.modifyResource(resource, item.building.production[resource]);
-            }
-            
-            // Special case for Launch Pad - launch rocket if enough fuel
-            if (item.building.id === 'launchPad') {
-                this.tryLaunchRocket(item.x, item.y);
+        // Special case for Launch Pad - process after all production
+        buildings.forEach(building => {
+            if (building.buildingId === 'launchPad') {
+                this.tryLaunchRocket(building.x, building.y);
             }
         });
     }
