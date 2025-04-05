@@ -344,11 +344,20 @@ export default class UIScene extends Phaser.Scene {
             for (const resource in card.building.cost) {
                 if (card.building.cost[resource] > 0) {
                     const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    
+                    // Check if player has enough of this resource
+                    const requiredAmount = card.building.cost[resource];
+                    const playerAmount = this.resourceManager.getResource(resource);
+                    const hasEnough = playerAmount >= requiredAmount;
+                    
+                    // Set color based on resource availability
+                    const textColor = hasEnough ? '#000000' : '#ff0000';
+                    
                     const costText = this.add.text(
                         5, 
                         costY, 
                         `${resourceName}: ${card.building.cost[resource]}`, 
-                        { fontSize: '10px', fontFamily: 'Arial', color: '#000000' }
+                        { fontSize: '10px', fontFamily: 'Arial', color: textColor }
                     );
                     cardContainer.add(costText);
                     costY += 12;
@@ -416,37 +425,99 @@ export default class UIScene extends Phaser.Scene {
                 this.infoTitle.setText(building.name);
                 
                 // Building description
-                let content = building.description + "\n\n";
+                this.infoContent.setText(building.description + "\n\nConstruction Cost:");
                 
                 // Construction Cost
                 if (Object.keys(building.cost).length > 0) {
-                    content += "Construction Cost:\n";
+                    // Create a container for the colored cost text elements
+                    this.costTexts = this.costTexts || [];
+                    
+                    // Clear any existing cost texts
+                    this.costTexts.forEach(text => text.destroy());
+                    this.costTexts = [];
+                    
+                    // Position for cost texts
+                    let yOffset = this.infoContent.y + this.infoContent.height + 5;
+                    
+                    // Add each resource cost with appropriate color
                     for (const resource in building.cost) {
                         const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        content += `${resourceName}: ${building.cost[resource]}\n`;
+                        const requiredAmount = building.cost[resource];
+                        const playerAmount = this.resourceManager.getResource(resource);
+                        const hasEnough = playerAmount >= requiredAmount;
+                        
+                        // Set color based on resource availability
+                        const textColor = hasEnough ? '#ffffff' : '#ff0000';
+                        
+                        const costText = this.add.text(
+                            this.infoContent.x, 
+                            yOffset, 
+                            `${resourceName}: ${building.cost[resource]}`, 
+                            { fontSize: '14px', fontFamily: 'Arial', color: textColor }
+                        );
+                        
+                        // Store text for later cleanup
+                        this.costTexts.push(costText);
+                        
+                        yOffset += costText.height;
                     }
-                    content += "\n";
-                }
-                
-                // Production
-                if (Object.keys(building.production).length > 0) {
-                    content += "Production:\n";
-                    for (const resource in building.production) {
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        content += `${resourceName}: +${building.production[resource]}\n`;
+                    
+                    // Position for the additional content after the costs
+                    this.additionalContent = this.add.text(
+                        this.infoContent.x,
+                        yOffset + 10, // Add 10px spacing after costs
+                        "",
+                        { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 330 } }
+                    );
+                    this.costTexts.push(this.additionalContent); // Add to cost texts for cleanup
+                    
+                    // Continue with the rest of the information
+                    let additionalText = "";
+                    
+                    // Production
+                    if (Object.keys(building.production).length > 0) {
+                        additionalText += "Production:\n";
+                        for (const resource in building.production) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            additionalText += `${resourceName}: +${building.production[resource]}\n`;
+                        }
                     }
-                }
-                
-                // Consumption
-                if (Object.keys(building.consumption).length > 0) {
-                    content += "\nConsumption:\n";
-                    for (const resource in building.consumption) {
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        content += `${resourceName}: -${building.consumption[resource]}\n`;
+                    
+                    // Consumption
+                    if (Object.keys(building.consumption).length > 0) {
+                        additionalText += "\nConsumption:\n";
+                        for (const resource in building.consumption) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            additionalText += `${resourceName}: -${building.consumption[resource]}\n`;
+                        }
                     }
+                    
+                    // Set the additional content text
+                    this.additionalContent.setText(additionalText);
+                } else {
+                    // If no costs, show regular content text directly
+                    let content = building.description + "\n\n";
+                    
+                    // Production
+                    if (Object.keys(building.production).length > 0) {
+                        content += "Production:\n";
+                        for (const resource in building.production) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            content += `${resourceName}: +${building.production[resource]}\n`;
+                        }
+                    }
+                    
+                    // Consumption
+                    if (Object.keys(building.consumption).length > 0) {
+                        content += "\nConsumption:\n";
+                        for (const resource in building.consumption) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            content += `${resourceName}: -${building.consumption[resource]}\n`;
+                        }
+                    }
+                    
+                    this.infoContent.setText(content);
                 }
-                
-                this.infoContent.setText(content);
                 
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
@@ -469,40 +540,114 @@ export default class UIScene extends Phaser.Scene {
             // Construction Cost
             if (Object.keys(card.building.cost).length > 0) {
                 content += "Construction Cost:\n";
+                
+                // Create a container for the colored cost text elements
+                this.costTexts = this.costTexts || [];
+                
+                // Clear any existing cost texts
+                this.costTexts.forEach(text => text.destroy());
+                this.costTexts = [];
+                
+                // Add all other information to the main content text
+                this.infoContent.setText(card.building.description + "\n\nConstruction Cost:");
+                
+                // Position for cost texts
+                let yOffset = this.infoContent.y + this.infoContent.height + 5;
+                
+                // Add each resource cost with appropriate color
                 for (const resource in card.building.cost) {
                     const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                    content += `${resourceName}: ${card.building.cost[resource]}\n`;
+                    const requiredAmount = card.building.cost[resource];
+                    const playerAmount = this.resourceManager.getResource(resource);
+                    const hasEnough = playerAmount >= requiredAmount;
+                    
+                    // Set color based on resource availability
+                    const textColor = hasEnough ? '#ffffff' : '#ff0000';
+                    
+                    const costText = this.add.text(
+                        this.infoContent.x, 
+                        yOffset, 
+                        `${resourceName}: ${card.building.cost[resource]}`, 
+                        { fontSize: '14px', fontFamily: 'Arial', color: textColor }
+                    );
+                    
+                    // Store text for later cleanup
+                    this.costTexts.push(costText);
+                    
+                    yOffset += costText.height;
                 }
-                content += "\n";
-            }
-            
-            // Terrain requirement
-            if (card.building.terrainRequirement) {
-                const terrain = Object.values(TERRAIN_TYPES).find(t => t.id === card.building.terrainRequirement);
-                if (terrain) {
-                    content += `Requires: ${terrain.name}\n\n`;
+                
+                // Position for the additional content after the costs
+                this.additionalContent = this.add.text(
+                    this.infoContent.x,
+                    yOffset + 10, // Add 10px spacing after costs
+                    "",
+                    { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 330 } }
+                );
+                this.costTexts.push(this.additionalContent); // Add to cost texts for cleanup
+                
+                // Continue with the rest of the information
+                let additionalText = "";
+                
+                // Terrain requirement
+                if (card.building.terrainRequirement) {
+                    const terrain = Object.values(TERRAIN_TYPES).find(t => t.id === card.building.terrainRequirement);
+                    if (terrain) {
+                        additionalText += `Requires: ${terrain.name}\n\n`;
+                    }
                 }
-            }
-            
-            // Production
-            if (Object.keys(card.building.production).length > 0) {
-                content += "Production:\n";
-                for (const resource in card.building.production) {
-                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                    content += `${resourceName}: +${card.building.production[resource]}\n`;
+                
+                // Production
+                if (Object.keys(card.building.production).length > 0) {
+                    additionalText += "Production:\n";
+                    for (const resource in card.building.production) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        additionalText += `${resourceName}: +${card.building.production[resource]}\n`;
+                    }
                 }
-            }
-            
-            // Consumption
-            if (Object.keys(card.building.consumption).length > 0) {
-                content += "\nConsumption:\n";
-                for (const resource in card.building.consumption) {
-                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                    content += `${resourceName}: -${card.building.consumption[resource]}\n`;
+                
+                // Consumption
+                if (Object.keys(card.building.consumption).length > 0) {
+                    additionalText += "\nConsumption:\n";
+                    for (const resource in card.building.consumption) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        additionalText += `${resourceName}: -${card.building.consumption[resource]}\n`;
+                    }
                 }
+                
+                // Set the additional content text
+                this.additionalContent.setText(additionalText);
+            } else {
+                // If no costs, just display regular content
+                
+                // Terrain requirement
+                if (card.building.terrainRequirement) {
+                    const terrain = Object.values(TERRAIN_TYPES).find(t => t.id === card.building.terrainRequirement);
+                    if (terrain) {
+                        content += `Requires: ${terrain.name}\n\n`;
+                    }
+                }
+                
+                // Production
+                if (Object.keys(card.building.production).length > 0) {
+                    content += "Production:\n";
+                    for (const resource in card.building.production) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        content += `${resourceName}: +${card.building.production[resource]}\n`;
+                    }
+                }
+                
+                // Consumption
+                if (Object.keys(card.building.consumption).length > 0) {
+                    content += "\nConsumption:\n";
+                    for (const resource in card.building.consumption) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        content += `${resourceName}: -${card.building.consumption[resource]}\n`;
+                    }
+                }
+                
+                this.infoContent.setText(content);
             }
-            
-            this.infoContent.setText(content);
             
             // Show building sprite
             this.infoSprite.setTexture(card.building.texture);
@@ -515,6 +660,20 @@ export default class UIScene extends Phaser.Scene {
         this.infoTitle.setText('');
         this.infoContent.setText('');
         this.infoSprite.setVisible(false);
+        
+        // Also clear any cost texts if they exist
+        if (this.costTexts) {
+            this.costTexts.forEach(text => {
+                if (text) text.destroy();
+            });
+            this.costTexts = [];
+        }
+        
+        // Clear additional content separately
+        if (this.additionalContent) {
+            this.additionalContent.destroy();
+            this.additionalContent = null;
+        }
     }
     
     // Show message to the player
