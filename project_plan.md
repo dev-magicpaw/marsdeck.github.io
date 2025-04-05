@@ -62,7 +62,7 @@
 
 - **Graphics:**
   - **Kenney.nl:** Check for free space or sci-fi asset packs that fit the Mars colony theme.
-    - **Isometric desert:** https://kenney.nl/assets/sketch-desert
+    - **UI pack**: https://kenney.nl/assets/ui-pack-sci-fi
   - **OpenGameArt.org:** Search for Mars or futuristic assets suitable for the prototype.
     - **Terrain atlas:** https://opengameart.org/content/tiled-terrains
   - **Itch.io Asset Packs:** A good source for both free and low-cost assets.
