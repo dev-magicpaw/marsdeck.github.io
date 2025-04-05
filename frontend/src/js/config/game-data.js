@@ -32,7 +32,7 @@ export const TERRAIN_FEATURES = {
         id: 'metal',
         name: 'Metal Deposit',
         description: 'Rich in iron ore',
-        textures: ['ironDeposit1', 'ironDeposit2', 'ironDeposit3', 'ironDeposit4'],
+        textures: ['ironDeposit1', 'ironDeposit2', 'ironDeposit3'],
         texture: 'ironDeposit1' // Default texture for UI
     },
     WATER: {

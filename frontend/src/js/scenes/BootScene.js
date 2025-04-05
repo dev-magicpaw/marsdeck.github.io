@@ -24,7 +24,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('ironDeposit1', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_08.png'));
         this.load.image('ironDeposit2', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_09.png'));
         this.load.image('ironDeposit3', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_10.png'));
-        this.load.image('ironDeposit4', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_11.png'));
         
         // Load water texture
         this.load.image('waterDeposit', require('../../assets/images/rts_sci_fi/Environment/scifiEnvironment_06.png'));
