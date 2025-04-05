@@ -418,6 +418,16 @@ export default class UIScene extends Phaser.Scene {
                 // Building description
                 let content = building.description + "\n\n";
                 
+                // Construction Cost
+                if (Object.keys(building.cost).length > 0) {
+                    content += "Construction Cost:\n";
+                    for (const resource in building.cost) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        content += `${resourceName}: ${building.cost[resource]}\n`;
+                    }
+                    content += "\n";
+                }
+                
                 // Production
                 if (Object.keys(building.production).length > 0) {
                     content += "Production:\n";
@@ -455,6 +465,16 @@ export default class UIScene extends Phaser.Scene {
             
             // Building description
             let content = card.building.description + "\n\n";
+            
+            // Construction Cost
+            if (Object.keys(card.building.cost).length > 0) {
+                content += "Construction Cost:\n";
+                for (const resource in card.building.cost) {
+                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    content += `${resourceName}: ${card.building.cost[resource]}\n`;
+                }
+                content += "\n";
+            }
             
             // Terrain requirement
             if (card.building.terrainRequirement) {
