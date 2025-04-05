@@ -15,7 +15,7 @@ export default class ResourceManager {
         };
         
         // Resources that don't accumulate between turns (e.g., energy)
-        this.nonAccumulatingResources = [RESOURCES.ENERGY];
+        this.nonAccumulatingResources = [];
         
         // For UI updates
         this.onResourceChange = null;

@@ -56,14 +56,13 @@ export const BUILDINGS = {
         id: 'droneDepo',
         name: 'Drone Depo',
         shortName: 'Drone Depo',
-        description: 'Produces drones for construction',
+        description: 'Produces drones immediately when built',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 2
         },
         production: {
-            [RESOURCES.DRONES]: 1
+            [RESOURCES.DRONES]: 10
         },
         consumption: {},
         terrainRequirement: null, // Can be built anywhere
@@ -77,14 +76,13 @@ export const BUILDINGS = {
         cost: {
             [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1
-        },
-        production: {
-            [RESOURCES.IRON]: 2
-        },
-        consumption: {
+            [RESOURCES.DRONES]: 2,
             [RESOURCES.ENERGY]: 1
         },
+        production: {
+            [RESOURCES.IRON]: 3
+        },
+        consumption: {},
         terrainRequirement: TERRAIN_FEATURES.METAL.id,
         texture: 'ironMine'
     },
@@ -92,18 +90,18 @@ export const BUILDINGS = {
         id: 'steelworks',
         name: 'Steelworks',
         shortName: 'Steelworks',
-        description: 'Converts iron to steel',
+        description: 'Converts iron to steel each turn, requires iron',
         cost: {
             [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 2,
-            [RESOURCES.DRONES]: 1
+            [RESOURCES.DRONES]: 1,
+            [RESOURCES.ENERGY]: 3
         },
         production: {
             [RESOURCES.STEEL]: 1
         },
         consumption: {
-            [RESOURCES.IRON]: 2,
-            [RESOURCES.ENERGY]: 1
+            [RESOURCES.IRON]: 2
         },
         terrainRequirement: null,
         texture: 'steelworks'
@@ -112,18 +110,17 @@ export const BUILDINGS = {
         id: 'concreteMixer',
         name: 'Concrete Harvester',
         shortName: 'Concrete',
-        description: 'Produces concrete from regolith',
+        description: 'Produces concrete from regolith each turn',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1
-        },
-        production: {
-            [RESOURCES.CONCRETE]: 2
-        },
-        consumption: {
+            [RESOURCES.DRONES]: 3,
             [RESOURCES.ENERGY]: 1
         },
+        production: {
+            [RESOURCES.CONCRETE]: 3
+        },
+        consumption: {},
         terrainRequirement: null,
         texture: 'concreteMixer'
     },
@@ -131,18 +128,17 @@ export const BUILDINGS = {
         id: 'waterPump',
         name: 'Water Pump',
         shortName: 'Water Pump',
-        description: 'Extracts water from deposits',
+        description: 'Extracts water from deposits each turn',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1
-        },
-        production: {
-            [RESOURCES.WATER]: 2
-        },
-        consumption: {
+            [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 1
         },
+        production: {
+            [RESOURCES.WATER]: 3
+        },
+        consumption: {},
         terrainRequirement: TERRAIN_FEATURES.WATER.id,
         texture: 'waterPump'
     },
@@ -150,18 +146,18 @@ export const BUILDINGS = {
         id: 'fuelRefinery',
         name: 'Fuel Refinery',
         shortName: 'Fuel',
-        description: 'Converts water to rocket fuel',
+        description: 'Converts water to rocket fuel each turn',
         cost: {
             [RESOURCES.CONCRETE]: 3,
             [RESOURCES.STEEL]: 2,
-            [RESOURCES.DRONES]: 2
+            [RESOURCES.DRONES]: 1,
+            [RESOURCES.ENERGY]: 2
         },
         production: {
             [RESOURCES.FUEL]: 1
         },
         consumption: {
-            [RESOURCES.WATER]: 2,
-            [RESOURCES.ENERGY]: 2
+            [RESOURCES.WATER]: 2
         },
         terrainRequirement: null,
         texture: 'fuelRefinery'
@@ -170,14 +166,13 @@ export const BUILDINGS = {
         id: 'windTurbine',
         name: 'Wind Turbine',
         shortName: 'Wind',
-        description: 'Generates energy from wind',
+        description: 'Generates energy immediately when built',
         cost: {
-            [RESOURCES.CONCRETE]: 1,
-            [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1
+            [RESOURCES.CONCRETE]: 3,
+            [RESOURCES.STEEL]: 1
         },
         production: {
-            [RESOURCES.ENERGY]: 2
+            [RESOURCES.ENERGY]: 3
         },
         consumption: {},
         terrainRequirement: null,
@@ -187,14 +182,14 @@ export const BUILDINGS = {
         id: 'solarPanel',
         name: 'Solar Panels',
         shortName: 'Solar',
-        description: 'Generates energy from sunlight',
+        description: 'Generates energy immediately when built',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 1
         },
         production: {
-            [RESOURCES.ENERGY]: 2
+            [RESOURCES.ENERGY]: 3
         },
         consumption: {},
         terrainRequirement: null,
@@ -208,7 +203,7 @@ export const BUILDINGS = {
         cost: {
             [RESOURCES.CONCRETE]: 4,
             [RESOURCES.STEEL]: 3,
-            [RESOURCES.DRONES]: 2
+            [RESOURCES.DRONES]: 1
         },
         production: {
             [RESOURCES.VICTORY_POINTS]: 0 // Special case - handled by game logic
