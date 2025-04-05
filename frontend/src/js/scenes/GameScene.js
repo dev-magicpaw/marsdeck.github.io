@@ -81,10 +81,8 @@ export default class GameScene extends Phaser.Scene {
                         const textureIndex = (x + y * 3) % ironTextures.length;
                         featureTexture = ironTextures[textureIndex];
                     } else if (cell.feature === TERRAIN_FEATURES.WATER.id) {
-                        // Choose a water texture based on position
-                        const waterTextures = TERRAIN_FEATURES.WATER.textures;
-                        const textureIndex = (x + y) % waterTextures.length;
-                        featureTexture = waterTextures[textureIndex];
+                        // Use the single water texture
+                        featureTexture = TERRAIN_FEATURES.WATER.texture;
                     } else if (cell.feature === TERRAIN_FEATURES.MOUNTAIN.id) {
                         // Choose a mountain texture based on position
                         const mountainTextures = TERRAIN_FEATURES.MOUNTAIN.textures;
