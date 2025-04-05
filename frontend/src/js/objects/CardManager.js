@@ -90,6 +90,15 @@ export default class CardManager {
         return playedCard;
     }
     
+    // Get a card from hand without removing it
+    getCardFromHand(cardIndex) {
+        if (cardIndex < 0 || cardIndex >= this.hand.length) {
+            return null;
+        }
+        
+        return this.hand[cardIndex];
+    }
+    
     // Get the current hand
     getHand() {
         return [...this.hand];

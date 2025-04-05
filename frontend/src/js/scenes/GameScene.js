@@ -178,8 +178,14 @@ export default class GameScene extends Phaser.Scene {
         this.gridContainer.add(buildingSprite);
         cell.buildingSprite = buildingSprite;
         
-        // Remove card from hand (already done in UI when selecting card)
+        // Remove the card from hand now that it's actually been used
+        if (this.selectedCardIndex !== undefined) {
+            this.cardManager.playCard(this.selectedCardIndex);
+        }
+        
+        // Clear the selection
         this.selectedCard = null;
+        this.selectedCardIndex = undefined;
         
         // Update UI
         if (this.uiScene) {
@@ -201,9 +207,23 @@ export default class GameScene extends Phaser.Scene {
     
     // Select a card from hand for placement
     selectCard(cardIndex) {
-        const card = this.cardManager.playCard(cardIndex);
+        // If we already have this card selected, deselect it
+        if (this.selectedCardIndex === cardIndex && this.selectedCard !== null) {
+            this.selectedCard = null;
+            this.selectedCardIndex = undefined;
+            
+            // Clear info panel
+            if (this.uiScene) {
+                this.uiScene.clearInfoPanel();
+                this.uiScene.refreshUI();
+            }
+            return;
+        }
+        
+        const card = this.cardManager.getCardFromHand(cardIndex);
         if (card) {
             this.selectedCard = card;
+            this.selectedCardIndex = cardIndex;
             
             // Update UI to show the selected card
             if (this.uiScene) {

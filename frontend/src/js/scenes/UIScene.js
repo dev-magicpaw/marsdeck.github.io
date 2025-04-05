@@ -4,6 +4,7 @@ import { BUILDINGS, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config
 export default class UIScene extends Phaser.Scene {
     constructor() {
         super('UIScene');
+        this.selectedCardIndex = null;
     }
 
     init(data) {
@@ -227,6 +228,11 @@ export default class UIScene extends Phaser.Scene {
     
     // Refresh all UI components
     refreshUI() {
+        // Save selected card reference from game scene
+        if (this.gameScene.selectedCard === null) {
+            this.selectedCardIndex = null;
+        }
+        
         this.updateResourceDisplay();
         this.updateHandDisplay();
         this.updateTurnDisplay();
@@ -281,6 +287,13 @@ export default class UIScene extends Phaser.Scene {
         cardBg.setDisplaySize(cardWidth, cardHeight);
         cardBg.setOrigin(0, 0);
         
+        // Add highlight for selected card
+        if (index === this.selectedCardIndex) {
+            const highlight = this.add.rectangle(0, 0, cardWidth, cardHeight, 0xffff00, 0.3);
+            highlight.setOrigin(0, 0);
+            cardContainer.add(highlight);
+        }
+        
         // Make card interactive
         cardBg.setInteractive();
         cardBg.on('pointerdown', () => {
@@ -329,6 +342,9 @@ export default class UIScene extends Phaser.Scene {
     
     // Handle card click
     onCardClick(cardIndex) {
+        // Update selected card index
+        this.selectedCardIndex = cardIndex;
+        
         // Select card for placement
         this.gameScene.selectCard(cardIndex);
         
