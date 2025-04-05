@@ -73,7 +73,7 @@ export default class UIScene extends Phaser.Scene {
             mapOffset, 
             mapOffset + mapSize + verticalSpacing - margin, 
             cardsWidth + margin * 2, 
-            130 + margin * 2, 
+            150 + margin * 2,
             0x222222, 
             0.8
         ); // Cards panel
@@ -296,7 +296,7 @@ export default class UIScene extends Phaser.Scene {
     // Create a card sprite
     createCardSprite(card, index) {
         const cardWidth = 80;
-        const cardHeight = 120;
+        const cardHeight = 140;
         const cardSpacing = 5;
         const xPos = index * (cardWidth + cardSpacing);
         
