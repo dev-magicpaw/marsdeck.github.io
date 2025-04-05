@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+// Import the terrain tileset directly
+import terrainTileset from '../../assets/images/terrain.png';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -9,12 +11,14 @@ export default class BootScene extends Phaser.Scene {
         // Loading screen 
         this.createLoadingBar();
 
-        // Load assets here
-        // this.load.image('cardTemplate', 'assets/images/card_template.png');
-        // this.load.image('gridTile', 'assets/images/grid_tile.png');
-        // Placeholder assets for now
+        // Load tile spritesheet with imported path
+        this.load.spritesheet('terrain', terrainTileset, { 
+            frameWidth: 32, 
+            frameHeight: 32 
+        });
+        
+        // Load building assets (using placeholders for now, can be replaced later)
         this.load.image('cardTemplate', 'https://via.placeholder.com/120x180/888/fff?text=Card');
-        this.load.image('gridTile', 'https://via.placeholder.com/64x64/555/fff?text=Tile');
         this.load.image('ironMine', 'https://via.placeholder.com/64x64/8B4513/fff?text=Mine');
         this.load.image('droneDepo', 'https://via.placeholder.com/64x64/7CFC00/fff?text=Drone');
         this.load.image('steelworks', 'https://via.placeholder.com/64x64/B0C4DE/fff?text=Steel');
@@ -24,14 +28,11 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('windTurbine', 'https://via.placeholder.com/64x64/00FFFF/fff?text=Wind');
         this.load.image('solarPanel', 'https://via.placeholder.com/64x64/FFD700/fff?text=Solar');
         this.load.image('launchPad', 'https://via.placeholder.com/64x64/9370DB/fff?text=Rocket');
-        
-        // Terrain types
-        this.load.image('terrainMetal', 'https://via.placeholder.com/64x64/CD853F/fff?text=Metal');
-        this.load.image('terrainWater', 'https://via.placeholder.com/64x64/ADD8E6/fff?text=Water');
-        this.load.image('terrainMountain', 'https://via.placeholder.com/64x64/A0522D/fff?text=Mount');
     }
 
     create() {
+        // Debug: Log when assets are loaded
+        console.log('Assets loaded successfully');
         this.scene.start('GameScene');
     }
 

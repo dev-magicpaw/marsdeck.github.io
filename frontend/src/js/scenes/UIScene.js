@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, RESOURCES, TERRAIN_TYPES } from '../config/game-data';
+import { getTerrainTileIndex } from '../config/terrain-tiles';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -135,7 +136,8 @@ export default class UIScene extends Phaser.Scene {
         );
         
         // Create a sprite placeholder for selected entity
-        this.infoSprite = this.add.sprite(x + 175, y + 170, 'gridTile');
+        this.infoSprite = this.add.sprite(x + 175, y + 170, 'terrain', getTerrainTileIndex('PLAIN'));
+        this.infoSprite.setScale(2); // Make it twice as big for better visibility
         this.infoSprite.setVisible(false);
     }
     
@@ -348,11 +350,24 @@ export default class UIScene extends Phaser.Scene {
             this.infoTitle.setText(terrain.name);
             this.infoContent.setText(terrain.description);
             
-            // Show terrain sprite if available
-            if (terrain.texture) {
-                this.infoSprite.setTexture(terrain.texture);
-                this.infoSprite.setVisible(true);
+            // Show terrain sprite using tileset
+            let terrainType;
+            switch(terrain.id) {
+                case TERRAIN_TYPES.METAL.id:
+                    terrainType = 'METAL';
+                    break;
+                case TERRAIN_TYPES.WATER.id:
+                    terrainType = 'WATER';
+                    break;
+                case TERRAIN_TYPES.MOUNTAIN.id:
+                    terrainType = 'MOUNTAIN';
+                    break;
+                default:
+                    terrainType = 'PLAIN';
             }
+            
+            this.infoSprite.setTexture('terrain', getTerrainTileIndex(terrainType));
+            this.infoSprite.setVisible(true);
         }
         
         // If there's a building, show building info instead

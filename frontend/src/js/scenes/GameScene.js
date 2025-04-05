@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_TYPES } from '../config/game-data';
+import { getRandomTileVariant } from '../config/terrain-tiles';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -9,6 +10,7 @@ export default class GameScene extends Phaser.Scene {
         super('GameScene');
         this.selectedCard = null;
         this.currentTurn = 1;
+        this.debug = false; // Debug mode flag
     }
 
     init() {
@@ -44,6 +46,89 @@ export default class GameScene extends Phaser.Scene {
         
         // Set up input handling
         this.setupInput();
+        
+        // Setup debug keys
+        this.setupDebugKeys();
+        
+        // Log what tileset is being used
+        console.log('Using terrain tileset');
+    }
+    
+    // Setup debug keyboard controls
+    setupDebugKeys() {
+        // Toggle debug mode with D key
+        this.input.keyboard.on('keydown-D', () => {
+            this.debug = !this.debug;
+            console.log(`Debug mode: ${this.debug ? 'ON' : 'OFF'}`);
+            
+            if (this.debug) {
+                this.showTilesetDebug();
+            } else {
+                if (this.tilesetDebug) {
+                    this.tilesetDebug.destroy();
+                    this.tilesetDebug = null;
+                }
+            }
+        });
+    }
+    
+    // Show tileset debug window
+    showTilesetDebug() {
+        if (this.tilesetDebug) {
+            this.tilesetDebug.destroy();
+        }
+        
+        // Create a panel to display some of the tileset
+        this.tilesetDebug = this.add.container(10, 10);
+        
+        // Background
+        const bg = this.add.graphics();
+        bg.fillStyle(0x000000, 0.8);
+        bg.fillRect(0, 0, 256, 256);
+        this.tilesetDebug.add(bg);
+        
+        // Title
+        const title = this.add.text(
+            128, 
+            10, 
+            'Tileset Debug - Press D to hide', 
+            { fontSize: '12px', fontFamily: 'Arial', color: '#ffffff' }
+        );
+        title.setOrigin(0.5, 0);
+        this.tilesetDebug.add(title);
+        
+        // Show a selection of tiles
+        const tilesPerRow = 8;
+        for (let i = 0; i < 64; i++) {
+            const tileIndex = i;
+            const x = (i % tilesPerRow) * 32;
+            const y = Math.floor(i / tilesPerRow) * 32 + 30;
+            
+            const tile = this.add.sprite(x, y, 'terrain', tileIndex);
+            tile.setOrigin(0, 0);
+            
+            // Add tile index text
+            const indexText = this.add.text(
+                x + 16, 
+                y + 16, 
+                `${tileIndex}`, 
+                { fontSize: '8px', fontFamily: 'Arial', color: '#ffffff', backgroundColor: '#000000' }
+            );
+            indexText.setOrigin(0.5);
+            
+            this.tilesetDebug.add(tile);
+            this.tilesetDebug.add(indexText);
+        }
+        
+        // Add instructions for viewing more tiles
+        const instructions = this.add.text(
+            128, 
+            240, 
+            'First 64 tiles shown. Edit terrain-tiles.js to use different indices', 
+            { fontSize: '10px', fontFamily: 'Arial', color: '#ffffff', align: 'center', wordWrap: { width: 240 } }
+        );
+        instructions.setOrigin(0.5, 0);
+        this.tilesetDebug.add(instructions);
     }
     
     // Create the visual grid
@@ -58,27 +143,49 @@ export default class GameScene extends Phaser.Scene {
                 const yPos = y * CELL_SIZE;
                 
                 // Create cell background based on terrain
-                let terrainSprite;
-                if (cell.terrain === TERRAIN_TYPES.METAL.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMetal');
-                } else if (cell.terrain === TERRAIN_TYPES.WATER.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainWater');
-                } else if (cell.terrain === TERRAIN_TYPES.MOUNTAIN.id) {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'terrainMountain');
-                } else {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'gridTile');
+                let tileIndex;
+                
+                // Get the appropriate tile index based on terrain type
+                switch(cell.terrain) {
+                    case TERRAIN_TYPES.METAL.id:
+                        tileIndex = getRandomTileVariant('METAL');
+                        break;
+                    case TERRAIN_TYPES.WATER.id:
+                        tileIndex = getRandomTileVariant('WATER');
+                        break;
+                    case TERRAIN_TYPES.MOUNTAIN.id:
+                        tileIndex = getRandomTileVariant('MOUNTAIN');
+                        break;
+                    default: // Plain terrain
+                        tileIndex = getRandomTileVariant('PLAIN');
                 }
                 
+                // Create the terrain sprite using the frame from our tileset
+                const terrainSprite = this.add.sprite(xPos, yPos, 'terrain', tileIndex);
                 terrainSprite.setOrigin(0, 0);
+                terrainSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
                 terrainSprite.setInteractive();
                 terrainSprite.data = { x, y }; // Store grid coordinates
                 
+                // Add debug text to show tile index if in debug mode
+                const debugText = this.add.text(
+                    xPos + CELL_SIZE/2, 
+                    yPos + CELL_SIZE/2, 
+                    `${tileIndex}`, 
+                    { fontSize: '10px', fontFamily: 'Arial', color: '#ffffff', backgroundColor: '#000000' }
+                );
+                debugText.setOrigin(0.5);
+                debugText.setVisible(false); // Hidden by default
+                terrainSprite.debugText = debugText; // Store reference for toggling visibility
+                
                 this.gridContainer.add(terrainSprite);
+                this.gridContainer.add(debugText);
                 
                 // If the cell has a building, add its sprite
                 if (cell.building) {
                     const buildingSprite = this.add.sprite(xPos, yPos, cell.building);
                     buildingSprite.setOrigin(0, 0);
+                    buildingSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
                     this.gridContainer.add(buildingSprite);
                     cell.sprite = buildingSprite;
                 }
@@ -94,6 +201,12 @@ export default class GameScene extends Phaser.Scene {
             if (gameObject.data && gameObject.data.x !== undefined) {
                 const x = gameObject.data.x;
                 const y = gameObject.data.y;
+                
+                // If we're in debug mode, show tile info
+                if (this.debug && gameObject.debugText) {
+                    gameObject.debugText.setVisible(!gameObject.debugText.visible);
+                    return;
+                }
                 
                 // If we have a card selected, try to place it
                 if (this.selectedCard && this.selectedCard.type === 'building') {
@@ -143,6 +256,7 @@ export default class GameScene extends Phaser.Scene {
         const yPos = y * CELL_SIZE;
         const buildingSprite = this.add.sprite(xPos, yPos, building.texture);
         buildingSprite.setOrigin(0, 0);
+        buildingSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
         this.gridContainer.add(buildingSprite);
         cell.sprite = buildingSprite;
         
