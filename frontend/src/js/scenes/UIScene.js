@@ -277,7 +277,7 @@ export default class UIScene extends Phaser.Scene {
         const cardContainer = this.add.container(xPos, 0);
         
         // Card background
-        const cardBg = this.add.sprite(0, 0, 'cardTemplate');
+        const cardBg = this.add.sprite(0, 0, card.type === 'building' ? 'cardBackground' : 'cardTemplate');
         cardBg.setDisplaySize(cardWidth, cardHeight);
         cardBg.setOrigin(0, 0);
         
