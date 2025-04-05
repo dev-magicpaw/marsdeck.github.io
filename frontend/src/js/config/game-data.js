@@ -39,8 +39,7 @@ export const TERRAIN_FEATURES = {
         id: 'water',
         name: 'Water Deposit',
         description: 'Frozen water under the surface',
-        textures: ['waterTile1', 'waterTile2'],
-        texture: 'waterTile1' // Default texture for UI
+        texture: 'waterDeposit'
     },
     MOUNTAIN: {
         id: 'mountain',
