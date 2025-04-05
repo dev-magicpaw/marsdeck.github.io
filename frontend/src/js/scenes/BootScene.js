@@ -15,6 +15,11 @@ export default class BootScene extends Phaser.Scene {
         // Placeholder assets for now
         this.load.image('cardTemplate', 'https://via.placeholder.com/120x180/888/fff?text=Card');
         this.load.image('gridTile', 'https://via.placeholder.com/64x64/555/fff?text=Tile');
+        
+        // Load sci-fi terrain tiles
+        this.load.image('terrainPlain1', require('../../assets/images/rts_sci_fi/Tile/scifiTile_41.png'));
+        this.load.image('terrainPlain2', require('../../assets/images/rts_sci_fi/Tile/scifiTile_42.png'));
+        
         this.load.image('ironMine', 'https://via.placeholder.com/64x64/8B4513/fff?text=Mine');
         this.load.image('droneDepo', 'https://via.placeholder.com/64x64/7CFC00/fff?text=Drone');
         this.load.image('steelworks', 'https://via.placeholder.com/64x64/B0C4DE/fff?text=Steel');

@@ -21,7 +21,8 @@ export const TERRAIN_TYPES = {
     PLAIN: {
         id: 'plain',
         name: 'Plain Ground',
-        description: 'Regular Martian surface'
+        description: 'Regular Martian surface',
+        texture: 'terrainPlain1'
     },
     METAL: {
         id: 'metal',

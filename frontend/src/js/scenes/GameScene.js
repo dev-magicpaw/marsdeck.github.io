@@ -66,7 +66,9 @@ export default class GameScene extends Phaser.Scene {
                 } else if (cell.terrain === TERRAIN_TYPES.MOUNTAIN.id) {
                     terrainSprite = this.add.sprite(xPos, yPos, 'terrainMountain');
                 } else {
-                    terrainSprite = this.add.sprite(xPos, yPos, 'gridTile');
+                    // Use alternating sci-fi tiles for plain terrain to create visual variety
+                    const tileTexture = (x + y) % 2 === 0 ? 'terrainPlain1' : 'terrainPlain2';
+                    terrainSprite = this.add.sprite(xPos, yPos, tileTexture);
                 }
                 
                 terrainSprite.setOrigin(0, 0);
