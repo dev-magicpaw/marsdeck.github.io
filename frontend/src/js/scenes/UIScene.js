@@ -51,7 +51,32 @@ export default class UIScene extends Phaser.Scene {
         // Create panel backgrounds
         this.createPanel(width - 350, 0, 350, 100, 0x222222, 0.8); // Resources panel
         this.createPanel(width - 350, 110, 350, 300, 0x222222, 0.8); // Info panel
-        this.createPanel(width - 350, height - 250, 350, 250, 0x222222, 0.8); // Hand panel
+        
+        // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
+        const cardWidth = 80;
+        const cardSpacing = 5;
+        const cardsWidth = (cardWidth + cardSpacing) * 8;
+        
+        // Position cards panel under the map (map is offset at 50,50 in GameScene)
+        const mapSize = 9 * 64; // 9 tiles of 64px each
+        const mapOffset = 50;
+        
+        // Add margins around the cards panel (10px on each side)
+        const margin = 10;
+        
+        // Space between map and cards panel
+        const verticalSpacing = 20;
+        
+        // Create cards panel under the map spanning most of the width (with margin)
+        // Align left border with the game map and add vertical spacing
+        this.createPanel(
+            mapOffset, 
+            mapOffset + mapSize + verticalSpacing - margin, 
+            cardsWidth + margin * 2, 
+            130 + margin * 2, 
+            0x222222, 
+            0.8
+        ); // Cards panel
     }
     
     createPanel(x, y, width, height, color, alpha) {
@@ -141,26 +166,21 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createHandPanel() {
-        const x = this.cameras.main.width - 340;
-        const y = this.cameras.main.height - 240;
+        // Calculate position for cards panel under the map
+        const mapOffset = 50;
+        const mapSize = 9 * 64; // 9 tiles of 64px each
+        const margin = 10; // Same margin as in createLayout
+        const verticalSpacing = 20; // Same spacing as in createLayout
         
-        // Header
-        this.add.text(x, y, 'CARDS', { 
-            fontSize: '20px', 
-            fontFamily: 'Arial', 
-            color: '#ffffff'
-        });
+        // Position cards with consistent margin from the panel edges
+        // Add margin to x position to create space from the left edge of the panel
+        const x = mapOffset + margin;
+        const y = mapOffset + mapSize + verticalSpacing; // Add space between map and cards
         
         // Create container for cards
-        this.handContainer = this.add.container(x, y + 30);
+        this.handContainer = this.add.container(x, y);
         
-        // Draw deck info
-        this.deckInfo = this.add.text(
-            x, 
-            y + 210, 
-            'Deck: 0 | Discard: 0', 
-            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff' }
-        );
+        // No title or deck info as requested
     }
     
     createMessageBox() {
@@ -188,6 +208,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createEndTurnButton() {
+        // Keep the END TURN button in the bottom right corner
         const x = this.cameras.main.width - 120;
         const y = this.cameras.main.height - 30;
         
@@ -256,7 +277,6 @@ export default class UIScene extends Phaser.Scene {
         
         // Get current hand
         const hand = this.cardManager.getHand();
-        const cardCounts = this.cardManager.getCardCounts();
         
         // Draw cards
         hand.forEach((card, index) => {
@@ -264,8 +284,7 @@ export default class UIScene extends Phaser.Scene {
             this.handContainer.add(cardContainer);
         });
         
-        // Update deck info
-        this.deckInfo.setText(`Deck: ${cardCounts.deck} | Discard: ${cardCounts.discardPile}`);
+        // Deck info has been removed
     }
     
     // Update turn counter
