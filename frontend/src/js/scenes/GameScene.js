@@ -149,7 +149,9 @@ export default class GameScene extends Phaser.Scene {
                 // Create the terrain sprite using the frame from our tileset
                 const terrainSprite = this.add.sprite(xPos, yPos, 'terrain', tileIndex);
                 terrainSprite.setOrigin(0, 0);
-                terrainSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
+                // Scale sprite to fill the cell size
+                terrainSprite.displayWidth = CELL_SIZE;
+                terrainSprite.displayHeight = CELL_SIZE;
                 terrainSprite.setInteractive();
                 terrainSprite.data = { x, y }; // Store grid coordinates
                 
@@ -171,16 +173,28 @@ export default class GameScene extends Phaser.Scene {
                 if (cell.feature) {
                     let featureTexture;
                     if (cell.feature === TERRAIN_FEATURES.METAL.id) {
-                        featureTexture = 'terrainMetal';
+                        // Choose an iron deposit texture based on position to create visual variety
+                        const ironTextures = TERRAIN_FEATURES.METAL.textures;
+                        const textureIndex = (x + y * 3) % ironTextures.length;
+                        featureTexture = ironTextures[textureIndex];
                     } else if (cell.feature === TERRAIN_FEATURES.WATER.id) {
-                        featureTexture = 'terrainWater';
+                        // Choose a water texture based on position
+                        const waterTextures = TERRAIN_FEATURES.WATER.textures;
+                        const textureIndex = (x + y) % waterTextures.length;
+                        featureTexture = waterTextures[textureIndex];
                     } else if (cell.feature === TERRAIN_FEATURES.MOUNTAIN.id) {
-                        featureTexture = 'terrainMountain';
+                        // Choose a mountain texture based on position
+                        const mountainTextures = TERRAIN_FEATURES.MOUNTAIN.textures;
+                        const textureIndex = (x + y) % mountainTextures.length;
+                        featureTexture = mountainTextures[textureIndex];
                     }
                     
                     if (featureTexture) {
                         const featureSprite = this.add.sprite(xPos, yPos, featureTexture);
                         featureSprite.setOrigin(0, 0);
+                        // Scale feature sprite to fill the cell size
+                        featureSprite.displayWidth = CELL_SIZE;
+                        featureSprite.displayHeight = CELL_SIZE;
                         this.gridContainer.add(featureSprite);
                         cell.featureSprite = featureSprite;
                     }
@@ -190,7 +204,9 @@ export default class GameScene extends Phaser.Scene {
                 if (cell.building) {
                     const buildingSprite = this.add.sprite(xPos, yPos, cell.building);
                     buildingSprite.setOrigin(0, 0);
-                    buildingSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
+                    // Scale building sprite to fill the cell size
+                    buildingSprite.displayWidth = CELL_SIZE;
+                    buildingSprite.displayHeight = CELL_SIZE;
                     this.gridContainer.add(buildingSprite);
                     cell.buildingSprite = buildingSprite;
                 }
@@ -261,7 +277,9 @@ export default class GameScene extends Phaser.Scene {
         const yPos = y * CELL_SIZE;
         const buildingSprite = this.add.sprite(xPos, yPos, building.texture);
         buildingSprite.setOrigin(0, 0);
-        buildingSprite.setDisplaySize(CELL_SIZE, CELL_SIZE);
+        // Scale building sprite to fill the cell size
+        buildingSprite.displayWidth = CELL_SIZE;
+        buildingSprite.displayHeight = CELL_SIZE;
         this.gridContainer.add(buildingSprite);
         cell.buildingSprite = buildingSprite;
         
