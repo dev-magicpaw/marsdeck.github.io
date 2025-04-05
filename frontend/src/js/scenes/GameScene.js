@@ -298,6 +298,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Update UI
         if (this.uiScene) {
+            this.uiScene.clearInfoPanel();
             this.uiScene.refreshUI();
         }
     }
