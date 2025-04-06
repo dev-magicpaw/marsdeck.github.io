@@ -3,6 +3,7 @@ export const GRID_SIZE = 9; // Initial grid size (configurable)
 export const CELL_SIZE = 64; // Size of each grid cell in pixels
 export const MAX_TURNS = 30; // Game ends after this many turns
 export const MAX_HAND_SIZE = 6; // Maximum cards in hand
+export const MAX_CARD_SLOTS = 8; // Maximum slots to display in the UI
 
 // Resource types
 export const RESOURCES = {

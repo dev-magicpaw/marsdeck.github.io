@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
+import { BUILDINGS, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -88,8 +88,8 @@ export default class UIScene extends Phaser.Scene {
         // Create bottom panel with same width as right panels
         this.bottomPanelBg = this.createPanel(width - 450, height - 50, 450, 50, 0x222222, 0.8);
         
-        // Calculate card panel width for MAX_HAND_SIZE cards
-        const cardsWidth = (this.cardWidth + this.cardSpacing) * MAX_HAND_SIZE;
+        // Calculate card panel width for MAX_CARD_SLOTS cards
+        const cardsWidth = (this.cardWidth + this.cardSpacing) * MAX_CARD_SLOTS;
         
         // Position cards panel under the map (map is offset at 50,50 in GameScene)
         const mapSize = 9 * 64; // 9 tiles of 64px each
@@ -263,7 +263,7 @@ export default class UIScene extends Phaser.Scene {
         // Create container for cards
         this.handContainer = this.add.container(x, y);
         
-        // Create the initial empty card slots (MAX_HAND_SIZE slots)
+        // Create the initial empty card slots (MAX_CARD_SLOTS slots)
         this.createCardSlots();
     }
     
@@ -272,8 +272,8 @@ export default class UIScene extends Phaser.Scene {
         // Clear existing slots
         this.cardSlotsContainer.removeAll(true);
         
-        // Create slots for max hand size
-        for (let i = 0; i < MAX_HAND_SIZE; i++) {
+        // Create slots for max card slots
+        for (let i = 0; i < MAX_CARD_SLOTS; i++) {
             const xPos = i * (this.cardWidth + this.cardSpacing);
             
             // Add slot background

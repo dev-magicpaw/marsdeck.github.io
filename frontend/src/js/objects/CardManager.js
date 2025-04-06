@@ -1,4 +1,4 @@
-import { BUILDINGS, MAX_HAND_SIZE } from '../config/game-data';
+import { BUILDINGS, MAX_CARD_SLOTS } from '../config/game-data';
 
 export default class CardManager {
     constructor(scene) {
@@ -60,8 +60,8 @@ export default class CardManager {
                 this.shuffleDeck();
             }
             
-            // Check if hand size would exceed maximum
-            if (this.hand.length >= MAX_HAND_SIZE) {
+            // Check if hand size would exceed maximum slots available in UI
+            if (this.hand.length >= MAX_CARD_SLOTS) {
                 break;
             }
             
