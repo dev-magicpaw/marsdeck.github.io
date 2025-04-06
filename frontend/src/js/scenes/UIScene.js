@@ -174,6 +174,7 @@ export default class UIScene extends Phaser.Scene {
     createActionsPanel() {
         const x = this.cameras.main.width - 340;
         const y = 430;
+        
         // Header
         this.actionsTitle = this.add.text(x, y, 'ACTIONS', { 
             fontSize: '20px', 
@@ -184,8 +185,7 @@ export default class UIScene extends Phaser.Scene {
         // Container for action buttons
         this.actionsContainer = this.add.container(x, y + 30);
         
-        // Hide actions panel initially
-        this.actionsTitle.setVisible(false);
+        // Only hide the container initially, keep title visible
         this.actionsContainer.setVisible(false);
     }
     
@@ -706,8 +706,7 @@ export default class UIScene extends Phaser.Scene {
             this.additionalContent = null;
         }
         
-        // Hide actions panel
-        this.actionsTitle.setVisible(false);
+        // Only hide action buttons, not the title
         this.actionsContainer.setVisible(false);
     }
     
@@ -843,8 +842,7 @@ export default class UIScene extends Phaser.Scene {
             this.actionsContainer.add(discardButton);
         }
         
-        // Show or hide actions panel based on if there are actions
-        this.actionsTitle.setVisible(hasActions);
+        // Only toggle visibility of the container, not the title
         this.actionsContainer.setVisible(hasActions);
     }
     
