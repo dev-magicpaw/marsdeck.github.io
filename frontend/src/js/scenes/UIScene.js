@@ -110,16 +110,38 @@ export default class UIScene extends Phaser.Scene {
         const resourceTypes = Object.values(RESOURCES);
         this.resourceTexts = {};
         
-        // Create text for each resource type
-        let xOffset = 0;
-        let yOffset = 30;
+        // Custom resource display order in column-based layout
+        const displayOrder = [
+            // First column
+            RESOURCES.ENERGY,
+            RESOURCES.DRONES,
+            
+            // Second column
+            RESOURCES.IRON,
+            RESOURCES.STEEL,
+            
+            // Third column
+            RESOURCES.WATER,
+            RESOURCES.FUEL,
+            
+            // Fourth column
+            RESOURCES.CONCRETE,
+            RESOURCES.REPUTATION
+        ];
         
-        resourceTypes.forEach((resourceType, index) => {
-            // Start a new row after 4 items
-            if (index > 0 && index % 4 === 0) {
-                xOffset = 0;
-                yOffset += 25;
-            }
+        // Create text for each resource type in the specified order
+        const columns = 4;
+        const columnSpacing = 85;
+        const rowSpacing = 25;
+        
+        displayOrder.forEach((resourceType, index) => {
+            // Calculate column and row position
+            const column = Math.floor(index / 2);
+            const row = index % 2;
+            
+            // Calculate x and y offsets
+            const xOffset = column * columnSpacing;
+            const yOffset = 30 + row * rowSpacing;
             
             // Create readable label from resource type
             const label = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
@@ -130,8 +152,6 @@ export default class UIScene extends Phaser.Scene {
                 `${label}: 0`, 
                 { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff' }
             );
-            
-            xOffset += 85;
         });
         
         // Turn counter
