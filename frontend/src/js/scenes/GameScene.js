@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_HAND_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -25,6 +25,9 @@ export default class GameScene extends Phaser.Scene {
         
         // Ensure player starts with specific cards
         this.setupStartingHand();
+        
+        // Card choice options
+        this.cardChoices = [];
     }
 
     create() {
@@ -44,6 +47,11 @@ export default class GameScene extends Phaser.Scene {
         
         // Set up input handling
         this.setupInput();
+        
+        // Present initial card choice for first turn
+        this.time.delayedCall(500, () => {
+            this.showCardChoices();
+        });
     }
     
     // Create the visual grid
@@ -282,21 +290,21 @@ export default class GameScene extends Phaser.Scene {
         // Reset non-accumulating resources
         this.resourceManager.resetNonAccumulatingResources();
         
-        // Draw new cards
-        const drawnCards = this.cardManager.drawCards(2);
-        
         // Increment turn counter
         this.currentTurn++;
         
         // Check for game end condition
         if (this.currentTurn > MAX_TURNS) {
             this.gameOver();
+            return;
         }
+        
+        // Show card choices for the next turn
+        this.showCardChoices();
         
         // Update UI
         if (this.uiScene) {
             this.uiScene.refreshUI();
-            this.uiScene.showNewCards(drawnCards);
         }
     }
     
@@ -425,6 +433,67 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    // Show card choices to the player
+    showCardChoices() {
+        // Draw 3 cards as choices
+        this.cardChoices = [];
+        const numChoices = 3;
+        
+        // Get cards from the deck
+        for (let i = 0; i < numChoices; i++) {
+            if (this.cardManager.deck.length === 0) {
+                if (this.cardManager.discardPile.length === 0) {
+                    break; // No more cards
+                }
+                // Reshuffle discard pile into deck
+                this.cardManager.deck = [...this.cardManager.discardPile];
+                this.cardManager.discardPile = [];
+                this.cardManager.shuffleDeck();
+            }
+            
+            if (this.cardManager.deck.length > 0) {
+                // Draw from the end of the deck to avoid shifting indices
+                const card = this.cardManager.deck.pop();
+                this.cardChoices.push(card);
+            }
+        }
+        
+        // Show choices in UI
+        if (this.uiScene && this.cardChoices.length > 0) {
+            this.uiScene.showCardChoices(this.cardChoices);
+        }
+    }
+    
+    // Handle card choice selection
+    selectCardChoice(choiceIndex) {
+        if (choiceIndex >= 0 && choiceIndex < this.cardChoices.length) {
+            // Add the selected card to hand
+            const selectedCard = this.cardChoices[choiceIndex];
+            
+            // Add to hand if there's room
+            if (this.cardManager.hand.length < MAX_HAND_SIZE) {
+                this.cardManager.hand.push(selectedCard);
+                this.uiScene.showMessage(`Added ${selectedCard.building.name} to your hand`);
+            } else {
+                this.uiScene.showMessage("Your hand is full! Card discarded.");
+                this.cardManager.discardPile.push(selectedCard);
+            }
+            
+            // Discard the other choices
+            for (let i = 0; i < this.cardChoices.length; i++) {
+                if (i !== choiceIndex) {
+                    this.cardManager.discardPile.push(this.cardChoices[i]);
+                }
+            }
+            
+            // Clear choices
+            this.cardChoices = [];
+            
+            // Update UI
+            this.uiScene.refreshUI();
+        }
+    }
+    
     // Set up specific starting cards for the player
     setupStartingHand() {
         // Clear any cards that might be in the hand

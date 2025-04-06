@@ -35,6 +35,9 @@ export default class UIScene extends Phaser.Scene {
         // Create actions panel
         this.createActionsPanel();
         
+        // Create choice panel
+        this.createChoicePanel();
+        
         // Create hand panel
         this.createHandPanel();
         
@@ -56,6 +59,7 @@ export default class UIScene extends Phaser.Scene {
         this.createPanel(width - 350, 0, 350, 100, 0x222222, 0.8); // Resources panel
         this.createPanel(width - 350, 110, 350, 300, 0x222222, 0.8); // Info panel
         this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
+        this.createPanel(width - 350, 510, 350, 200, 0x222222, 0.8); // Choice panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
         const maxCards = 8;
@@ -186,6 +190,25 @@ export default class UIScene extends Phaser.Scene {
         
         // Only hide the container initially, keep title visible
         this.actionsContainer.setVisible(false);
+    }
+    
+    createChoicePanel() {
+        const x = this.cameras.main.width - 340;
+        const y = 520;
+        
+        // Header
+        this.choiceTitle = this.add.text(x, y, 'CHOOSE A CARD', { 
+            fontSize: '20px', 
+            fontFamily: 'Arial', 
+            color: '#ffffff'
+        });
+        
+        // Container for card choices
+        this.choiceContainer = this.add.container(x, y + 30);
+        
+        // Hide choice panel initially
+        this.choiceTitle.setVisible(false);
+        this.choiceContainer.setVisible(false);
     }
     
     createHandPanel() {
@@ -812,5 +835,101 @@ export default class UIScene extends Phaser.Scene {
         button.on('pointerdown', callback);
         
         return button;
+    }
+    
+    // Show card choices for player selection
+    showCardChoices(cards) {
+        // Clear any previous choices
+        this.choiceContainer.removeAll(true);
+        
+        if (cards.length === 0) {
+            this.choiceTitle.setVisible(false);
+            this.choiceContainer.setVisible(false);
+            return;
+        }
+        
+        // Show title
+        this.choiceTitle.setVisible(true);
+        this.choiceContainer.setVisible(true);
+        
+        // Create mini card displays - use same dimensions as hand cards
+        const cardWidth = 80;  // Same as in createCardSprite
+        const cardHeight = 140; // Same as in createCardSprite
+        const cardSpacing = 5;  // Same spacing as hand cards
+        
+        cards.forEach((card, index) => {
+            const xPos = index * (cardWidth + cardSpacing);
+            
+            // Create card container
+            const cardContainer = this.add.container(xPos, 0);
+            
+            // Card background
+            const cardBg = this.add.sprite(0, 0, 'cardBackground');
+            cardBg.setDisplaySize(cardWidth, cardHeight);
+            cardBg.setOrigin(0, 0);
+            cardContainer.add(cardBg);
+            
+            // Make card interactive
+            cardBg.setInteractive();
+            cardBg.on('pointerdown', () => {
+                this.onCardChoiceClick(index);
+            });
+            
+            // Card content (if it's a building card)
+            if (card.type === 'building') {
+                // Building name
+                const nameText = this.add.text(
+                    cardWidth / 2, 
+                    10, 
+                    card.building.shortName, 
+                    { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
+                );
+                nameText.setOrigin(0.5, 0);
+                cardContainer.add(nameText);
+                
+                // Building icon
+                const icon = this.add.sprite(cardWidth / 2, 45, card.building.texture);
+                icon.setDisplaySize(40, 40); // Match the size in hand cards
+                icon.setOrigin(0.5);
+                cardContainer.add(icon);
+                
+                // Cost text
+                let costY = 75; // Adjusted to match hand cards
+                for (const resource in card.building.cost) {
+                    if (card.building.cost[resource] > 0) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        
+                        // Check if player has enough of this resource
+                        const requiredAmount = card.building.cost[resource];
+                        const playerAmount = this.resourceManager.getResource(resource);
+                        const hasEnough = playerAmount >= requiredAmount;
+                        
+                        // Set color based on resource availability
+                        const textColor = hasEnough ? '#000000' : '#ff0000';
+                        
+                        const costText = this.add.text(
+                            5, 
+                            costY, 
+                            `${resourceName}: ${card.building.cost[resource]}`, 
+                            { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                        );
+                        cardContainer.add(costText);
+                        costY += 12;
+                    }
+                }
+            }
+            
+            this.choiceContainer.add(cardContainer);
+        });
+    }
+    
+    // Handle card choice click
+    onCardChoiceClick(choiceIndex) {
+        // Tell the game scene which card was chosen
+        this.gameScene.selectCardChoice(choiceIndex);
+        
+        // Hide the choice panel
+        this.choiceTitle.setVisible(false);
+        this.choiceContainer.setVisible(false);
     }
 } 
