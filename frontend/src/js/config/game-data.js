@@ -229,5 +229,16 @@ export const BUILDINGS = {
         consumption: {},
         terrainRequirement: null,
         texture: 'launchPadSurrounding' // Now using its own unique texture
+    },
+    WIND_TURBINE_SURROUNDING: {
+        id: 'windTurbineSurrounding',
+        name: 'Wind Turbine Surrounding',
+        shortName: 'Wind Area',
+        description: 'Part of the wind turbine area, cannot be built on',
+        cost: {}, // No cost as it's placed automatically
+        production: {},
+        consumption: {},
+        terrainRequirement: null,
+        texture: 'windTurbineSurrounding'
     }
 }; 

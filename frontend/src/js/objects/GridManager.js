@@ -122,6 +122,19 @@ export default class GridManager {
             }
         }
         
+        // Special case for Wind Turbine - check adjacent tiles
+        if (building.id === 'windTurbine') {
+            // Get all adjacent cells
+            const adjacentCells = this.getAdjacentCells(x, y);
+            
+            // Check if any adjacent cell has a mountain or building
+            for (const adjCell of adjacentCells) {
+                if (adjCell.feature === TERRAIN_FEATURES.MOUNTAIN.id || adjCell.building) {
+                    return false; // Can't place if adjacent to mountain or building
+                }
+            }
+        }
+        
         return true;
     }
     
