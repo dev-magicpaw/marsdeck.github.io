@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
+import { BUILDINGS, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES, VICTORY_GOAL } from '../config/game-data';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -344,11 +344,11 @@ export default class UIScene extends Phaser.Scene {
         const margin = 20;
         const panelX = width - panelWidth;
         
-        // Create reputation display
+        // Create reputation display with goal
         const reputationText = this.add.text(
             panelX + margin, 
             height - panelHeight/2, 
-            `Reputation: 0`, 
+            `Reputation: 0/${VICTORY_GOAL}`, 
             { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
         );
         reputationText.setOrigin(0, 0.5);
@@ -455,7 +455,13 @@ export default class UIScene extends Phaser.Scene {
         // Update each resource text
         for (const resourceType in this.resourceTexts) {
             const label = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
-            this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}`);
+            
+            // Special formatting for reputation to show the goal
+            if (resourceType === RESOURCES.REPUTATION) {
+                this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}/${VICTORY_GOAL}`);
+            } else {
+                this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}`);
+            }
         }
     }
     
@@ -926,6 +932,88 @@ export default class UIScene extends Phaser.Scene {
         });
     }
     
+    // Show victory screen when player reaches reputation goal
+    showVictory(reputation, goal) {
+        // Clear existing UI
+        this.handContainer.removeAll(true);
+        
+        // Create victory panel
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        const panel = this.add.graphics();
+        panel.fillStyle(0x000066, 0.8);  // Blue background for victory
+        panel.fillRect(width / 2 - 200, height / 2 - 150, 400, 300);
+        
+        // Title
+        this.add.text(
+            width / 2, 
+            height / 2 - 120, 
+            'VICTORY!', 
+            { fontSize: '36px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Score info
+        this.add.text(
+            width / 2, 
+            height / 2 - 50, 
+            `You've reached the reputation goal!`, 
+            { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        this.add.text(
+            width / 2, 
+            height / 2 - 10, 
+            `Reputation: ${reputation}/${goal}`, 
+            { fontSize: '24px', fontFamily: 'Arial', color: '#ffff00', align: 'center' }
+        ).setOrigin(0.5);
+        
+        this.add.text(
+            width / 2, 
+            height / 2 + 40, 
+            'Your Mars colony is thriving!', 
+            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Restart button
+        const restartButton = this.add.container(width / 2, height / 2 + 100);
+        
+        const buttonBg = this.add.graphics();
+        buttonBg.fillStyle(0x0066cc, 1);  // Blue button for victory
+        buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+        
+        const buttonText = this.add.text(
+            0, 
+            0, 
+            'PLAY AGAIN', 
+            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        restartButton.add(buttonBg);
+        restartButton.add(buttonText);
+        
+        restartButton.setInteractive(new Phaser.Geom.Rectangle(-75, -20, 150, 40), Phaser.Geom.Rectangle.Contains);
+        
+        restartButton.on('pointerdown', () => {
+            // Restart the game
+            this.scene.stop('UIScene');
+            this.scene.stop('GameScene');
+            this.scene.start('GameScene');
+        });
+        
+        restartButton.on('pointerover', () => {
+            buttonBg.clear();
+            buttonBg.fillStyle(0x0099ff, 1);
+            buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+        });
+        
+        restartButton.on('pointerout', () => {
+            buttonBg.clear();
+            buttonBg.fillStyle(0x0066cc, 1);
+            buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+        });
+    }
+    
     // Update the actions panel based on selected entity
     updateActionsPanel() {
         // Clear existing buttons
@@ -1048,9 +1136,6 @@ export default class UIScene extends Phaser.Scene {
     createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30) {
         const button = this.add.container(0, 0);
         
-        // Button background
-        const bg = this.add.graphics();
-        bg.fillStyle(0x666666, 1); // Gray color for disabled button
         bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         button.add(bg);
         

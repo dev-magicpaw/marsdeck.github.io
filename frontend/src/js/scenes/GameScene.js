@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -767,6 +767,23 @@ export default class GameScene extends Phaser.Scene {
         // Show game over screen in UI
         if (this.uiScene) {
             this.uiScene.showGameOver(finalScore, reputation, bonusPoints);
+        }
+    }
+    
+    // Player victory when reputation goal is reached
+    playerVictory() {
+        // Get current reputation
+        const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+        
+        // Stop game input
+        this.input.enabled = false;
+        
+        // Show victory message
+        this.uiScene.showMessage(`VICTORY! You've reached ${reputation} reputation points`);
+        
+        // Show victory screen
+        if (this.uiScene) {
+            this.uiScene.showVictory(reputation, VICTORY_GOAL);
         }
     }
 
