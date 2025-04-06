@@ -401,8 +401,11 @@ export default class GameScene extends Phaser.Scene {
                             const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
                             cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
                             cell.rocketSprite.setOrigin(0.5, 0.5);
-                            cell.rocketSprite.displayWidth = CELL_SIZE * 0.7;
-                            cell.rocketSprite.displayHeight = CELL_SIZE * 0.7;
+                            
+                            // Scale rocket proportionally to fit in the cell
+                            const rocketScale = (CELL_SIZE * 0.7) / Math.max(cell.rocketSprite.width, cell.rocketSprite.height);
+                            cell.rocketSprite.setScale(rocketScale);
+                            
                             this.gridContainer.add(cell.rocketSprite);
                         } else {
                             // Update existing sprite
@@ -437,17 +440,22 @@ export default class GameScene extends Phaser.Scene {
         // Create landing animation sprite starting from above
         const landingAnimation = this.add.sprite(xPos, yPos - 300, 'rocketInFlight');
         landingAnimation.setOrigin(0.5, 0.5);
-        landingAnimation.displayWidth = CELL_SIZE * 0.1; // Start small
-        landingAnimation.displayHeight = CELL_SIZE * 0.1;
+        
+        // Scale rocket proportionally to start small
+        const startScale = (CELL_SIZE * 0.1) / Math.max(landingAnimation.width, landingAnimation.height);
+        landingAnimation.setScale(startScale);
+        
         landingAnimation.setAlpha(0.2); // Start faded
         this.gridContainer.add(landingAnimation);
+        
+        // Calculate end scale for the landing animation
+        const endScale = (CELL_SIZE * 0.7) / Math.max(landingAnimation.width, landingAnimation.height);
         
         // Create landing animation (reverse of launch)
         this.tweens.add({
             targets: landingAnimation,
             y: yPos,
-            scaleX: 0.7,  // End at normal size
-            scaleY: 0.7,
+            scale: endScale,  // End at normal scale
             alpha: 1,  // Fully visible at end
             duration: 1500,
             ease: 'Cubic.easeIn',
@@ -464,8 +472,11 @@ export default class GameScene extends Phaser.Scene {
                     const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
                     cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
                     cell.rocketSprite.setOrigin(0.5, 0.5);
-                    cell.rocketSprite.displayWidth = CELL_SIZE * 0.7;
-                    cell.rocketSprite.displayHeight = CELL_SIZE * 0.7;
+                    
+                    // Scale rocket proportionally
+                    const rocketScale = (CELL_SIZE * 0.7) / Math.max(cell.rocketSprite.width, cell.rocketSprite.height);
+                    cell.rocketSprite.setScale(rocketScale);
+                    
                     this.gridContainer.add(cell.rocketSprite);
                 }
                 
@@ -525,8 +536,7 @@ export default class GameScene extends Phaser.Scene {
             const rocketSprite = cell.rocketSprite;
             const launchAnimation = this.add.sprite(rocketSprite.x, rocketSprite.y, 'rocketInFlight');
             launchAnimation.setOrigin(0.5, 0.5);
-            launchAnimation.displayWidth = rocketSprite.displayWidth;
-            launchAnimation.displayHeight = rocketSprite.displayHeight;
+            launchAnimation.setScale(rocketSprite.scaleX, rocketSprite.scaleY);
             this.gridContainer.add(launchAnimation);
             
             // Hide the original sprite
@@ -536,8 +546,7 @@ export default class GameScene extends Phaser.Scene {
             this.tweens.add({
                 targets: launchAnimation,
                 y: rocketSprite.y - 300,
-                scaleX: 0.1,
-                scaleY: 0.1,
+                scale: rocketSprite.scaleX * 0.1, // Shrink to 10% of original size
                 alpha: 0,
                 duration: 1500,
                 ease: 'Cubic.easeOut',
