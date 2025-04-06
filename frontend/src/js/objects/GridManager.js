@@ -7,6 +7,9 @@ export default class GridManager {
         this.cellSize = CELL_SIZE;
         this.grid = [];
         
+        // Track rockets in flight and their return timers
+        this.rocketsInFlight = [];
+        
         // Initialize the grid with empty cells
         this.initializeGrid();
     }
@@ -27,7 +30,10 @@ export default class GridManager {
                     building: null, // No building initially
                     terrainSprite: null, // Sprite for terrain
                     featureSprite: null, // Sprite for terrain feature
-                    buildingSprite: null // Sprite for building
+                    buildingSprite: null, // Sprite for building
+                    rocketSprite: null, // Sprite for rocket
+                    hasRocket: false, // Whether this cell has a rocket
+                    rocketState: null // State of the rocket (null, 'unfueled', 'fueled', 'in-flight')
                 });
             }
             this.grid.push(row);
@@ -155,7 +161,91 @@ export default class GridManager {
         }
         
         this.grid[y][x].building = building.id;
+        
+        // If this is a launch pad, add a rocket to it
+        if (building.id === 'launchPad') {
+            this.grid[y][x].hasRocket = true;
+            this.updateRocketState(x, y);
+        }
+        
         return true;
+    }
+    
+    // Update the rocket state based on available resources
+    updateRocketState(x, y) {
+        const cell = this.getCell(x, y);
+        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket) {
+            return;
+        }
+        
+        // Check if player has enough resources for launch
+        if (this.scene.resourceManager.hasSufficientResources(this.scene.launchCost)) {
+            cell.rocketState = 'fueled';
+        } else {
+            cell.rocketState = 'unfueled';
+        }
+    }
+    
+    // Launch a rocket from a launch pad
+    launchRocket(x, y) {
+        const cell = this.getCell(x, y);
+        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket || cell.rocketState !== 'fueled') {
+            return false;
+        }
+        
+        // Add to rockets in flight with return timer
+        this.rocketsInFlight.push({
+            x: x,
+            y: y,
+            returnsAtTurn: this.scene.currentTurn + 1 // Returns after next full turn
+        });
+        
+        // Update cell state
+        cell.hasRocket = false;
+        cell.rocketState = null;
+        
+        return true;
+    }
+    
+    // Process end of turn for rockets in flight
+    processRocketReturns() {
+        const returningRockets = [];
+        
+        // Find rockets that should return this turn
+        for (let i = 0; i < this.rocketsInFlight.length; i++) {
+            if (this.rocketsInFlight[i].returnsAtTurn === this.scene.currentTurn) {
+                returningRockets.push(this.rocketsInFlight[i]);
+                this.rocketsInFlight.splice(i, 1);
+                i--; // Adjust index after removal
+            }
+        }
+        
+        // Return rockets to launch pads
+        for (const rocket of returningRockets) {
+            const cell = this.getCell(rocket.x, rocket.y);
+            if (cell && cell.building === 'launchPad') {
+                cell.hasRocket = true;
+                this.updateRocketState(rocket.x, rocket.y);
+            }
+        }
+        
+        return returningRockets.length; // Return number of rockets that landed
+    }
+    
+    // Get all launch pads with rockets ready for launch
+    getLaunchReadyPads() {
+        const readyPads = [];
+        
+        for (let y = 0; y < this.gridSize; y++) {
+            for (let x = 0; x < this.gridSize; x++) {
+                const cell = this.grid[y][x];
+                if (cell.building === 'launchPad' && cell.hasRocket && cell.rocketState === 'fueled') {
+                    readyPads.push({ x, y });
+                }
+            }
+        }
+        
+        return readyPads;
     }
     
     // Remove a building from a cell

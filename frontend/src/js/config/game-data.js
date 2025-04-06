@@ -199,7 +199,7 @@ export const BUILDINGS = {
         id: 'launchPad',
         name: 'Launch Pad',
         shortName: 'Launcher',
-        description: 'Allows rocket launches for reputation',
+        description: 'Allows manual rocket launches for reputation. Rockets return after 1 turn.',
         cost: {
             [RESOURCES.CONCRETE]: 4,
             [RESOURCES.STEEL]: 3,
@@ -210,7 +210,14 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'launchPad'
+        texture: 'launchPad',
+        // Rocket launch costs
+        launchCost: {
+            [RESOURCES.FUEL]: 10,
+            [RESOURCES.STEEL]: 10
+        },
+        // Reputation earned per launch
+        launchReward: 10
     },
     LAUNCH_PAD_SURROUNDING: {
         id: 'launchPadSurrounding',

@@ -458,7 +458,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Show cell info in the info panel
-    showCellInfo(cell) {
+    showCellInfo(cell, gameScene) {
         // Clear current info
         this.clearInfoPanel();
         
@@ -504,6 +504,21 @@ export default class UIScene extends Phaser.Scene {
                 // Set the content to just the building description without construction cost
                 let content = building.description + "\n\n";
                 
+                // Special info for Launch Pad
+                if (building.id === 'launchPad') {
+                    if (cell.hasRocket) {
+                        if (cell.rocketState === 'fueled') {
+                            content += "Status: Rocket fueled and ready for launch\n";
+                            content += `Launch Cost: ${building.launchCost[RESOURCES.FUEL]} Fuel, ${building.launchCost[RESOURCES.STEEL]} Steel\n`;
+                            content += `Reward: +${building.launchReward} Reputation\n\n`;
+                        } else {
+                            content += "Status: Rocket needs fuel for launch\n\n";
+                        }
+                    } else {
+                        content += "Status: Rocket in flight (returns next turn)\n\n";
+                    }
+                }
+                
                 // Production
                 if (Object.keys(building.production).length > 0) {
                     content += "Production:\n";
@@ -527,6 +542,12 @@ export default class UIScene extends Phaser.Scene {
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
                 this.infoSprite.setVisible(true);
+                
+                // Store selected cell for actions
+                this.selectedCell = cell;
+                
+                // Update actions for this building (like launch for launch pad)
+                this.updateActionsPanel();
             }
         }
     }
@@ -668,6 +689,7 @@ export default class UIScene extends Phaser.Scene {
         this.infoTitle.setText('');
         this.infoContent.setText('');
         this.infoSprite.setVisible(false);
+        this.selectedCell = null;
         
         // Also clear any cost texts if they exist
         if (this.costTexts) {
@@ -821,6 +843,34 @@ export default class UIScene extends Phaser.Scene {
             
             this.actionsContainer.add(discardButton);
         }
+        // If we have a selected Launch Pad with a rocket, show launch action
+        else if (this.selectedCell && 
+                 this.selectedCell.building === 'launchPad' && 
+                 this.selectedCell.hasRocket) {
+            hasActions = true;
+            
+            // Check if the rocket is fueled
+            const isFueled = this.selectedCell.rocketState === 'fueled';
+            
+            // Create launch button (enabled or disabled based on state)
+            if (isFueled) {
+                // Enabled launch button
+                const launchButton = this.createActionButton('Launch', () => {
+                    // Launch rocket from the launch pad
+                    this.gameScene.launchRocket(this.selectedCell.x, this.selectedCell.y);
+                    
+                    // Clear selection and refresh UI
+                    this.clearInfoPanel();
+                    this.refreshUI();
+                }, 0x0066cc); // Blue color for launch button
+                
+                this.actionsContainer.add(launchButton);
+            } else {
+                // Disabled launch button
+                const launchButton = this.createDisabledButton('Launch', 'Need fuel to launch rocket');
+                this.actionsContainer.add(launchButton);
+            }
+        }
         
         // Only toggle visibility of the container, not the title
         this.actionsContainer.setVisible(hasActions);
@@ -869,6 +919,92 @@ export default class UIScene extends Phaser.Scene {
         button.on('pointerdown', callback);
         
         return button;
+    }
+    
+    // Helper to create disabled action buttons
+    createDisabledButton(text, tooltipText) {
+        const buttonWidth = 100;
+        const buttonHeight = 30;
+        
+        const button = this.add.container(0, 0);
+        
+        // Button background
+        const bg = this.add.graphics();
+        bg.fillStyle(0x666666, 1); // Gray color for disabled button
+        bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        button.add(bg);
+        
+        // Button text
+        const buttonText = this.add.text(
+            buttonWidth / 2, 
+            buttonHeight / 2, 
+            text, 
+            { fontSize: '14px', fontFamily: 'Arial', color: '#aaaaaa', align: 'center' }
+        );
+        buttonText.setOrigin(0.5);
+        button.add(buttonText);
+        
+        // Make button interactive for tooltip only
+        button.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effect to show tooltip
+        button.on('pointerover', () => {
+            this.showTooltip(tooltipText, button.x + buttonWidth / 2, button.y - 5);
+        });
+        
+        button.on('pointerout', () => {
+            this.hideTooltip();
+        });
+        
+        return button;
+    }
+    
+    // Show tooltip
+    showTooltip(text, x, y) {
+        // Remove any existing tooltip
+        this.hideTooltip();
+        
+        // Create tooltip container
+        this.tooltip = this.add.container(x, y);
+        
+        // Background
+        const tooltipBg = this.add.graphics();
+        tooltipBg.fillStyle(0x000000, 0.8);
+        
+        // Text
+        const tooltipText = this.add.text(
+            0, 
+            0, 
+            text, 
+            { fontSize: '12px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        );
+        tooltipText.setOrigin(0.5, 1);
+        
+        // Calculate background size based on text
+        const padding = 5;
+        const width = tooltipText.width + padding * 2;
+        const height = tooltipText.height + padding * 2;
+        
+        // Draw background
+        tooltipBg.fillRoundedRect(-width/2, -height, width, height, 3);
+        
+        // Add to container
+        this.tooltip.add(tooltipBg);
+        this.tooltip.add(tooltipText);
+        
+        // Add to scene
+        this.add.existing(this.tooltip);
+        
+        // Make sure tooltip is on top
+        this.tooltip.setDepth(1000);
+    }
+    
+    // Hide tooltip
+    hideTooltip() {
+        if (this.tooltip) {
+            this.tooltip.destroy();
+            this.tooltip = null;
+        }
     }
     
     // Show card choices for player selection
