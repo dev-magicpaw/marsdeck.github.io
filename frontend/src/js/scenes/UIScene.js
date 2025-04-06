@@ -56,10 +56,10 @@ export default class UIScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         
         // Create panel backgrounds
-        this.createPanel(width - 350, 0, 350, 100, 0x222222, 0.8); // Resources panel
-        this.createPanel(width - 350, 110, 350, 300, 0x222222, 0.8); // Info panel
-        this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
-        this.choicePanelBg = this.createPanel(width - 350, 510, 350, 200, 0x222222, 0.8); // Choice panel
+        this.createPanel(width - 450, 0, 450, 100, 0x222222, 0.8); // Resources panel
+        this.createPanel(width - 450, 110, 450, 300, 0x222222, 0.8); // Info panel
+        this.createPanel(width - 450, 420, 450, 80, 0x222222, 0.8); // Actions panel
+        this.choicePanelBg = this.createPanel(width - 450, 510, 450, 200, 0x222222, 0.8); // Choice panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
         const maxCards = 8;
@@ -96,7 +96,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createResourcesPanel() {
-        const x = this.cameras.main.width - 340;
+        const x = this.cameras.main.width - 440;
         const y = 10;
         
         // Header
@@ -131,7 +131,7 @@ export default class UIScene extends Phaser.Scene {
         
         // Create text for each resource type in the specified order
         const columns = 4;
-        const columnSpacing = 85;
+        const columnSpacing = 105; // Increased spacing for wider panel
         const rowSpacing = 25;
         
         displayOrder.forEach((resourceType, index) => {
@@ -156,7 +156,7 @@ export default class UIScene extends Phaser.Scene {
         
         // Turn counter
         this.turnText = this.add.text(
-            x + 260, 
+            x + 360, 
             y, 
             `Turn: 1`, 
             { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
@@ -164,7 +164,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createInfoPanel() {
-        const x = this.cameras.main.width - 340;
+        const x = this.cameras.main.width - 440;
         const y = 120;
         
         // Header
@@ -186,17 +186,16 @@ export default class UIScene extends Phaser.Scene {
             x, 
             y + 55, 
             '', 
-            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 330 } }
+            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 430 } }
         );
         
         // Create a sprite placeholder for selected entity
-        this.infoSprite = this.add.sprite(x + 175, y + 170, 'terrain', getTerrainTileIndex('PLAIN'));
-        this.infoSprite.setScale(2); // Make it twice as big for better visibility
+        this.infoSprite = this.add.sprite(x + 225, y + 170, 'gridTile');
         this.infoSprite.setVisible(false);
     }
     
     createActionsPanel() {
-        const x = this.cameras.main.width - 340;
+        const x = this.cameras.main.width - 440;
         const y = 430;
         
         // Header
@@ -214,7 +213,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createChoicePanel() {
-        const x = this.cameras.main.width - 340;
+        const x = this.cameras.main.width - 440;
         const y = 520;
         
         // Header
