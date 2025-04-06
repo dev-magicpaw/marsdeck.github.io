@@ -1081,7 +1081,7 @@ export default class UIScene extends Phaser.Scene {
                 this.actionsContainer.add(launchButton);
             } else {
                 // Disabled launch button
-                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 180, 45);
+                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 250, 30);
                 this.actionsContainer.add(launchButton);
             }
         }
