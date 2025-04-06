@@ -1030,10 +1030,11 @@ export default class UIScene extends Phaser.Scene {
                 // Discard the selected card
                 this.cardManager.discardCard(this.selectedCardIndex);
                 
-                // Clear selection
+                // Clear selection and illegal tile shading
                 this.selectedCardIndex = null;
                 this.gameScene.selectedCard = null;
                 this.gameScene.selectedCardIndex = undefined;
+                this.gameScene.clearIllegalTileShading();
                 
                 // Update UI
                 this.clearInfoPanel();
