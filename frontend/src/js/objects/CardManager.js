@@ -18,8 +18,8 @@ export default class CardManager {
         
         // Add multiple copies of each building
         Object.values(BUILDINGS).forEach(building => {
-            // Skip the Launch Pad Surrounding - it should only be placed automatically
-            if (building.id === 'launchPadSurrounding') {
+            // Skip buildings that shouldn't have cards created for them
+            if (!building.createCard) {
                 return;
             }
             
