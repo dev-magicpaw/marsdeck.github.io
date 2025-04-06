@@ -364,24 +364,25 @@ export default class UIScene extends Phaser.Scene {
         this.turnText.setOrigin(0.5, 0.5);
         
         // Create end turn button
-        const buttonWidth = 100;
-        const buttonHeight = 30;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
         
-        const button = this.add.graphics();
-        button.fillStyle(0x0066cc, 1);
-        button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        // Create end turn button using the texture
+        const buttonBg = this.add.sprite(0, 0, 'endTurnButton');
+        buttonBg.setDisplaySize(buttonWidth, buttonHeight);
+        buttonBg.setOrigin(0, 0);
         
         const buttonText = this.add.text(
             buttonWidth / 2, 
             buttonHeight / 2, 
             'END TURN', 
-            { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
+            { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
         );
         buttonText.setOrigin(0.5);
         
         this.endTurnButton = this.add.container(panelX + panelWidth - buttonWidth - margin, height - panelHeight/2);
         this.endTurnButton.setY(this.endTurnButton.y - buttonHeight/2); // Center vertically
-        this.endTurnButton.add(button);
+        this.endTurnButton.add(buttonBg);
         this.endTurnButton.add(buttonText);
         
         this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
@@ -391,19 +392,15 @@ export default class UIScene extends Phaser.Scene {
         });
         
         this.endTurnButton.on('pointerover', () => {
-            button.clear();
-            button.fillStyle(0x0088ff, 1); // Lighter blue for hover
-            button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            buttonBg.setTint(0xaaccff); // Light blue tint for hover
         });
         
         this.endTurnButton.on('pointerout', () => {
-            button.clear();
-            button.fillStyle(0x0066cc, 1); // Back to blue
-            button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            buttonBg.clearTint(); // Clear tint on pointer out
         });
         
-        // Store the button graphics for enabling/disabling
-        this.endTurnButtonGraphics = button;
+        // Store the button background for enabling/disabling
+        this.endTurnButtonBg = buttonBg;
         
         // Initial button state check
         this.updateEndTurnButton();
@@ -413,24 +410,20 @@ export default class UIScene extends Phaser.Scene {
     updateEndTurnButton() {
         const handSize = this.cardManager.getHand().length;
         const isOverLimit = handSize > MAX_HAND_SIZE;
-        const buttonWidth = 100;
-        const buttonHeight = 30;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
         
         if (isOverLimit) {
             // Disable button
             this.endTurnButton.disableInteractive();
-            this.endTurnButtonGraphics.clear();
-            this.endTurnButtonGraphics.fillStyle(0x666666, 1); // Gray when disabled
-            this.endTurnButtonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            this.endTurnButtonBg.setTint(0x666666); // Gray tint when disabled
             
             // Show message to inform player
             this.showMessage(`Hand over limit! Discard ${handSize - MAX_HAND_SIZE} card(s)`);
         } else {
             // Enable button
             this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
-            this.endTurnButtonGraphics.clear();
-            this.endTurnButtonGraphics.fillStyle(0x0066cc, 1); // Blue when enabled
-            this.endTurnButtonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            this.endTurnButtonBg.clearTint(); // Clear any tint
         }
     }
     
