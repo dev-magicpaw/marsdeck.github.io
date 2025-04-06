@@ -275,6 +275,35 @@ export default class GameScene extends Phaser.Scene {
             this.refreshRocketSprites();
         }
         
+        // Special case for Wind Turbine - place surrounding buildings
+        if (building.id === 'windTurbine') {
+            const adjacentCells = this.gridManager.getAdjacentCells(x, y);
+            const surroundingBuilding = BUILDINGS.WIND_TURBINE_SURROUNDING;
+            
+            // Place surroundings on all adjacent cells
+            for (const adjCell of adjacentCells) {
+                // Remove feature sprite if it exists (surrounding buildings never require features)
+                if (adjCell.featureSprite) {
+                    adjCell.featureSprite.destroy();
+                    adjCell.featureSprite = null;
+                }
+                
+                // Place the surrounding building 
+                this.gridManager.placeBuilding(adjCell.x, adjCell.y, surroundingBuilding);
+                
+                // Add surrounding building sprite
+                const surroundingXPos = adjCell.x * CELL_SIZE;
+                const surroundingYPos = adjCell.y * CELL_SIZE;
+                const surroundingSprite = this.add.sprite(surroundingXPos, surroundingYPos, surroundingBuilding.texture);
+                surroundingSprite.setOrigin(0, 0);
+                surroundingSprite.displayWidth = CELL_SIZE;
+                surroundingSprite.displayHeight = CELL_SIZE;
+                surroundingSprite.setAlpha(0.7); // Make it slightly transparent to distinguish it
+                this.gridContainer.add(surroundingSprite);
+                adjCell.buildingSprite = surroundingSprite;
+            }
+        }
+        
         // Immediate production for certain buildings
         if (building.id === 'droneDepo' || building.id === 'solarPanel' || building.id === 'windTurbine') {
             for (const resource in building.production) {
