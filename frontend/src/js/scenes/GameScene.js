@@ -9,6 +9,7 @@ export default class GameScene extends Phaser.Scene {
         super('GameScene');
         this.selectedCard = null;
         this.currentTurn = 1;
+        this.illegalTileSprites = []; // Store references to illegal tile shading sprites
     }
 
     init() {
@@ -186,6 +187,9 @@ export default class GameScene extends Phaser.Scene {
         if (this.selectedCard !== null) {
             this.selectedCard = null;
             this.selectedCardIndex = undefined;
+            
+            // Clear illegal tile shading
+            this.clearIllegalTileShading();
         }
         
         // Clear info panel and refresh UI regardless of what was selected
@@ -321,9 +325,10 @@ export default class GameScene extends Phaser.Scene {
             this.cardManager.playCard(this.selectedCardIndex);
         }
         
-        // Clear the selection
+        // Clear the selection and illegal tile shading
         this.selectedCard = null;
         this.selectedCardIndex = undefined;
+        this.clearIllegalTileShading();
         
         // Update UI
         if (this.uiScene) {
@@ -346,6 +351,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Select a card from hand for placement
     selectCard(cardIndex) {
+        // Clear any existing illegal tile shading
+        this.clearIllegalTileShading();
+        
         // If we already have this card selected, deselect it
         if (this.selectedCardIndex === cardIndex && this.selectedCard !== null) {
             this.selectedCard = null;
@@ -367,6 +375,11 @@ export default class GameScene extends Phaser.Scene {
             // Update UI to show the selected card
             if (this.uiScene) {
                 this.uiScene.showSelectedCard(card);
+            }
+            
+            // If it's a building card and we have enough resources, show illegal tiles
+            if (card.type === 'building' && this.resourceManager.hasSufficientResources(card.building.cost)) {
+                this.showIllegalTiles(card.building);
             }
         }
     }
@@ -863,5 +876,48 @@ export default class GameScene extends Phaser.Scene {
         
         // Draw 2 more random cards to complete starting hand
         this.cardManager.drawCards(startingHandSize - startingCards.length);
+    }
+
+    // Show shading on illegal tiles for the selected building
+    showIllegalTiles(building) {
+        // Clear any existing shading first
+        this.clearIllegalTileShading();
+        
+        // Loop through all grid cells
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                // Check if this is an illegal placement
+                if (!this.gridManager.canPlaceBuilding(x, y, building)) {
+                    const xPos = x * CELL_SIZE;
+                    const yPos = y * CELL_SIZE;
+                    
+                    // Create shading sprite
+                    const shadingSprite = this.add.sprite(xPos, yPos, 'illegalTileShade');
+                    shadingSprite.setOrigin(0, 0);
+                    shadingSprite.displayWidth = CELL_SIZE;
+                    shadingSprite.displayHeight = CELL_SIZE;
+                    shadingSprite.setAlpha(0.5); // Set transparency
+                    
+                    // Add to grid container at the top level so it overlays other sprites
+                    this.gridContainer.add(shadingSprite);
+                    
+                    // Store reference to remove later
+                    this.illegalTileSprites.push(shadingSprite);
+                }
+            }
+        }
+    }
+    
+    // Clear all illegal tile shading sprites
+    clearIllegalTileShading() {
+        // Destroy all shading sprites and clear the array
+        if (this.illegalTileSprites.length > 0) {
+            this.illegalTileSprites.forEach(sprite => {
+                if (sprite && sprite.active) {
+                    sprite.destroy();
+                }
+            });
+            this.illegalTileSprites = [];
+        }
     }
 } 
