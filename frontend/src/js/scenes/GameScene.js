@@ -523,86 +523,82 @@ export default class GameScene extends Phaser.Scene {
         this.gridManager.launchRocket(x, y);
         
         // Create flickering effect
-        if (cell.rocketSprite) {
-            // Reference for later use
-            const rocketSprite = cell.rocketSprite;
-            const xPos = rocketSprite.x;
-            const yPos = rocketSprite.y;
-            const rocketScale = rocketSprite.scaleX;
-            
-            // Hide the original sprite
-            rocketSprite.setVisible(false);
-            
-            // Create a new sprite for the pre-launch flickering
-            const flickerSprite = this.add.sprite(xPos, yPos, 'rocketFueled');
-            flickerSprite.setOrigin(0.5, 1.0);
-            flickerSprite.setScale(rocketScale);
-            this.gridContainer.add(flickerSprite);
-            
-            // Define the flickering sequence
-            const flickerSequence = [
-                { key: 'rocketInFlight', duration: 200 },
-                { key: 'rocketFueled', duration: 200 },
-                { key: 'rocketInFlight', duration: 200 },
-                { key: 'rocketFueled', duration: 200 },
-                { key: 'rocketInFlight', duration: 200 },
-                { key: 'rocketFueled', duration: 200 },
-                { key: 'rocketInFlight', duration: 200 }
-            ];
-            
-            // Initialize sequence counter
-            let sequenceIndex = 0;
-            
-            // Create a timer for flickering effect
-            const flickerTimer = this.time.addEvent({
-                delay: 200,
-                callback: () => {
-                    sequenceIndex++;
-                    if (sequenceIndex < flickerSequence.length) {
-                        // Update texture for next flicker
-                        flickerSprite.setTexture(flickerSequence[sequenceIndex].key);
-                    } else {
-                        // Flickering complete, start the launch
-                        flickerTimer.remove();
-                        
-                        // Create the launch animation sprite
-                        const launchSprite = this.add.sprite(xPos, yPos, 'rocketInFlight');
-                        launchSprite.setOrigin(0.5, 1.0);
-                        launchSprite.setScale(rocketScale);
-                        this.gridContainer.add(launchSprite);
-                        
-                        // Remove the flicker sprite
-                        flickerSprite.destroy();
-                        
-                        // Calculate the distance to fly off the screen
-                        const mapHeight = this.gridManager.gridSize * CELL_SIZE;
-                        const distanceToTop = yPos;
-                        const extraDistance = 100; // Go a bit beyond the edge
-                        
-                        // Launch the rocket animation - fly straight up at constant size
-                        this.tweens.add({
-                            targets: launchSprite,
-                            y: -extraDistance, // Go beyond the top edge
-                            duration: 2000,
-                            ease: 'Quad.easeIn',
-                            onComplete: () => {
-                                launchSprite.destroy();
-                                
-                                // Note: State change is now handled at the beginning of the method
-                                // No need to call this.gridManager.launchRocket(x, y) here
-                            }
-                        });
-                    }
-                },
-                repeat: flickerSequence.length - 1
-            });
-        }
+        // Reference for later use
+        const rocketSprite = cell.rocketSprite;
+        const xPos = rocketSprite.x;
+        const yPos = rocketSprite.y;
+        const rocketScale = rocketSprite.scaleX;
+        
+        // Hide the original sprite
+        rocketSprite.setVisible(false);
+        
+        // Create a new sprite for the pre-launch flickering
+        const flickerSprite = this.add.sprite(xPos, yPos, 'rocketFueled');
+        flickerSprite.setOrigin(0.5, 1.0);
+        flickerSprite.setScale(rocketScale);
+        this.gridContainer.add(flickerSprite);
+        
+        // Define the flickering sequence
+        const flickerSequence = [
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 }
+        ];
+        
+        // Initialize sequence counter
+        let sequenceIndex = 0;
+        
+        // Create a timer for flickering effect
+        // TODO: Put it into a separate function
+        const flickerTimer = this.time.addEvent({
+            delay: 200,
+            callback: () => {
+                sequenceIndex++;
+                if (sequenceIndex < flickerSequence.length) {
+                    // Update texture for next flicker
+                    flickerSprite.setTexture(flickerSequence[sequenceIndex].key);
+                } else {
+                    // Flickering complete, start the launch
+                    flickerTimer.remove();
+                    
+                    // Create the launch animation sprite
+                    const launchSprite = this.add.sprite(xPos, yPos, 'rocketInFlight');
+                    launchSprite.setOrigin(0.5, 1.0);
+                    launchSprite.setScale(rocketScale);
+                    this.gridContainer.add(launchSprite);
+                    
+                    // Remove the flicker sprite
+                    flickerSprite.destroy();
+                    
+                    // Calculate the distance to fly off the screen
+                    const mapHeight = this.gridManager.gridSize * CELL_SIZE;
+                    const distanceToTop = yPos;
+                    const extraDistance = 100; // Go a bit beyond the edge
+                    
+                    // Launch the rocket animation - fly straight up at constant size
+                    this.tweens.add({
+                        targets: launchSprite,
+                        y: -extraDistance, // Go beyond the top edge
+                        duration: 2000,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => {
+                            launchSprite.destroy();
+                        }
+                    });
+                }
+            },
+            repeat: flickerSequence.length - 1
+        });
         
         // Show message
         this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
         
         // Update UI
-        this.uiScene.refreshUI();
+            this.uiScene.refreshUI();
         
         return true;
     }
