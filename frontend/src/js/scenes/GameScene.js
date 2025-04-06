@@ -518,6 +518,10 @@ export default class GameScene extends Phaser.Scene {
         // Award reputation
         this.resourceManager.modifyResource(RESOURCES.REPUTATION, this.launchReward);
         
+        // Update the rocket state immediately to prevent duplicate launches
+        // This happens before the animation so the UI will update correctly
+        this.gridManager.launchRocket(x, y);
+        
         // Create flickering effect
         if (cell.rocketSprite) {
             // Reference for later use
@@ -584,24 +588,21 @@ export default class GameScene extends Phaser.Scene {
                             onComplete: () => {
                                 launchSprite.destroy();
                                 
-                                // Apply the state change in grid manager after the animation
-                                this.gridManager.launchRocket(x, y);
+                                // Note: State change is now handled at the beginning of the method
+                                // No need to call this.gridManager.launchRocket(x, y) here
                             }
                         });
                     }
                 },
                 repeat: flickerSequence.length - 1
             });
-        } else {
-            // If no sprite exists, just update the state
-            this.gridManager.launchRocket(x, y);
         }
         
         // Show message
         this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
         
         // Update UI
-            this.uiScene.refreshUI();
+        this.uiScene.refreshUI();
         
         return true;
     }
