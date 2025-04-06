@@ -506,16 +506,15 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Special info for Launch Pad
                 if (building.id === 'launchPad') {
+                    content += "Status:\n";
                     if (cell.hasRocket) {
                         if (cell.rocketState === 'fueled') {
-                            content += "Status: Rocket fueled and ready for launch\n";
-                            content += `Launch Cost: ${building.launchCost[RESOURCES.FUEL]} Fuel, ${building.launchCost[RESOURCES.STEEL]} Steel\n`;
-                            content += `Reward: +${building.launchReward} Reputation\n\n`;
+                            content += "Rocket ready\n";
                         } else {
-                            content += "Status: Rocket needs fuel for launch\n\n";
+                            content += "Rocket needs fuel\n";
                         }
                     } else {
-                        content += "Status: Rocket in flight (returns next turn)\n\n";
+                        content += "Rocket in flight\n";
                     }
                 }
                 
