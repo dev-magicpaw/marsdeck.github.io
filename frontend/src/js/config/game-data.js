@@ -67,7 +67,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null, // Can be built anywhere
-        texture: 'droneDepo'
+        texture: 'droneDepo',
+        createCard: true
     },
     IRON_MINE: {
         id: 'ironMine',
@@ -85,7 +86,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.METAL.id,
-        texture: 'ironMine'
+        texture: 'ironMine',
+        createCard: true
     },
     STEELWORKS: {
         id: 'steelworks',
@@ -105,7 +107,8 @@ export const BUILDINGS = {
             [RESOURCES.IRON]: 2
         },
         terrainRequirement: null,
-        texture: 'steelworks'
+        texture: 'steelworks',
+        createCard: true
     },
     CONCRETE_HARVESTER: {
         id: 'concreteMixer',
@@ -123,7 +126,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'concreteMixer'
+        texture: 'concreteMixer',
+        createCard: true
     },
     WATER_PUMP: {
         id: 'waterPump',
@@ -141,7 +145,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.WATER.id,
-        texture: 'waterPump'
+        texture: 'waterPump',
+        createCard: true
     },
     FUEL_REFINERY: {
         id: 'fuelRefinery',
@@ -161,7 +166,8 @@ export const BUILDINGS = {
             [RESOURCES.WATER]: 2
         },
         terrainRequirement: null,
-        texture: 'fuelRefinery'
+        texture: 'fuelRefinery',
+        createCard: true
     },
     WIND_TURBINE: {
         id: 'windTurbine',
@@ -177,7 +183,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'windTurbine'
+        texture: 'windTurbine',
+        createCard: true
     },
     SOLAR_PANELS: {
         id: 'solarPanel',
@@ -194,7 +201,8 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'solarPanel'
+        texture: 'solarPanel',
+        createCard: true
     },
     LAUNCH_PAD: {
         id: 'launchPad',
@@ -217,7 +225,8 @@ export const BUILDINGS = {
             [RESOURCES.STEEL]: 10
         },
         // Reputation earned per launch
-        launchReward: 10
+        launchReward: 10,
+        createCard: true
     },
     LAUNCH_PAD_SURROUNDING: {
         id: 'launchPadSurrounding',
@@ -228,7 +237,8 @@ export const BUILDINGS = {
         production: {},
         consumption: {},
         terrainRequirement: null,
-        texture: 'launchPadSurrounding' // Now using its own unique texture
+        texture: 'launchPadSurrounding', // Now using its own unique texture
+        createCard: false
     },
     WIND_TURBINE_SURROUNDING: {
         id: 'windTurbineSurrounding',
@@ -239,6 +249,7 @@ export const BUILDINGS = {
         production: {},
         consumption: {},
         terrainRequirement: null,
-        texture: 'windTurbineSurrounding'
+        texture: 'windTurbineSurrounding',
+        createCard: false
     }
 }; 
