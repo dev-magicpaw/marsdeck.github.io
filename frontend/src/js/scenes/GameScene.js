@@ -441,87 +441,6 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     
-    // Animate rocket landing on a launch pad
-    animateRocketLanding(x, y) {
-        const cell = this.gridManager.getCell(x, y);
-        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket) {
-            return;
-        }
-        
-        // Calculate position at center of cell
-        const xPos = x * CELL_SIZE + (CELL_SIZE / 2);
-        const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
-        
-        // If there's already a rocket sprite, hide it until landing completes
-        if (cell.rocketSprite) {
-            cell.rocketSprite.setVisible(false);
-        }
-        
-        // Create landing animation sprite starting from above
-        const landingAnimation = this.add.sprite(xPos, yPos - 300, 'rocketInFlight');
-        landingAnimation.setOrigin(0.5, 1.0); // Set origin to bottom center
-        
-        // Scale rocket proportionally to start small
-        const startScale = (CELL_SIZE * 0.1) / Math.max(landingAnimation.width, landingAnimation.height);
-        landingAnimation.setScale(startScale);
-        
-        landingAnimation.setAlpha(0.2); // Start faded
-        this.gridContainer.add(landingAnimation);
-        
-        // Calculate end scale for the landing animation
-        const endScale = (CELL_SIZE * 0.7) / Math.max(landingAnimation.width, landingAnimation.height);
-        
-        // Create landing animation (reverse of launch)
-        this.tweens.add({
-            targets: landingAnimation,
-            y: yPos,
-            scale: endScale,  // End at normal scale
-            alpha: 1,  // Fully visible at end
-            duration: 1500,
-            ease: 'Cubic.easeIn',
-            onComplete: () => {
-                landingAnimation.destroy();
-                // Show the real rocket sprite after landing
-                if (cell.rocketSprite) {
-                    // Determine texture based on state (fuel status)
-                    const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
-                    cell.rocketSprite.setTexture(texture);
-                    cell.rocketSprite.setVisible(true);
-                } else {
-                    // Create a new rocket sprite
-                    const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
-                    cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
-                    cell.rocketSprite.setOrigin(0.5, 1.0); // Set origin to bottom center
-                    
-                    // Scale rocket proportionally
-                    const rocketScale = (CELL_SIZE * 0.7) / Math.max(cell.rocketSprite.width, cell.rocketSprite.height);
-                    cell.rocketSprite.setScale(rocketScale);
-                    
-                    this.gridContainer.add(cell.rocketSprite);
-                }
-                
-                // Mark the rocket as no longer just landed
-                cell.justLanded = false;
-            }
-        });
-    }
-    
-    // Update all rocket states based on available resources
-    updateRocketStates() {
-        // Loop through grid and update all rockets
-        for (let y = 0; y < this.gridManager.gridSize; y++) {
-            for (let x = 0; x < this.gridManager.gridSize; x++) {
-                const cell = this.gridManager.getCell(x, y);
-                if (cell && cell.building === 'launchPad' && cell.hasRocket) {
-                    this.gridManager.updateRocketState(x, y);
-                }
-            }
-        }
-        
-        // Refresh rocket sprites to match state
-        this.refreshRocketSprites();
-    }
-    
     // Launch a rocket from a launch pad
     launchRocket(x, y) {
         const cell = this.gridManager.getCell(x, y);
@@ -545,35 +464,83 @@ export default class GameScene extends Phaser.Scene {
         // Award reputation
         this.resourceManager.modifyResource(RESOURCES.REPUTATION, this.launchReward);
         
-        // Launch rocket in grid manager (updates state)
-        if (!this.gridManager.launchRocket(x, y)) {
-            return false;
-        }
-        
-        // Animate rocket launch
+        // Create flickering effect
         if (cell.rocketSprite) {
-            // Clone the rocket sprite for animation
+            // Reference for later use
             const rocketSprite = cell.rocketSprite;
-            const launchAnimation = this.add.sprite(rocketSprite.x, rocketSprite.y, 'rocketInFlight');
-            launchAnimation.setOrigin(0.5, 1.0); // Set origin to bottom center
-            launchAnimation.setScale(rocketSprite.scaleX, rocketSprite.scaleY);
-            this.gridContainer.add(launchAnimation);
+            const xPos = rocketSprite.x;
+            const yPos = rocketSprite.y;
+            const rocketScale = rocketSprite.scaleX;
             
             // Hide the original sprite
             rocketSprite.setVisible(false);
             
-            // Create launch animation
-            this.tweens.add({
-                targets: launchAnimation,
-                y: rocketSprite.y - 300,
-                scale: rocketSprite.scaleX * 0.1, // Shrink to 10% of original size
-                alpha: 0,
-                duration: 1500,
-                ease: 'Cubic.easeOut',
-                onComplete: () => {
-                    launchAnimation.destroy();
-                }
+            // Create a new sprite for the pre-launch flickering
+            const flickerSprite = this.add.sprite(xPos, yPos, 'rocketFueled');
+            flickerSprite.setOrigin(0.5, 1.0);
+            flickerSprite.setScale(rocketScale);
+            this.gridContainer.add(flickerSprite);
+            
+            // Define the flickering sequence
+            const flickerSequence = [
+                { key: 'rocketInFlight', duration: 300 },
+                { key: 'rocketFueled', duration: 300 },
+                { key: 'rocketInFlight', duration: 300 },
+                { key: 'rocketFueled', duration: 300 },
+                { key: 'rocketInFlight', duration: 300 },
+                { key: 'rocketFueled', duration: 300 },
+                { key: 'rocketInFlight', duration: 300 }
+            ];
+            
+            // Initialize sequence counter
+            let sequenceIndex = 0;
+            
+            // Create a timer for flickering effect
+            const flickerTimer = this.time.addEvent({
+                delay: 300,
+                callback: () => {
+                    sequenceIndex++;
+                    if (sequenceIndex < flickerSequence.length) {
+                        // Update texture for next flicker
+                        flickerSprite.setTexture(flickerSequence[sequenceIndex].key);
+                    } else {
+                        // Flickering complete, start the launch
+                        flickerTimer.remove();
+                        
+                        // Create the launch animation sprite
+                        const launchSprite = this.add.sprite(xPos, yPos, 'rocketInFlight');
+                        launchSprite.setOrigin(0.5, 1.0);
+                        launchSprite.setScale(rocketScale);
+                        this.gridContainer.add(launchSprite);
+                        
+                        // Remove the flicker sprite
+                        flickerSprite.destroy();
+                        
+                        // Calculate the distance to fly off the screen
+                        const mapHeight = this.gridManager.gridSize * CELL_SIZE;
+                        const distanceToTop = yPos;
+                        const extraDistance = 100; // Go a bit beyond the edge
+                        
+                        // Launch the rocket animation - fly straight up at constant size
+                        this.tweens.add({
+                            targets: launchSprite,
+                            y: -extraDistance, // Go beyond the top edge
+                            duration: 2000,
+                            ease: 'Quad.easeIn',
+                            onComplete: () => {
+                                launchSprite.destroy();
+                                
+                                // Apply the state change in grid manager after the animation
+                                this.gridManager.launchRocket(x, y);
+                            }
+                        });
+                    }
+                },
+                repeat: flickerSequence.length - 1
             });
+        } else {
+            // If no sprite exists, just update the state
+            this.gridManager.launchRocket(x, y);
         }
         
         // Show message
@@ -583,6 +550,112 @@ export default class GameScene extends Phaser.Scene {
         this.uiScene.refreshUI();
         
         return true;
+    }
+    
+    // Animate rocket landing on a launch pad
+    animateRocketLanding(x, y) {
+        const cell = this.gridManager.getCell(x, y);
+        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket) {
+            return;
+        }
+        
+        // Calculate position at center of cell
+        const xPos = x * CELL_SIZE + (CELL_SIZE / 2);
+        const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
+        
+        // If there's already a rocket sprite, hide it until landing completes
+        if (cell.rocketSprite) {
+            cell.rocketSprite.setVisible(false);
+        }
+        
+        // Scale for the rocket (70% of cell size)
+        const rocketScale = (CELL_SIZE * 0.7) / Math.max(
+            this.textures.get('rocketInFlight').get().width,
+            this.textures.get('rocketInFlight').get().height
+        );
+        
+        // Create landing animation sprite starting from above the screen
+        const extraDistance = 100; // Start beyond the top edge
+        const landingSprite = this.add.sprite(xPos, -extraDistance, 'rocketInFlight');
+        landingSprite.setOrigin(0.5, 1.0); // Set origin to bottom center
+        landingSprite.setScale(rocketScale);
+        this.gridContainer.add(landingSprite);
+        
+        // Create landing animation - fly down at constant size
+        this.tweens.add({
+            targets: landingSprite,
+            y: yPos,
+            duration: 2000,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+                // Start flickering effect upon landing
+                
+                // Define the flickering sequence
+                const flickerSequence = [
+                    { key: 'rocketUnFueled', duration: 300 },
+                    { key: 'rocketInFlight', duration: 300 },
+                    { key: 'rocketUnFueled', duration: 300 },
+                    { key: 'rocketInFlight', duration: 300 },
+                    { key: 'rocketUnFueled', duration: 300 },
+                    { key: 'rocketInFlight', duration: 300 },
+                    { key: 'rocketUnFueled', duration: 300 }
+                ];
+                
+                // Initialize sequence counter
+                let sequenceIndex = 0;
+                
+                // Create a timer for flickering effect
+                const flickerTimer = this.time.addEvent({
+                    delay: 300,
+                    callback: () => {
+                        sequenceIndex++;
+                        if (sequenceIndex < flickerSequence.length) {
+                            // Update texture for next flicker
+                            landingSprite.setTexture(flickerSequence[sequenceIndex].key);
+                        } else {
+                            // Flickering complete, show the final rocket state
+                            flickerTimer.remove();
+                            landingSprite.destroy();
+                            
+                            // Show the real rocket sprite after landing and flickering
+                            if (cell.rocketSprite) {
+                                // Determine texture based on state (fuel status)
+                                const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
+                                cell.rocketSprite.setTexture(texture);
+                                cell.rocketSprite.setVisible(true);
+                            } else {
+                                // Create a new rocket sprite
+                                const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
+                                cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
+                                cell.rocketSprite.setOrigin(0.5, 1.0); // Set origin to bottom center
+                                cell.rocketSprite.setScale(rocketScale);
+                                this.gridContainer.add(cell.rocketSprite);
+                            }
+                            
+                            // Mark the rocket as no longer just landed
+                            cell.justLanded = false;
+                        }
+                    },
+                    repeat: flickerSequence.length - 1
+                });
+            }
+        });
+    }
+    
+    // Update all rocket states based on available resources
+    updateRocketStates() {
+        // Loop through grid and update all rockets
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                const cell = this.gridManager.getCell(x, y);
+                if (cell && cell.building === 'launchPad' && cell.hasRocket) {
+                    this.gridManager.updateRocketState(x, y);
+                }
+            }
+        }
+        
+        // Refresh rocket sprites to match state
+        this.refreshRocketSprites();
     }
     
     // Process building production for all buildings
