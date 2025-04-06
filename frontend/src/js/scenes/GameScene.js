@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_HAND_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -26,6 +26,9 @@ export default class GameScene extends Phaser.Scene {
         
         // Ensure player starts with specific cards
         this.setupStartingHand();
+        
+        // Card choice options
+        this.cardChoices = [];
     }
 
     create() {
@@ -46,88 +49,10 @@ export default class GameScene extends Phaser.Scene {
         // Set up input handling
         this.setupInput();
         
-        // Setup debug keys
-        this.setupDebugKeys();
-        
-        // Log what tileset is being used
-        console.log('Using terrain tileset');
-    }
-    
-    // Setup debug keyboard controls
-    setupDebugKeys() {
-        // Toggle debug mode with D key
-        this.input.keyboard.on('keydown-D', () => {
-            this.debug = !this.debug;
-            console.log(`Debug mode: ${this.debug ? 'ON' : 'OFF'}`);
-            
-            if (this.debug) {
-                this.showTilesetDebug();
-            } else {
-                if (this.tilesetDebug) {
-                    this.tilesetDebug.destroy();
-                    this.tilesetDebug = null;
-                }
-            }
+        // Present initial card choice for first turn
+        this.time.delayedCall(500, () => {
+            this.showCardChoices();
         });
-    }
-    
-    // Show tileset debug window
-    showTilesetDebug() {
-        if (this.tilesetDebug) {
-            this.tilesetDebug.destroy();
-        }
-        
-        // Create a panel to display some of the tileset
-        this.tilesetDebug = this.add.container(10, 10);
-        
-        // Background
-        const bg = this.add.graphics();
-        bg.fillStyle(0x000000, 0.8);
-        bg.fillRect(0, 0, 256, 256);
-        this.tilesetDebug.add(bg);
-        
-        // Title
-        const title = this.add.text(
-            128, 
-            10, 
-            'Tileset Debug - Press D to hide', 
-            { fontSize: '12px', fontFamily: 'Arial', color: '#ffffff' }
-        );
-        title.setOrigin(0.5, 0);
-        this.tilesetDebug.add(title);
-        
-        // Show a selection of tiles
-        const tilesPerRow = 8;
-        for (let i = 0; i < 64; i++) {
-            const tileIndex = i;
-            const x = (i % tilesPerRow) * 32;
-            const y = Math.floor(i / tilesPerRow) * 32 + 30;
-            
-            const tile = this.add.sprite(x, y, 'terrain', tileIndex);
-            tile.setOrigin(0, 0);
-            
-            // Add tile index text
-            const indexText = this.add.text(
-                x + 16, 
-                y + 16, 
-                `${tileIndex}`, 
-                { fontSize: '8px', fontFamily: 'Arial', color: '#ffffff', backgroundColor: '#000000' }
-            );
-            indexText.setOrigin(0.5);
-            
-            this.tilesetDebug.add(tile);
-            this.tilesetDebug.add(indexText);
-        }
-        
-        // Add instructions for viewing more tiles
-        const instructions = this.add.text(
-            128, 
-            240, 
-            'First 64 tiles shown. Edit terrain-tiles.js to use different indices', 
-            { fontSize: '10px', fontFamily: 'Arial', color: '#ffffff', align: 'center', wordWrap: { width: 240 } }
-        );
-        instructions.setOrigin(0.5, 0);
-        this.tilesetDebug.add(instructions);
     }
     
     // Create the visual grid
@@ -385,21 +310,21 @@ export default class GameScene extends Phaser.Scene {
         // Reset non-accumulating resources
         this.resourceManager.resetNonAccumulatingResources();
         
-        // Draw new cards
-        const drawnCards = this.cardManager.drawCards(2);
-        
         // Increment turn counter
         this.currentTurn++;
         
         // Check for game end condition
         if (this.currentTurn > MAX_TURNS) {
             this.gameOver();
+            return;
         }
+        
+        // Show card choices for the next turn
+        this.showCardChoices();
         
         // Update UI
         if (this.uiScene) {
             this.uiScene.refreshUI();
-            this.uiScene.showNewCards(drawnCards);
         }
     }
     
@@ -528,6 +453,67 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    // Show card choices to the player
+    showCardChoices() {
+        // Draw 3 cards as choices
+        this.cardChoices = [];
+        const numChoices = 3;
+        
+        // Get cards from the deck
+        for (let i = 0; i < numChoices; i++) {
+            if (this.cardManager.deck.length === 0) {
+                if (this.cardManager.discardPile.length === 0) {
+                    break; // No more cards
+                }
+                // Reshuffle discard pile into deck
+                this.cardManager.deck = [...this.cardManager.discardPile];
+                this.cardManager.discardPile = [];
+                this.cardManager.shuffleDeck();
+            }
+            
+            if (this.cardManager.deck.length > 0) {
+                // Draw from the end of the deck to avoid shifting indices
+                const card = this.cardManager.deck.pop();
+                this.cardChoices.push(card);
+            }
+        }
+        
+        // Show choices in UI
+        if (this.uiScene && this.cardChoices.length > 0) {
+            this.uiScene.showCardChoices(this.cardChoices);
+        }
+    }
+    
+    // Handle card choice selection
+    selectCardChoice(choiceIndex) {
+        if (choiceIndex >= 0 && choiceIndex < this.cardChoices.length) {
+            // Add the selected card to hand
+            const selectedCard = this.cardChoices[choiceIndex];
+            
+            // Add to hand if there's room
+            if (this.cardManager.hand.length < MAX_HAND_SIZE) {
+                this.cardManager.hand.push(selectedCard);
+                this.uiScene.showMessage(`Added ${selectedCard.building.name} to your hand`);
+            } else {
+                this.uiScene.showMessage("Your hand is full! Card discarded.");
+                this.cardManager.discardPile.push(selectedCard);
+            }
+            
+            // Discard the other choices
+            for (let i = 0; i < this.cardChoices.length; i++) {
+                if (i !== choiceIndex) {
+                    this.cardManager.discardPile.push(this.cardChoices[i]);
+                }
+            }
+            
+            // Clear choices
+            this.cardChoices = [];
+            
+            // Update UI
+            this.uiScene.refreshUI();
+        }
+    }
+    
     // Set up specific starting cards for the player
     setupStartingHand() {
         // Clear any cards that might be in the hand
