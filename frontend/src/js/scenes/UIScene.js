@@ -749,7 +749,7 @@ export default class UIScene extends Phaser.Scene {
         this.add.text(
             width / 2, 
             height / 2 - 50, 
-            `Victory Points: ${victoryPoints}`, 
+            `Reputation: ${victoryPoints}`, 
             { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
         ).setOrigin(0.5);
         

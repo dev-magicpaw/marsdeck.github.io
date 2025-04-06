@@ -13,7 +13,7 @@ export const RESOURCES = {
     FUEL: 'fuel',
     DRONES: 'drones',
     ENERGY: 'energy',
-    VICTORY_POINTS: 'victoryPoints'
+    REPUTATION: 'reputation'
 };
 
 // Terrain types and their properties
@@ -199,14 +199,14 @@ export const BUILDINGS = {
         id: 'launchPad',
         name: 'Launch Pad',
         shortName: 'Launcher',
-        description: 'Allows rocket launches for victory points',
+        description: 'Allows rocket launches for reputation',
         cost: {
             [RESOURCES.CONCRETE]: 4,
             [RESOURCES.STEEL]: 3,
             [RESOURCES.DRONES]: 1
         },
         production: {
-            [RESOURCES.VICTORY_POINTS]: 0 // Special case - handled by game logic
+            [RESOURCES.REPUTATION]: 0 // Special case - handled by game logic
         },
         consumption: {},
         terrainRequirement: null,
