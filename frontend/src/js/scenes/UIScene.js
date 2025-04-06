@@ -4,7 +4,31 @@ import { BUILDINGS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } 
 export default class UIScene extends Phaser.Scene {
     constructor() {
         super('UIScene');
-        this.selectedCardIndex = null;
+        
+        // References to other scenes
+        this.gameScene = null;
+        
+        // Card dimensions
+        this.cardWidth = 80;
+        this.cardHeight = 140;
+        this.cardSpacing = 5;
+        
+        // Selected card tracking
+        this.selectedCardIndex = undefined;
+        
+        // References to game managers
+        this.resourceManager = null;
+        this.cardManager = null;
+        
+        // UI components
+        this.handContainer = null;
+        this.cardSlotsContainer = null;
+        this.infoPanel = null;
+        this.actionsPanel = null;
+        this.messageText = null;
+        
+        // Timers and animations
+        this.messageTimer = null;
     }
 
     init(data) {
@@ -64,11 +88,8 @@ export default class UIScene extends Phaser.Scene {
         // Create bottom panel with same width as right panels
         this.bottomPanelBg = this.createPanel(width - 450, height - 50, 450, 50, 0x222222, 0.8);
         
-        // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
-        const maxCards = 8;
-        const cardWidth = 80;
-        const cardSpacing = 5;
-        const cardsWidth = (cardWidth + cardSpacing) * maxCards;
+        // Calculate card panel width for MAX_HAND_SIZE cards
+        const cardsWidth = (this.cardWidth + this.cardSpacing) * MAX_HAND_SIZE;
         
         // Position cards panel under the map (map is offset at 50,50 in GameScene)
         const mapSize = 9 * 64; // 9 tiles of 64px each
@@ -85,7 +106,7 @@ export default class UIScene extends Phaser.Scene {
             0, 
             mapOffset + mapSize + verticalSpacing - margin, 
             cardsWidth + margin * 2, 
-            150 + margin * 2,
+            this.cardHeight + margin * 2,
             0x222222, 
             0.8
         ); // Cards panel
@@ -236,8 +257,33 @@ export default class UIScene extends Phaser.Scene {
         const x = margin; // Start from the left edge plus margin
         const y = mapOffset + mapSize + verticalSpacing;
         
+        // Create container for card slots (backgrounds)
+        this.cardSlotsContainer = this.add.container(x, y);
+        
         // Create container for cards
-        this.handContainer = this.add.container(x, y);        
+        this.handContainer = this.add.container(x, y);
+        
+        // Create the initial empty card slots (MAX_HAND_SIZE slots)
+        this.createCardSlots();
+    }
+    
+    // Create placeholder backgrounds for card slots
+    createCardSlots() {
+        // Clear existing slots
+        this.cardSlotsContainer.removeAll(true);
+        
+        // Create slots for max hand size
+        for (let i = 0; i < MAX_HAND_SIZE; i++) {
+            const xPos = i * (this.cardWidth + this.cardSpacing);
+            
+            // Add slot background
+            const slotBg = this.add.sprite(xPos, 0, 'cardSlotBackground');
+            slotBg.setDisplaySize(this.cardWidth, this.cardHeight);
+            slotBg.setOrigin(0, 0);
+            slotBg.setAlpha(0.7); // Make it slightly transparent
+            
+            this.cardSlotsContainer.add(slotBg);
+        }
     }
     
     createMessageBox() {
@@ -411,21 +457,18 @@ export default class UIScene extends Phaser.Scene {
     
     // Create a card sprite
     createCardSprite(card, index) {
-        const cardWidth = 80;
-        const cardHeight = 140;
-        const cardSpacing = 5;
-        const xPos = index * (cardWidth + cardSpacing);
+        const xPos = index * (this.cardWidth + this.cardSpacing);
         
         const cardContainer = this.add.container(xPos, 0);
         
         // Card background
         const cardBg = this.add.sprite(0, 0, card.type === 'building' ? 'cardBackground' : 'cardTemplate');
-        cardBg.setDisplaySize(cardWidth, cardHeight);
+        cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
         cardBg.setOrigin(0, 0);
         
         // Add highlight for selected card
         if (index === this.selectedCardIndex) {
-            const highlight = this.add.rectangle(0, 0, cardWidth, cardHeight, 0xffff00, 0.3);
+            const highlight = this.add.rectangle(0, 0, this.cardWidth, this.cardHeight, 0xffff00, 0.3);
             highlight.setOrigin(0, 0);
             cardContainer.add(highlight);
         }
@@ -442,7 +485,7 @@ export default class UIScene extends Phaser.Scene {
         if (card.type === 'building') {
             // Building name - use short name for card display
             const nameText = this.add.text(
-                cardWidth / 2, 
+                this.cardWidth / 2, 
                 10, 
                 card.building.shortName, 
                 { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
@@ -451,7 +494,7 @@ export default class UIScene extends Phaser.Scene {
             cardContainer.add(nameText);
             
             // Building icon
-            const icon = this.add.sprite(cardWidth / 2, 45, card.building.texture);
+            const icon = this.add.sprite(this.cardWidth / 2, 45, card.building.texture);
             icon.setDisplaySize(40, 40);
             icon.setOrigin(0.5);
             cardContainer.add(icon);
@@ -1067,20 +1110,15 @@ export default class UIScene extends Phaser.Scene {
         this.choiceContainer.setVisible(true);
         this.choicePanelBg.visible = true; // Show background when cards are shown
         
-        // Create mini card displays - use same dimensions as hand cards
-        const cardWidth = 80;  // Same as in createCardSprite
-        const cardHeight = 140; // Same as in createCardSprite
-        const cardSpacing = 5;  // Same spacing as hand cards
-        
         cards.forEach((card, index) => {
-            const xPos = index * (cardWidth + cardSpacing);
+            const xPos = index * (this.cardWidth + this.cardSpacing);
             
             // Create card container
             const cardContainer = this.add.container(xPos, 0);
             
             // Card background
             const cardBg = this.add.sprite(0, 0, 'cardBackground');
-            cardBg.setDisplaySize(cardWidth, cardHeight);
+            cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
             cardBg.setOrigin(0, 0);
             cardContainer.add(cardBg);
             
@@ -1094,7 +1132,7 @@ export default class UIScene extends Phaser.Scene {
             if (card.type === 'building') {
                 // Building name
                 const nameText = this.add.text(
-                    cardWidth / 2, 
+                    this.cardWidth / 2, 
                     10, 
                     card.building.shortName, 
                     { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
@@ -1103,7 +1141,7 @@ export default class UIScene extends Phaser.Scene {
                 cardContainer.add(nameText);
                 
                 // Building icon
-                const icon = this.add.sprite(cardWidth / 2, 45, card.building.texture);
+                const icon = this.add.sprite(this.cardWidth / 2, 45, card.building.texture);
                 icon.setDisplaySize(40, 40); // Match the size in hand cards
                 icon.setOrigin(0.5);
                 cardContainer.add(icon);
