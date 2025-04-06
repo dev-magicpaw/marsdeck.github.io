@@ -109,23 +109,15 @@ export default class GridManager {
             return false;
         }
         
-        // Special case for Launch Pad - check adjacent tiles
-        if (building.id === 'launchPad') {
+        // Special case for Launch Pad and Wind Turbine - check for map edges
+        if (building.id === 'launchPad' || building.id === 'windTurbine') {
             // Get all adjacent cells
             const adjacentCells = this.getAdjacentCells(x, y);
             
-            // Check if any adjacent cell has a mountain or building
-            for (const adjCell of adjacentCells) {
-                if (adjCell.feature === TERRAIN_FEATURES.MOUNTAIN.id || adjCell.building) {
-                    return false; // Can't place if adjacent to mountain or building
-                }
+            // Edge detection - need exactly 4 adjacent cells (not on edge)
+            if (adjacentCells.length < 4) {
+                return false; // Can't place on the edge of the map
             }
-        }
-        
-        // Special case for Wind Turbine - check adjacent tiles
-        if (building.id === 'windTurbine') {
-            // Get all adjacent cells
-            const adjacentCells = this.getAdjacentCells(x, y);
             
             // Check if any adjacent cell has a mountain or building
             for (const adjCell of adjacentCells) {
