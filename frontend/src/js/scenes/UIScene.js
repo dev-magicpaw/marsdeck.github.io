@@ -44,8 +44,8 @@ export default class UIScene extends Phaser.Scene {
         // Create message box for notifications
         this.createMessageBox();
         
-        // Create end turn button
-        this.createEndTurnButton();
+        // Create bottom panel with turn, reputation and end turn button
+        this.createBottomPanel();
         
         // Initial UI update
         this.refreshUI();
@@ -60,6 +60,9 @@ export default class UIScene extends Phaser.Scene {
         this.createPanel(width - 450, 110, 450, 300, 0x222222, 0.8); // Info panel
         this.createPanel(width - 450, 420, 450, 80, 0x222222, 0.8); // Actions panel
         this.choicePanelBg = this.createPanel(width - 450, 510, 450, 200, 0x222222, 0.8); // Choice panel
+        
+        // Create bottom panel with same width as right panels
+        this.bottomPanelBg = this.createPanel(width - 450, height - 50, 450, 50, 0x222222, 0.8);
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
         const maxCards = 8;
@@ -125,8 +128,7 @@ export default class UIScene extends Phaser.Scene {
             RESOURCES.FUEL,
             
             // Fourth column
-            RESOURCES.CONCRETE,
-            RESOURCES.REPUTATION
+            RESOURCES.CONCRETE
         ];
         
         // Create text for each resource type in the specified order
@@ -152,15 +154,7 @@ export default class UIScene extends Phaser.Scene {
                 `${label}: 0`, 
                 { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff' }
             );
-        });
-        
-        // Turn counter
-        this.turnText = this.add.text(
-            x + 360, 
-            y, 
-            `Turn: 1`, 
-            { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
-        );
+        });        
     }
     
     createInfoPanel() {
@@ -270,30 +264,55 @@ export default class UIScene extends Phaser.Scene {
         this.messageBox.add(this.messageText);
     }
     
-    createEndTurnButton() {
-        const buttonHeight = 40;
+    createBottomPanel() {
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        const panelHeight = 50;
+        const panelWidth = 450;
+        const margin = 20;
+        const panelX = width - panelWidth;
+        
+        // Create reputation display
+        const reputationText = this.add.text(
+            panelX + margin, 
+            height - panelHeight/2, 
+            `Reputation: 0`, 
+            { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
+        );
+        reputationText.setOrigin(0, 0.5);
+        this.resourceTexts[RESOURCES.REPUTATION] = reputationText;
+        
+        // Create turn counter
+        this.turnText = this.add.text(
+            panelX + panelWidth/2, 
+            height - panelHeight/2, 
+            `Turn: 1/30`, 
+            { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
+        );
+        this.turnText.setOrigin(0.5, 0.5);
+        
+        // Create end turn button
         const buttonWidth = 100;
-        const buttonMargin = 10;
-        const x = this.cameras.main.width - buttonWidth - buttonMargin;
-        const y = this.cameras.main.height - buttonHeight - buttonMargin;
+        const buttonHeight = 30;
         
         const button = this.add.graphics();
         button.fillStyle(0x0066cc, 1);
         button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         
         const buttonText = this.add.text(
-            50, 
-            20, 
+            buttonWidth / 2, 
+            buttonHeight / 2, 
             'END TURN', 
             { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
         );
         buttonText.setOrigin(0.5);
         
-        this.endTurnButton = this.add.container(x, y);
+        this.endTurnButton = this.add.container(panelX + panelWidth - buttonWidth - margin, height - panelHeight/2);
+        this.endTurnButton.setY(this.endTurnButton.y - buttonHeight/2); // Center vertically
         this.endTurnButton.add(button);
         this.endTurnButton.add(buttonText);
         
-        this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 40), Phaser.Geom.Rectangle.Contains);
+        this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
         
         this.endTurnButton.on('pointerdown', () => {
             this.gameScene.endTurn();
@@ -302,13 +321,13 @@ export default class UIScene extends Phaser.Scene {
         this.endTurnButton.on('pointerover', () => {
             button.clear();
             button.fillStyle(0x0088ff, 1); // Lighter blue for hover
-            button.fillRoundedRect(0, 0, 100, 40, 5);
+            button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         });
         
         this.endTurnButton.on('pointerout', () => {
             button.clear();
             button.fillStyle(0x0066cc, 1); // Back to blue
-            button.fillRoundedRect(0, 0, 100, 40, 5);
+            button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         });
         
         // Store the button graphics for enabling/disabling
@@ -322,22 +341,24 @@ export default class UIScene extends Phaser.Scene {
     updateEndTurnButton() {
         const handSize = this.cardManager.getHand().length;
         const isOverLimit = handSize > MAX_HAND_SIZE;
+        const buttonWidth = 100;
+        const buttonHeight = 30;
         
         if (isOverLimit) {
             // Disable button
             this.endTurnButton.disableInteractive();
             this.endTurnButtonGraphics.clear();
             this.endTurnButtonGraphics.fillStyle(0x666666, 1); // Gray when disabled
-            this.endTurnButtonGraphics.fillRoundedRect(0, 0, 100, 40, 5);
+            this.endTurnButtonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
             
             // Show message to inform player
             this.showMessage(`Hand over limit! Discard ${handSize - MAX_HAND_SIZE} card(s)`);
         } else {
             // Enable button
-            this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 40), Phaser.Geom.Rectangle.Contains);
+            this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
             this.endTurnButtonGraphics.clear();
             this.endTurnButtonGraphics.fillStyle(0x0066cc, 1); // Blue when enabled
-            this.endTurnButtonGraphics.fillRoundedRect(0, 0, 100, 40, 5);
+            this.endTurnButtonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         }
     }
     
