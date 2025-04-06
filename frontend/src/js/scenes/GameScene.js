@@ -481,7 +481,7 @@ export default class GameScene extends Phaser.Scene {
         this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
         
         // Update UI
-        this.uiScene.refreshResourceDisplay();
+        this.uiScene.refreshUI();
         
         return true;
     }

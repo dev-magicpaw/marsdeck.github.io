@@ -9,7 +9,7 @@ export default class ResourceManager {
             [RESOURCES.STEEL]: 40, 
             [RESOURCES.CONCRETE]: 40,
             [RESOURCES.WATER]: 0,
-            [RESOURCES.FUEL]: 0,
+            [RESOURCES.FUEL]: 40,
             [RESOURCES.DRONES]: 10,
             [RESOURCES.ENERGY]: 0,
             [RESOURCES.REPUTATION]: 0
