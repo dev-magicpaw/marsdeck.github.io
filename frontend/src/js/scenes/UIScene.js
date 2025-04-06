@@ -490,7 +490,7 @@ export default class UIScene extends Phaser.Scene {
             xPos = index * (this.cardWidth + this.cardSpacing);
         } else {
             // Add extra spacing for cards after the limit (same as in createCardSlots)
-            xPos = index * (this.cardWidth + this.cardSpacing) + this.cardSpacing;
+            xPos = index * (this.cardWidth + this.cardSpacing) + 2 * this.cardSpacing;
         }
         
         const cardContainer = this.add.container(xPos, 0);
