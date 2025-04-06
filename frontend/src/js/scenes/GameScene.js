@@ -273,7 +273,7 @@ export default class GameScene extends Phaser.Scene {
             console.log('Cannot place building here');
             // Show UI error message
             if (this.uiScene) {
-                this.uiScene.showMessage('Cannot place building here. Check terrain requirements.');
+                this.uiScene.showMessage('Cannot place building here.');
             }
             return;
         }
