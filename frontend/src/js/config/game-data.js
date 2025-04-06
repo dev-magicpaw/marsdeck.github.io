@@ -272,11 +272,11 @@ export const BUILDINGS = {
 // Deck composition - defines how many copies of each card type will be in the deck
 export const DECK_COMPOSITION = {
     // Format: buildingId: numberOfCopies
-    'droneDepo': 4,       // More drone depos for early resource generation
-    'ironMine': 3,        // Regular resource production buildings
+    'droneDepo': 3,       // More drone depos for early resource generation
+    'ironMine': 5,        // Regular resource production buildings
     'steelworks': 3,
-    'concreteMixer': 3,
-    'waterPump': 3,
+    'concreteMixer': 5,
+    'waterPump': 5,
     'fuelRefinery': 3,
     'windTurbine': 4,     // More wind turbines for energy generation
     'solarPanel': 4,      // More solar panels for energy generation
