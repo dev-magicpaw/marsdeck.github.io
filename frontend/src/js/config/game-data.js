@@ -221,6 +221,6 @@ export const BUILDINGS = {
         production: {},
         consumption: {},
         terrainRequirement: null,
-        texture: 'launchPad' // Using the same texture as launch pad
+        texture: 'launchPadSurrounding' // Now using its own unique texture
     }
 }; 
