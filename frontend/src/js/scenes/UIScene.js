@@ -13,6 +13,8 @@ export default class UIScene extends Phaser.Scene {
         this.cardHeight = 140;
         this.cardSpacing = 5;
         
+        this.buttonHeight = 30;
+        
         // Selected card tracking
         this.selectedCardIndex = undefined;
         
@@ -1070,12 +1072,12 @@ export default class UIScene extends Phaser.Scene {
                     // Clear selection and refresh UI
                     this.clearInfoPanel();
                     this.refreshUI();
-                }, 0x0066cc, 300); // Blue color for launch button with larger size
+                }, 0x0066cc, 300, this.buttonHeight, 'endTurnButton'); // Use blue texture with larger width and consistent height
                 
                 this.actionsContainer.add(launchButton);
             } else {
-                // Disabled launch button
-                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 250, 30);
+                // Disabled launch button - now we'll use a grayed-out version of the texture
+                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 300, this.buttonHeight, 'endTurnButton');
                 this.actionsContainer.add(launchButton);
             }
         }
@@ -1144,13 +1146,24 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Helper to create disabled action buttons
-    createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30) {
+    createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30, textureName = null) {
         const button = this.add.container(0, 0);
         
-        // Button background with gray color for disabled appearance
-        const bg = this.add.graphics();
-        bg.fillStyle(0x555555, 0.7); // Gray, semi-transparent for disabled look
-        bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        // Button background - either use texture or graphics
+        let bg;
+        if (textureName) {
+            // Use the provided texture with a gray tint
+            bg = this.add.sprite(0, 0, textureName);
+            bg.setDisplaySize(buttonWidth, buttonHeight);
+            bg.setOrigin(0, 0);
+            bg.setTint(0x888888); // Gray tint for disabled appearance
+            bg.setAlpha(0.7);     // Semi-transparent
+        } else {
+            // Use graphics (for backward compatibility)
+            bg = this.add.graphics();
+            bg.fillStyle(0x555555, 0.7); // Gray, semi-transparent for disabled look
+            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        }
         button.add(bg);
         
         // Button text
