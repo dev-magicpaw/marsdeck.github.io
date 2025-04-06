@@ -23,8 +23,8 @@ export const RESOURCES = {
 // Initial resource values when game starts
 export const STARTING_RESOURCES = {
     [RESOURCES.IRON]: 0,
-    [RESOURCES.STEEL]: 15, 
-    [RESOURCES.CONCRETE]: 15,
+    [RESOURCES.STEEL]: 20, 
+    [RESOURCES.CONCRETE]: 20,
     [RESOURCES.WATER]: 0,
     [RESOURCES.FUEL]: 0,
     [RESOURCES.DRONES]: 0,
@@ -194,7 +194,7 @@ export const BUILDINGS = {
             [RESOURCES.STEEL]: 1
         },
         production: {
-            [RESOURCES.ENERGY]: 3
+            [RESOURCES.ENERGY]: 6
         },
         consumption: {},
         terrainRequirement: null,

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
+import { SAMPLE_MAP } from '../config/map-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -18,8 +19,12 @@ export default class GameScene extends Phaser.Scene {
         this.resourceManager = new ResourceManager(this);
         this.cardManager = new CardManager(this);
         
-        // Generate random map
-        this.gridManager.generateRandomMap();
+        // Choose which map to use
+        // Option 1: Generate a random map
+        // this.gridManager.generateRandomMap();
+        
+        // Option 2: Load a predefined map configuration
+        this.gridManager.loadMapConfig(SAMPLE_MAP);
         
         // Initialize turn counter
         this.currentTurn = 1;
