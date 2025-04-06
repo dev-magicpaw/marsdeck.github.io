@@ -489,13 +489,13 @@ export default class GameScene extends Phaser.Scene {
             
             // Define the flickering sequence
             const flickerSequence = [
-                { key: 'rocketInFlight', duration: 300 },
-                { key: 'rocketFueled', duration: 300 },
-                { key: 'rocketInFlight', duration: 300 },
-                { key: 'rocketFueled', duration: 300 },
-                { key: 'rocketInFlight', duration: 300 },
-                { key: 'rocketFueled', duration: 300 },
-                { key: 'rocketInFlight', duration: 300 }
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 }
             ];
             
             // Initialize sequence counter
@@ -503,7 +503,7 @@ export default class GameScene extends Phaser.Scene {
             
             // Create a timer for flickering effect
             const flickerTimer = this.time.addEvent({
-                delay: 300,
+                delay: 200,
                 callback: () => {
                     sequenceIndex++;
                     if (sequenceIndex < flickerSequence.length) {
@@ -598,12 +598,12 @@ export default class GameScene extends Phaser.Scene {
                 
                 // Define the flickering sequence
                 const flickerSequence = [
-                    { key: 'rocketUnFueled', duration: 300 },
-                    { key: 'rocketInFlight', duration: 300 },
-                    { key: 'rocketUnFueled', duration: 300 },
-                    { key: 'rocketInFlight', duration: 300 },
-                    { key: 'rocketUnFueled', duration: 300 },
-                    { key: 'rocketInFlight', duration: 300 },
+                    { key: 'rocketUnFueled', duration: 200 },
+                    { key: 'rocketInFlight', duration: 200 },
+                    { key: 'rocketUnFueled', duration: 200 },
+                    { key: 'rocketInFlight', duration: 200 },
+                    { key: 'rocketUnFueled', duration: 200 },
+                    { key: 'rocketInFlight', duration: 200 },
                     { key: 'rocketUnFueled', duration: 300 }
                 ];
                 
@@ -612,7 +612,7 @@ export default class GameScene extends Phaser.Scene {
                 
                 // Create a timer for flickering effect
                 const flickerTimer = this.time.addEvent({
-                    delay: 300,
+                    delay: 200,
                     callback: () => {
                         sequenceIndex++;
                         if (sequenceIndex < flickerSequence.length) {
