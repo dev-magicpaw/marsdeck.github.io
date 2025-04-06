@@ -58,9 +58,10 @@ export default class UIScene extends Phaser.Scene {
         this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
+        const maxCards = 7;
         const cardWidth = 80;
         const cardSpacing = 5;
-        const cardsWidth = (cardWidth + cardSpacing) * 8;
+        const cardsWidth = (cardWidth + cardSpacing) * maxCards;
         
         // Position cards panel under the map (map is offset at 50,50 in GameScene)
         const mapSize = 9 * 64; // 9 tiles of 64px each
@@ -194,17 +195,13 @@ export default class UIScene extends Phaser.Scene {
         const mapOffset = 50;
         const mapSize = 9 * 64; // 9 tiles of 64px each
         const margin = 10; // Same margin as in createLayout
-        const verticalSpacing = 20; // Same spacing as in createLayout
-        
-        // Position cards with consistent margin from the panel edges
-        // Add margin to x position to create space from the left edge of the panel
+        const verticalSpacing = 20; // Add space between map and cards
+   
         const x = mapOffset + margin;
-        const y = mapOffset + mapSize + verticalSpacing; // Add space between map and cards
+        const y = mapOffset + mapSize + verticalSpacing;
         
         // Create container for cards
-        this.handContainer = this.add.container(x, y);
-        
-        // No title or deck info as requested
+        this.handContainer = this.add.container(x, y);        
     }
     
     createMessageBox() {
