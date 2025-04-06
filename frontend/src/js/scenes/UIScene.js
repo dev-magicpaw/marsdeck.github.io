@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
+import { BUILDINGS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -270,27 +270,56 @@ export default class UIScene extends Phaser.Scene {
         );
         buttonText.setOrigin(0.5);
         
-        const endTurnButton = this.add.container(x, y);
-        endTurnButton.add(button);
-        endTurnButton.add(buttonText);
+        this.endTurnButton = this.add.container(x, y);
+        this.endTurnButton.add(button);
+        this.endTurnButton.add(buttonText);
         
-        endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 40), Phaser.Geom.Rectangle.Contains);
+        this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 40), Phaser.Geom.Rectangle.Contains);
         
-        endTurnButton.on('pointerdown', () => {
+        this.endTurnButton.on('pointerdown', () => {
             this.gameScene.endTurn();
         });
         
-        endTurnButton.on('pointerover', () => {
+        this.endTurnButton.on('pointerover', () => {
             button.clear();
             button.fillStyle(0x0088ff, 1); // Lighter blue for hover
             button.fillRoundedRect(0, 0, 100, 40, 5);
         });
         
-        endTurnButton.on('pointerout', () => {
+        this.endTurnButton.on('pointerout', () => {
             button.clear();
             button.fillStyle(0x0066cc, 1); // Back to blue
             button.fillRoundedRect(0, 0, 100, 40, 5);
         });
+        
+        // Store the button graphics for enabling/disabling
+        this.endTurnButtonGraphics = button;
+        
+        // Initial button state check
+        this.updateEndTurnButton();
+    }
+    
+    // Check if hand is over limit and update END TURN button accordingly
+    updateEndTurnButton() {
+        const handSize = this.cardManager.getHand().length;
+        const isOverLimit = handSize > MAX_HAND_SIZE;
+        
+        if (isOverLimit) {
+            // Disable button
+            this.endTurnButton.disableInteractive();
+            this.endTurnButtonGraphics.clear();
+            this.endTurnButtonGraphics.fillStyle(0x666666, 1); // Gray when disabled
+            this.endTurnButtonGraphics.fillRoundedRect(0, 0, 100, 40, 5);
+            
+            // Show message to inform player
+            this.showMessage(`Hand over limit! Discard ${handSize - MAX_HAND_SIZE} card(s)`);
+        } else {
+            // Enable button
+            this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 40), Phaser.Geom.Rectangle.Contains);
+            this.endTurnButtonGraphics.clear();
+            this.endTurnButtonGraphics.fillStyle(0x0066cc, 1); // Blue when enabled
+            this.endTurnButtonGraphics.fillRoundedRect(0, 0, 100, 40, 5);
+        }
     }
     
     // Refresh all UI components
@@ -304,6 +333,7 @@ export default class UIScene extends Phaser.Scene {
         this.updateHandDisplay();
         this.updateTurnDisplay();
         this.updateActionsPanel();
+        this.updateEndTurnButton();
     }
     
     // Update resource counters
@@ -782,6 +812,9 @@ export default class UIScene extends Phaser.Scene {
                 // Update UI
                 this.clearInfoPanel();
                 this.refreshUI();
+                
+                // Check if we're now under the hand limit
+                this.updateEndTurnButton();
                 
                 // Show message
                 this.showMessage('Card discarded');
