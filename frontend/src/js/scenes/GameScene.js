@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -23,6 +23,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Initialize turn counter
         this.currentTurn = 1;
+        this.maxTurns = MAX_TURNS;
         
         // Ensure player starts with specific cards
         this.setupStartingHand();
