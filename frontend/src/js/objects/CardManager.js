@@ -18,6 +18,11 @@ export default class CardManager {
         
         // Add multiple copies of each building
         Object.values(BUILDINGS).forEach(building => {
+            // Skip the Launch Pad Surrounding - it should only be placed automatically
+            if (building.id === 'launchPadSurrounding') {
+                return;
+            }
+            
             // The number of copies depends on the rarity/importance
             // For prototype, add 2-3 copies of each building
             const numCopies = building.id === 'launchPad' ? 1 : 3;
