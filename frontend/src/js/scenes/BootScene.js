@@ -71,6 +71,9 @@ export default class BootScene extends Phaser.Scene {
         
         // Load hand limit indicator
         this.load.image('handLimitIndicator', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_small_square.png'));
+        
+        // Load end turn button texture
+        this.load.image('endTurnButton', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_gloss_large.png'));
     }
 
     create() {
