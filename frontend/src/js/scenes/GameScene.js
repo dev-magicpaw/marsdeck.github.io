@@ -396,38 +396,6 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
-        
-        // Special case for Launch Pad - process after all production
-        buildings.forEach(building => {
-            if (building.buildingId === 'launchPad') {
-                this.tryLaunchRocket(building.x, building.y);
-            }
-        });
-    }
-    
-    // Try to launch a rocket from launch pad for victory points
-    tryLaunchRocket(x, y) {
-        const launchCost = {
-            [RESOURCES.FUEL]: 5,
-            [RESOURCES.STEEL]: 2,
-            [RESOURCES.WATER]: 1
-        };
-        
-        if (this.resourceManager.hasSufficientResources(launchCost)) {
-            // Consume resources
-            this.resourceManager.consumeResources(launchCost);
-            
-            // Add reputation
-            this.resourceManager.modifyResource(RESOURCES.REPUTATION, 10);
-            
-            // Show launch animation
-            // TODO: Add rocket launch animation
-            
-            // Update UI
-            if (this.uiScene) {
-                this.uiScene.showMessage('Rocket launched successfully! +10 Reputation');
-            }
-        }
     }
     
     // Game over - calculate final score
