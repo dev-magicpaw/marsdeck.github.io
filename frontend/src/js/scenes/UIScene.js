@@ -496,10 +496,27 @@ export default class UIScene extends Phaser.Scene {
         
         const cardContainer = this.add.container(xPos, 0);
         
-        // Card background
-        const cardBg = this.add.sprite(0, 0, card.type === 'building' ? 'cardBackground' : 'cardTemplate');
-        cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
-        cardBg.setOrigin(0, 0);
+        // Card background using NineSlice for better UI scaling
+        let cardBg;
+        const textureKey = card.type === 'building' ? 'cardBackground' : 'cardTemplate';
+        
+        if (card.type === 'building') {
+            // Use NineSlice for building cards
+            // The corner sizes are set to 10px for all corners
+            cardBg = this.add.nineslice(
+                0, 0,               // position
+                textureKey,         // texture key
+                null,               // frame (null for default)
+                this.cardWidth, this.cardHeight, // size
+                10, 10, 35, 15      // slice sizes: left, right, top, bottom
+            );
+            cardBg.setOrigin(0, 0);
+        } else {
+            // Use regular sprite for other card types
+            cardBg = this.add.sprite(0, 0, textureKey);
+            cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
+            cardBg.setOrigin(0, 0);
+        }
         
         // Add highlight for selected card
         if (index === this.selectedCardIndex) {
@@ -1262,10 +1279,19 @@ export default class UIScene extends Phaser.Scene {
             // Create card container
             const cardContainer = this.add.container(xPos, 0);
             
-            // Card background
-            const cardBg = this.add.sprite(0, 0, 'cardBackground');
-            cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
+            // Card background using NineSlice for better UI scaling
+            let cardBg;
+            
+            // Use NineSlice for better scaling
+            cardBg = this.add.nineslice(
+                0, 0,                // position
+                'cardBackground',    // texture key
+                null,                // frame (null for default)
+                this.cardWidth, this.cardHeight, // size
+                10, 10, 10, 10       // slice sizes: left, right, top, bottom
+            );
             cardBg.setOrigin(0, 0);
+            
             cardContainer.add(cardBg);
             
             // Make card interactive
