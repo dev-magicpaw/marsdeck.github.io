@@ -6,7 +6,7 @@ export const MAX_HAND_SIZE = 6; // Maximum cards in hand
 export const MAX_CARD_SLOTS = 8; // Maximum slots to display in the UI
 
 // The amount of reputation needed to win the game
-export const VICTORY_GOAL = 10;
+export const VICTORY_GOAL = 25;
 
 // Resource types
 export const RESOURCES = {
@@ -18,6 +18,18 @@ export const RESOURCES = {
     DRONES: 'drones',
     ENERGY: 'energy',
     REPUTATION: 'reputation'
+};
+
+// Initial resource values when game starts
+export const STARTING_RESOURCES = {
+    [RESOURCES.IRON]: 0,
+    [RESOURCES.STEEL]: 40, 
+    [RESOURCES.CONCRETE]: 40,
+    [RESOURCES.WATER]: 0,
+    [RESOURCES.FUEL]: 40,
+    [RESOURCES.DRONES]: 10,
+    [RESOURCES.ENERGY]: 0,
+    [RESOURCES.REPUTATION]: 0
 };
 
 // Terrain types and their properties

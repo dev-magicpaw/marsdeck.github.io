@@ -1,19 +1,10 @@
-import { RESOURCES, VICTORY_GOAL } from '../config/game-data';
+import { RESOURCES, STARTING_RESOURCES, VICTORY_GOAL } from '../config/game-data';
 
 export default class ResourceManager {
     constructor(scene) {
         this.scene = scene;
         // Starting resources
-        this.resources = {
-            [RESOURCES.IRON]: 0,
-            [RESOURCES.STEEL]: 40, 
-            [RESOURCES.CONCRETE]: 40,
-            [RESOURCES.WATER]: 0,
-            [RESOURCES.FUEL]: 40,
-            [RESOURCES.DRONES]: 10,
-            [RESOURCES.ENERGY]: 0,
-            [RESOURCES.REPUTATION]: 0
-        };
+        this.resources = { ...STARTING_RESOURCES };
         
         // Resources that don't accumulate between turns (e.g., energy)
         this.nonAccumulatingResources = [];
