@@ -59,7 +59,7 @@ export default class UIScene extends Phaser.Scene {
         this.createPanel(width - 350, 0, 350, 100, 0x222222, 0.8); // Resources panel
         this.createPanel(width - 350, 110, 350, 300, 0x222222, 0.8); // Info panel
         this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
-        this.createPanel(width - 350, 510, 350, 200, 0x222222, 0.8); // Choice panel
+        this.choicePanelBg = this.createPanel(width - 350, 510, 350, 200, 0x222222, 0.8); // Choice panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
         const maxCards = 8;
@@ -210,6 +210,7 @@ export default class UIScene extends Phaser.Scene {
         // Hide choice panel initially
         this.choiceTitle.setVisible(false);
         this.choiceContainer.setVisible(false);
+        this.choicePanelBg.visible = false; // Hide background too
     }
     
     createHandPanel() {
@@ -846,12 +847,14 @@ export default class UIScene extends Phaser.Scene {
         if (cards.length === 0) {
             this.choiceTitle.setVisible(false);
             this.choiceContainer.setVisible(false);
+            this.choicePanelBg.visible = false; // Hide background when no cards
             return;
         }
         
-        // Show title
+        // Show title and background
         this.choiceTitle.setVisible(true);
         this.choiceContainer.setVisible(true);
+        this.choicePanelBg.visible = true; // Show background when cards are shown
         
         // Create mini card displays - use same dimensions as hand cards
         const cardWidth = 80;  // Same as in createCardSprite
@@ -932,5 +935,6 @@ export default class UIScene extends Phaser.Scene {
         // Hide the choice panel
         this.choiceTitle.setVisible(false);
         this.choiceContainer.setVisible(false);
+        this.choicePanelBg.visible = false; // Hide background when choice is made
     }
 } 
