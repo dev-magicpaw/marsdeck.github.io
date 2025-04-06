@@ -61,6 +61,9 @@ export default class BootScene extends Phaser.Scene {
         
         // Load card background
         this.load.image('cardBackground', require('../../assets/images/ui_pack_space/Blue/Default/button_square_header_large_rectangle.png'));
+        
+        // Load card slot background
+        this.load.image('cardSlotBackground', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_outline_large.png'));
     }
 
     create() {
