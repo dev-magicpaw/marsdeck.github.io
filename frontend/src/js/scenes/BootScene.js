@@ -74,6 +74,9 @@ export default class BootScene extends Phaser.Scene {
         
         // Load end turn button texture
         this.load.image('endTurnButton', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_gloss_large.png'));
+        
+        // Load discard button texture
+        this.load.image('discardButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_large.png'));
     }
 
     create() {

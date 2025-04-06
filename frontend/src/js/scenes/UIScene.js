@@ -364,8 +364,8 @@ export default class UIScene extends Phaser.Scene {
         this.turnText.setOrigin(0.5, 0.5);
         
         // Create end turn button
-        const buttonWidth = 120;
-        const buttonHeight = 40;
+        const buttonWidth = 100;
+        const buttonHeight = 30;
         
         // Create end turn button using the texture
         const buttonBg = this.add.sprite(0, 0, 'endTurnButton');
@@ -410,8 +410,8 @@ export default class UIScene extends Phaser.Scene {
     updateEndTurnButton() {
         const handSize = this.cardManager.getHand().length;
         const isOverLimit = handSize > MAX_HAND_SIZE;
-        const buttonWidth = 120;
-        const buttonHeight = 40;
+        const buttonWidth = 100;
+        const buttonHeight = 30;
         
         if (isOverLimit) {
             // Disable button
@@ -1018,7 +1018,7 @@ export default class UIScene extends Phaser.Scene {
         if (this.selectedCardIndex !== null) {
             hasActions = true;
             
-            // Create discard button
+            // Create discard button using texture
             const discardButton = this.createActionButton('Discard', () => {
                 // Discard the selected card
                 this.cardManager.discardCard(this.selectedCardIndex);
@@ -1038,7 +1038,7 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Show message
                 this.showMessage('Card discarded');
-            }, 0xcc0000); // Use red color for discard button
+            }, 0xcc0000, 100, 30, 'discardButton'); // Use red texture for discard button
             
             this.actionsContainer.add(discardButton);
         }
@@ -1085,13 +1085,22 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Helper to create action buttons
-    createActionButton(text, callback, buttonColor = 0x994500, buttonWidth = 100, buttonHeight = 30) {
+    createActionButton(text, callback, buttonColor = 0x994500, buttonWidth = 100, buttonHeight = 30, textureName = null) {
         const button = this.add.container(0, 0);
         
-        // Button background
-        const bg = this.add.graphics();
-        bg.fillStyle(buttonColor, 1);
-        bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        // Button background - either use texture or graphics
+        let bg;
+        if (textureName) {
+            // Use the provided texture
+            bg = this.add.sprite(0, 0, textureName);
+            bg.setDisplaySize(buttonWidth, buttonHeight);
+            bg.setOrigin(0, 0);
+        } else {
+            // Use graphics (for backward compatibility)
+            bg = this.add.graphics();
+            bg.fillStyle(buttonColor, 1);
+            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        }
         button.add(bg);
         
         // Button text
@@ -1099,7 +1108,7 @@ export default class UIScene extends Phaser.Scene {
             buttonWidth / 2, 
             buttonHeight / 2, 
             text, 
-            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' }
         );
         buttonText.setOrigin(0.5);
         button.add(buttonText);
@@ -1109,15 +1118,23 @@ export default class UIScene extends Phaser.Scene {
         
         // Add hover effect
         button.on('pointerover', () => {
-            bg.clear();
-            bg.fillStyle(buttonColor === 0x994500 ? 0xcc6600 : buttonColor * 1.2, 1);
-            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            if (textureName) {
+                bg.setTint(0xdddddd); // Light tint for hover
+            } else {
+                bg.clear();
+                bg.fillStyle(buttonColor === 0x994500 ? 0xcc6600 : buttonColor * 1.2, 1);
+                bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            }
         });
         
         button.on('pointerout', () => {
-            bg.clear();
-            bg.fillStyle(buttonColor, 1);
-            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            if (textureName) {
+                bg.clearTint(); // Clear tint
+            } else {
+                bg.clear();
+                bg.fillStyle(buttonColor, 1);
+                bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+            }
         });
         
         // Add click handler
