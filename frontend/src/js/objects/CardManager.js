@@ -1,4 +1,4 @@
-import { BUILDINGS, MAX_CARD_SLOTS } from '../config/game-data';
+import { BUILDINGS, DECK_COMPOSITION, MAX_CARD_SLOTS } from '../config/game-data';
 
 export default class CardManager {
     constructor(scene) {
@@ -12,10 +12,39 @@ export default class CardManager {
         this.shuffleDeck();
     }
     
-    // Create the initial deck with multiple copies of each building card
+    // Create the initial deck with cards based on DECK_COMPOSITION
     initializeDeck() {
         this.deck = [];
         
+        // Add cards based on the DECK_COMPOSITION configuration
+        Object.entries(DECK_COMPOSITION).forEach(([buildingId, count]) => {
+            // Find the building definition
+            const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
+            
+            // Skip if building not found or shouldn't have cards
+            if (!building || !building.createCard) {
+                return;
+            }
+            
+            // Add the specified number of copies to the deck
+            for (let i = 0; i < count; i++) {
+                this.deck.push({
+                    type: 'building',
+                    building: building
+                });
+            }
+        });
+        
+        // If the deck is empty (e.g., if DECK_COMPOSITION is invalid),
+        // fall back to the default deck creation logic
+        if (this.deck.length === 0) {
+            console.warn('Deck composition is empty or invalid. Using default deck.');
+            this.createDefaultDeck();
+        }
+    }
+    
+    // Fallback method to create a default deck if DECK_COMPOSITION is invalid
+    createDefaultDeck() {
         // Add multiple copies of each building
         Object.values(BUILDINGS).forEach(building => {
             // Skip buildings that shouldn't have cards created for them
@@ -24,7 +53,6 @@ export default class CardManager {
             }
             
             // The number of copies depends on the rarity/importance
-            // For prototype, add 2-3 copies of each building
             const numCopies = building.id === 'launchPad' ? 1 : 3;
             
             for (let i = 0; i < numCopies; i++) {
