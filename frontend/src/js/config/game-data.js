@@ -267,4 +267,26 @@ export const BUILDINGS = {
         texture: 'windTurbineSurrounding',
         createCard: false
     }
+};
+
+// Deck composition - defines how many copies of each card type will be in the deck
+export const DECK_COMPOSITION = {
+    // Format: buildingId: numberOfCopies
+    'droneDepo': 4,       // More drone depos for early resource generation
+    'ironMine': 3,        // Regular resource production buildings
+    'steelworks': 3,
+    'concreteMixer': 3,
+    'waterPump': 3,
+    'fuelRefinery': 3,
+    'windTurbine': 4,     // More wind turbines for energy generation
+    'solarPanel': 4,      // More solar panels for energy generation
+    'launchPad': 1        // Only one launch pad as it's a special building
+};
+
+// Starting hand configuration - specific cards to always include in starting hand
+export const STARTING_HAND = {
+    // Format: buildingId: true/false
+    'droneDepo': true,   // Always include drone depo in starting hand
+    'windTurbine': true, // Always include wind turbine in starting hand
+    'launchPad': true    // Always include launch pad in starting hand
 }; 

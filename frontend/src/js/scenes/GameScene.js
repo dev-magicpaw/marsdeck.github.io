@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, STARTING_HAND, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
 import { SAMPLE_MAP } from '../config/map-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
@@ -888,17 +888,31 @@ export default class GameScene extends Phaser.Scene {
     setupStartingHand() {
         // Clear any cards that might be in the hand
         this.cardManager.hand = [];
-        const startingHandSize = 4;
-        const startingCards = [BUILDINGS.DRONE_DEPO, BUILDINGS.WIND_TURBINE, BUILDINGS.LAUNCH_PAD];
+        const startingHandSize = 4; // Total cards we want in starting hand
         
-        startingCards.forEach(card => {
+        // Add cards specified in STARTING_HAND configuration
+        const startingCards = [];
+        
+        // Collect all buildings that should be in the starting hand
+        Object.entries(STARTING_HAND).forEach(([buildingId, shouldInclude]) => {
+            if (shouldInclude) {
+                // Find the building by ID
+                const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
+                if (building) {
+                    startingCards.push(building);
+                }
+            }
+        });
+        
+        // Add the starting cards to hand
+        startingCards.forEach(building => {
             this.cardManager.hand.push({
                 type: 'building',
-                building: card
+                building: building
             });
         });
         
-        // Draw 2 more random cards to complete starting hand
+        // Draw remaining random cards to complete starting hand
         this.cardManager.drawCards(startingHandSize - startingCards.length);
     }
 
