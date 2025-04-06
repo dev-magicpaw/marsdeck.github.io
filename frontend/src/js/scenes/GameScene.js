@@ -400,7 +400,7 @@ export default class GameScene extends Phaser.Scene {
                             const xPos = x * CELL_SIZE + (CELL_SIZE / 2);
                             const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
                             cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
-                            cell.rocketSprite.setOrigin(0.5, 0.5);
+                            cell.rocketSprite.setOrigin(0.5, 1.0); // Set origin to bottom center
                             
                             // Scale rocket proportionally to fit in the cell
                             const rocketScale = (CELL_SIZE * 0.7) / Math.max(cell.rocketSprite.width, cell.rocketSprite.height);
@@ -439,7 +439,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Create landing animation sprite starting from above
         const landingAnimation = this.add.sprite(xPos, yPos - 300, 'rocketInFlight');
-        landingAnimation.setOrigin(0.5, 0.5);
+        landingAnimation.setOrigin(0.5, 1.0); // Set origin to bottom center
         
         // Scale rocket proportionally to start small
         const startScale = (CELL_SIZE * 0.1) / Math.max(landingAnimation.width, landingAnimation.height);
@@ -471,7 +471,7 @@ export default class GameScene extends Phaser.Scene {
                     // Create a new rocket sprite
                     const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
                     cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
-                    cell.rocketSprite.setOrigin(0.5, 0.5);
+                    cell.rocketSprite.setOrigin(0.5, 1.0); // Set origin to bottom center
                     
                     // Scale rocket proportionally
                     const rocketScale = (CELL_SIZE * 0.7) / Math.max(cell.rocketSprite.width, cell.rocketSprite.height);
@@ -535,7 +535,7 @@ export default class GameScene extends Phaser.Scene {
             // Clone the rocket sprite for animation
             const rocketSprite = cell.rocketSprite;
             const launchAnimation = this.add.sprite(rocketSprite.x, rocketSprite.y, 'rocketInFlight');
-            launchAnimation.setOrigin(0.5, 0.5);
+            launchAnimation.setOrigin(0.5, 1.0); // Set origin to bottom center
             launchAnimation.setScale(rocketSprite.scaleX, rocketSprite.scaleY);
             this.gridContainer.add(launchAnimation);
             
