@@ -404,14 +404,18 @@ export default class GameScene extends Phaser.Scene {
         // Calculate final score (reputation + resource bonuses)
         const resources = this.resourceManager.getAllResources();
         const reputation = resources[RESOURCES.REPUTATION];
+
+        const resourcesBringVictoryPoints = false;
         
         // Add bonus points for leftover resources
-        const bonusPoints = Math.floor(
-            resources[RESOURCES.STEEL] / 2 +
-            resources[RESOURCES.CONCRETE] / 2 +
-            resources[RESOURCES.WATER] / 2 +
-            resources[RESOURCES.FUEL] * 2
-        );
+        if (resourcesBringVictoryPoints) {
+            bonusPoints = Math.floor(
+                resources[RESOURCES.STEEL] / 2 +
+                resources[RESOURCES.CONCRETE] / 2 +
+                resources[RESOURCES.WATER] / 2 +
+                resources[RESOURCES.FUEL] * 2
+            );
+        }
         
         const finalScore = reputation + bonusPoints;
         
