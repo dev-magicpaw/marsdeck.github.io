@@ -377,8 +377,8 @@ export default class GameScene extends Phaser.Scene {
                 this.uiScene.showSelectedCard(card);
             }
             
-            // If it's a building card and we have enough resources, show illegal tiles
-            if (card.type === 'building' && this.resourceManager.hasSufficientResources(card.building.cost)) {
+            // If it's a building card - show illegal tiles
+            if (card.type === 'building') {
                 this.showIllegalTiles(card.building);
             }
         }
