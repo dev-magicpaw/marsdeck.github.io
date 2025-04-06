@@ -528,20 +528,17 @@ export default class GameScene extends Phaser.Scene {
     setupStartingHand() {
         // Clear any cards that might be in the hand
         this.cardManager.hand = [];
+        const startingHandSize = 4;
+        const startingCards = [BUILDINGS.DRONE_DEPO, BUILDINGS.WIND_TURBINE];
         
-        // Add a Drone Depo card
-        this.cardManager.hand.push({
-            type: 'building',
-            building: BUILDINGS.DRONE_DEPO
-        });
-        
-        // Add a Wind Turbine card
-        this.cardManager.hand.push({
-            type: 'building',
-            building: BUILDINGS.WIND_TURBINE
+        startingCards.forEach(card => {
+            this.cardManager.hand.push({
+                type: 'building',
+                building: card
+            });
         });
         
         // Draw 2 more random cards to complete starting hand
-        this.cardManager.drawCards(2);
+        this.cardManager.drawCards(startingHandSize - startingCards.length);
     }
 } 
