@@ -11,7 +11,7 @@ export default class ResourceManager {
             [RESOURCES.FUEL]: 0,
             [RESOURCES.DRONES]: 10,
             [RESOURCES.ENERGY]: 0,
-            [RESOURCES.VICTORY_POINTS]: 0
+            [RESOURCES.REPUTATION]: 0
         };
         
         // Resources that don't accumulate between turns (e.g., energy)

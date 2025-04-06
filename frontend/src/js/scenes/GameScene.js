@@ -386,24 +386,24 @@ export default class GameScene extends Phaser.Scene {
             // Consume resources
             this.resourceManager.consumeResources(launchCost);
             
-            // Add victory points
-            this.resourceManager.modifyResource(RESOURCES.VICTORY_POINTS, 10);
+            // Add reputation
+            this.resourceManager.modifyResource(RESOURCES.REPUTATION, 10);
             
             // Show launch animation
             // TODO: Add rocket launch animation
             
             // Update UI
             if (this.uiScene) {
-                this.uiScene.showMessage('Rocket launched successfully! +10 Victory Points');
+                this.uiScene.showMessage('Rocket launched successfully! +10 Reputation');
             }
         }
     }
     
     // Game over - calculate final score
     gameOver() {
-        // Calculate final score (victory points + resource bonuses)
+        // Calculate final score (reputation + resource bonuses)
         const resources = this.resourceManager.getAllResources();
-        const vp = resources[RESOURCES.VICTORY_POINTS];
+        const reputation = resources[RESOURCES.REPUTATION];
         
         // Add bonus points for leftover resources
         const bonusPoints = Math.floor(
@@ -413,11 +413,11 @@ export default class GameScene extends Phaser.Scene {
             resources[RESOURCES.FUEL] * 2
         );
         
-        const finalScore = vp + bonusPoints;
+        const finalScore = reputation + bonusPoints;
         
         // Show game over screen in UI
         if (this.uiScene) {
-            this.uiScene.showGameOver(finalScore, vp, bonusPoints);
+            this.uiScene.showGameOver(finalScore, reputation, bonusPoints);
         }
     }
 } 
