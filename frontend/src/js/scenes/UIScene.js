@@ -1136,6 +1136,9 @@ export default class UIScene extends Phaser.Scene {
     createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30) {
         const button = this.add.container(0, 0);
         
+        // Button background with gray color for disabled appearance
+        const bg = this.add.graphics();
+        bg.fillStyle(0x555555, 0.7); // Gray, semi-transparent for disabled look
         bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         button.add(bg);
         
