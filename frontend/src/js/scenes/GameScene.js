@@ -269,6 +269,12 @@ export default class GameScene extends Phaser.Scene {
             
             // Place surroundings on all adjacent cells
             for (const adjCell of adjacentCells) {
+                // Remove feature sprite if it exists (surrounding buildings never require features)
+                if (adjCell.featureSprite) {
+                    adjCell.featureSprite.destroy();
+                    adjCell.featureSprite = null;
+                }
+                
                 // Place the surrounding building 
                 this.gridManager.placeBuilding(adjCell.x, adjCell.y, surroundingBuilding);
                 
