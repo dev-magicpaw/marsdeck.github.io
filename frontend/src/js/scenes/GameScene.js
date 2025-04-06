@@ -105,7 +105,8 @@ export default class GameScene extends Phaser.Scene {
                 terrainSprite.displayWidth = CELL_SIZE;
                 terrainSprite.displayHeight = CELL_SIZE;
                 terrainSprite.setInteractive();
-                terrainSprite.data = { x, y }; // Store grid coordinates
+                terrainSprite.setData('gridX', x); // Store grid X coordinate properly
+                terrainSprite.setData('gridY', y); // Store grid Y coordinate properly
                 
                 // Add debug text to show tile index if in debug mode
                 const debugText = this.add.text(
@@ -169,9 +170,9 @@ export default class GameScene extends Phaser.Scene {
         // Handle grid cell clicks
         this.input.on('gameobjectdown', (pointer, gameObject) => {
             // Check if we clicked on a grid cell
-            if (gameObject.data && gameObject.data.x !== undefined) {
-                const x = gameObject.data.x;
-                const y = gameObject.data.y;
+            if (gameObject.getData('gridX') !== undefined) {
+                const x = gameObject.getData('gridX');
+                const y = gameObject.getData('gridY');
                 
                 // If we're in debug mode, show tile info
                 if (this.debug && gameObject.debugText) {
