@@ -19,6 +19,7 @@ export default class UIScene extends Phaser.Scene {
         this.infoPanel = null;
         this.handPanel = null;
         this.messageBox = null;
+        this.actionsPanel = null;
     }
 
     create() {
@@ -30,6 +31,9 @@ export default class UIScene extends Phaser.Scene {
         
         // Create info panel
         this.createInfoPanel();
+        
+        // Create actions panel
+        this.createActionsPanel();
         
         // Create hand panel
         this.createHandPanel();
@@ -51,6 +55,7 @@ export default class UIScene extends Phaser.Scene {
         // Create panel backgrounds
         this.createPanel(width - 350, 0, 350, 100, 0x222222, 0.8); // Resources panel
         this.createPanel(width - 350, 110, 350, 300, 0x222222, 0.8); // Info panel
+        this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
         const cardWidth = 80;
@@ -165,6 +170,24 @@ export default class UIScene extends Phaser.Scene {
         this.infoSprite.setVisible(false);
     }
     
+    createActionsPanel() {
+        const x = this.cameras.main.width - 340;
+        const y = 430;
+        // Header
+        this.actionsTitle = this.add.text(x, y, 'ACTIONS', { 
+            fontSize: '20px', 
+            fontFamily: 'Arial', 
+            color: '#ffffff'
+        });
+        
+        // Container for action buttons
+        this.actionsContainer = this.add.container(x, y + 30);
+        
+        // Hide actions panel initially
+        this.actionsTitle.setVisible(false);
+        this.actionsContainer.setVisible(false);
+    }
+    
     createHandPanel() {
         // Calculate position for cards panel under the map
         const mapOffset = 50;
@@ -257,6 +280,7 @@ export default class UIScene extends Phaser.Scene {
         this.updateResourceDisplay();
         this.updateHandDisplay();
         this.updateTurnDisplay();
+        this.updateActionsPanel();
     }
     
     // Update resource counters
@@ -378,6 +402,7 @@ export default class UIScene extends Phaser.Scene {
         
         // Update UI
         this.updateHandDisplay();
+        this.updateActionsPanel();
     }
     
     // Show cell info in the info panel
@@ -652,6 +677,9 @@ export default class UIScene extends Phaser.Scene {
             // Show building sprite
             this.infoSprite.setTexture(card.building.texture);
             this.infoSprite.setVisible(true);
+            
+            // Update actions panel
+            this.updateActionsPanel();
         }
     }
     
@@ -674,6 +702,10 @@ export default class UIScene extends Phaser.Scene {
             this.additionalContent.destroy();
             this.additionalContent = null;
         }
+        
+        // Hide actions panel
+        this.actionsTitle.setVisible(false);
+        this.actionsContainer.setVisible(false);
     }
     
     // Show message to the player
@@ -774,5 +806,87 @@ export default class UIScene extends Phaser.Scene {
             buttonBg.fillStyle(0x994500, 1);
             buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
         });
+    }
+    
+    // Update the actions panel based on selected entity
+    updateActionsPanel() {
+        // Clear existing buttons
+        this.actionsContainer.removeAll(true);
+        
+        let hasActions = false;
+        
+        // If we have a selected card, show discard action
+        if (this.selectedCardIndex !== null) {
+            hasActions = true;
+            
+            // Create discard button
+            const discardButton = this.createActionButton('Discard', () => {
+                // Discard the selected card
+                this.cardManager.discardCard(this.selectedCardIndex);
+                
+                // Clear selection
+                this.selectedCardIndex = null;
+                this.gameScene.selectedCard = null;
+                this.gameScene.selectedCardIndex = undefined;
+                
+                // Update UI
+                this.clearInfoPanel();
+                this.refreshUI();
+                
+                // Show message
+                this.showMessage('Card discarded');
+            }, 0xcc0000); // Use red color for discard button
+            
+            this.actionsContainer.add(discardButton);
+        }
+        
+        // Show or hide actions panel based on if there are actions
+        this.actionsTitle.setVisible(hasActions);
+        this.actionsContainer.setVisible(hasActions);
+    }
+    
+    // Helper to create action buttons
+    createActionButton(text, callback, buttonColor = 0x994500) {
+        const buttonWidth = 100;
+        const buttonHeight = 30;
+        
+        const button = this.add.container(0, 0);
+        
+        // Button background
+        const bg = this.add.graphics();
+        bg.fillStyle(buttonColor, 1);
+        bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        button.add(bg);
+        
+        // Button text
+        const buttonText = this.add.text(
+            buttonWidth / 2, 
+            buttonHeight / 2, 
+            text, 
+            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        );
+        buttonText.setOrigin(0.5);
+        button.add(buttonText);
+        
+        // Make button interactive
+        button.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effect
+        button.on('pointerover', () => {
+            bg.clear();
+            bg.fillStyle(buttonColor === 0x994500 ? 0xcc6600 : 0xff0000, 1);
+            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        });
+        
+        button.on('pointerout', () => {
+            bg.clear();
+            bg.fillStyle(buttonColor, 1);
+            bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
+        });
+        
+        // Add click handler
+        button.on('pointerdown', callback);
+        
+        return button;
     }
 } 
