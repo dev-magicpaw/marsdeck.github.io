@@ -272,9 +272,21 @@ export default class UIScene extends Phaser.Scene {
         // Clear existing slots
         this.cardSlotsContainer.removeAll(true);
         
+        // Width of the hand limit indicator
+        const indicatorWidth = 5;
+        
         // Create slots for max card slots
         for (let i = 0; i < MAX_CARD_SLOTS; i++) {
-            const xPos = i * (this.cardWidth + this.cardSpacing);
+            // Adjust position for slots after the hand limit indicator
+            let xPos;
+            if (i < MAX_HAND_SIZE) {
+                // Normal position for slots before the limit
+                xPos = i * (this.cardWidth + this.cardSpacing);
+            } else {
+                // Add extra spacing (same as cardSpacing) for slots after the limit
+                // Add 2*cardSpacing to account for the indicator width and ensure equal spacing on both sides.
+                xPos = i * (this.cardWidth + this.cardSpacing) + 2* this.cardSpacing;
+            }
             
             // Add slot background
             const slotBg = this.add.sprite(xPos, 0, 'cardSlotBackground');
@@ -283,6 +295,20 @@ export default class UIScene extends Phaser.Scene {
             slotBg.setAlpha(0.7); // Make it slightly transparent
             
             this.cardSlotsContainer.add(slotBg);
+            
+            // Add hand limit indicator after the MAX_HAND_SIZE slot
+            if (i === MAX_HAND_SIZE - 1) {
+                // Position right after this card slot with full card spacing
+                const indicatorX = xPos + this.cardWidth + this.cardSpacing;
+                
+                // Create the hand limit indicator
+                const handLimitIndicator = this.add.sprite(indicatorX, 0, 'handLimitIndicator');
+                handLimitIndicator.setDisplaySize(indicatorWidth, this.cardHeight); // 5px width, same height as cards
+                handLimitIndicator.setOrigin(0, 0);
+                handLimitIndicator.setAlpha(0.9);
+                
+                this.cardSlotsContainer.add(handLimitIndicator);
+            }
         }
     }
     
@@ -457,7 +483,15 @@ export default class UIScene extends Phaser.Scene {
     
     // Create a card sprite
     createCardSprite(card, index) {
-        const xPos = index * (this.cardWidth + this.cardSpacing);
+        // Calculate x position accounting for the hand limit indicator
+        let xPos;
+        if (index < MAX_HAND_SIZE) {
+            // Normal position for cards before the limit
+            xPos = index * (this.cardWidth + this.cardSpacing);
+        } else {
+            // Add extra spacing for cards after the limit (same as in createCardSlots)
+            xPos = index * (this.cardWidth + this.cardSpacing) + this.cardSpacing;
+        }
         
         const cardContainer = this.add.container(xPos, 0);
         

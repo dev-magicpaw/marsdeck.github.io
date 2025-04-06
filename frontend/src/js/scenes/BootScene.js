@@ -64,6 +64,9 @@ export default class BootScene extends Phaser.Scene {
         
         // Load card slot background
         this.load.image('cardSlotBackground', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_outline_large.png'));
+        
+        // Load hand limit indicator
+        this.load.image('handLimitIndicator', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_small_square.png'));
     }
 
     create() {
