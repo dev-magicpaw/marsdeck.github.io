@@ -383,9 +383,7 @@ export default class GameScene extends Phaser.Scene {
         // Give the player a card choice
         this.showCardChoices();
         
-        // Update UI
-        this.uiScene.setTurnCounter(this.currentTurn);
-        this.uiScene.refreshResourceDisplay();
+        // Update UI - refreshUI will update turn counter and resources
         this.uiScene.refreshUI();
     }
     
