@@ -448,100 +448,28 @@ export default class UIScene extends Phaser.Scene {
             if (building) {
                 this.infoTitle.setText(building.name);
                 
-                // Building description
-                this.infoContent.setText(building.description + "\n\nConstruction Cost:");
+                // Set the content to just the building description without construction cost
+                let content = building.description + "\n\n";
                 
-                // Construction Cost
-                if (Object.keys(building.cost).length > 0) {
-                    // Create a container for the colored cost text elements
-                    this.costTexts = this.costTexts || [];
-                    
-                    // Clear any existing cost texts
-                    this.costTexts.forEach(text => text.destroy());
-                    this.costTexts = [];
-                    
-                    // Position for cost texts
-                    let yOffset = this.infoContent.y + this.infoContent.height + 5;
-                    
-                    // Add each resource cost with appropriate color
-                    for (const resource in building.cost) {
+                // Production
+                if (Object.keys(building.production).length > 0) {
+                    content += "Production:\n";
+                    for (const resource in building.production) {
                         const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        const requiredAmount = building.cost[resource];
-                        const playerAmount = this.resourceManager.getResource(resource);
-                        const hasEnough = playerAmount >= requiredAmount;
-                        
-                        // Set color based on resource availability
-                        const textColor = hasEnough ? '#ffffff' : '#ff0000';
-                        
-                        const costText = this.add.text(
-                            this.infoContent.x, 
-                            yOffset, 
-                            `${resourceName}: ${building.cost[resource]}`, 
-                            { fontSize: '14px', fontFamily: 'Arial', color: textColor }
-                        );
-                        
-                        // Store text for later cleanup
-                        this.costTexts.push(costText);
-                        
-                        yOffset += costText.height;
+                        content += `${resourceName}: +${building.production[resource]}\n`;
                     }
-                    
-                    // Position for the additional content after the costs
-                    this.additionalContent = this.add.text(
-                        this.infoContent.x,
-                        yOffset + 10, // Add 10px spacing after costs
-                        "",
-                        { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 330 } }
-                    );
-                    this.costTexts.push(this.additionalContent); // Add to cost texts for cleanup
-                    
-                    // Continue with the rest of the information
-                    let additionalText = "";
-                    
-                    // Production
-                    if (Object.keys(building.production).length > 0) {
-                        additionalText += "Production:\n";
-                        for (const resource in building.production) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            additionalText += `${resourceName}: +${building.production[resource]}\n`;
-                        }
-                    }
-                    
-                    // Consumption
-                    if (Object.keys(building.consumption).length > 0) {
-                        additionalText += "\nConsumption:\n";
-                        for (const resource in building.consumption) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            additionalText += `${resourceName}: -${building.consumption[resource]}\n`;
-                        }
-                    }
-                    
-                    // Set the additional content text
-                    this.additionalContent.setText(additionalText);
-                } else {
-                    // If no costs, show regular content text directly
-                    let content = building.description + "\n\n";
-                    
-                    // Production
-                    if (Object.keys(building.production).length > 0) {
-                        content += "Production:\n";
-                        for (const resource in building.production) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            content += `${resourceName}: +${building.production[resource]}\n`;
-                        }
-                    }
-                    
-                    // Consumption
-                    if (Object.keys(building.consumption).length > 0) {
-                        content += "\nConsumption:\n";
-                        for (const resource in building.consumption) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            content += `${resourceName}: -${building.consumption[resource]}\n`;
-                        }
-                    }
-                    
-                    this.infoContent.setText(content);
                 }
+                
+                // Consumption
+                if (Object.keys(building.consumption).length > 0) {
+                    content += "\nConsumption:\n";
+                    for (const resource in building.consumption) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        content += `${resourceName}: -${building.consumption[resource]}\n`;
+                    }
+                }
+                
+                this.infoContent.setText(content);
                 
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
