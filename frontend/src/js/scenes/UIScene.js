@@ -231,13 +231,15 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createEndTurnButton() {
-        // Keep the END TURN button in the bottom right corner
-        const x = this.cameras.main.width - 120;
-        const y = this.cameras.main.height - 30;
+        const buttonHeight = 40;
+        const buttonWidth = 100;
+        const buttonMargin = 10;
+        const x = this.cameras.main.width - buttonWidth - buttonMargin;
+        const y = this.cameras.main.height - buttonHeight - buttonMargin;
         
         const button = this.add.graphics();
-        button.fillStyle(0x994500, 1);
-        button.fillRoundedRect(0, 0, 100, 40, 5);
+        button.fillStyle(0x0066cc, 1);
+        button.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         
         const buttonText = this.add.text(
             50, 
@@ -259,13 +261,13 @@ export default class UIScene extends Phaser.Scene {
         
         endTurnButton.on('pointerover', () => {
             button.clear();
-            button.fillStyle(0xcc6600, 1);
+            button.fillStyle(0x0088ff, 1); // Lighter blue for hover
             button.fillRoundedRect(0, 0, 100, 40, 5);
         });
         
         endTurnButton.on('pointerout', () => {
             button.clear();
-            button.fillStyle(0x994500, 1);
+            button.fillStyle(0x0066cc, 1); // Back to blue
             button.fillRoundedRect(0, 0, 100, 40, 5);
         });
     }
