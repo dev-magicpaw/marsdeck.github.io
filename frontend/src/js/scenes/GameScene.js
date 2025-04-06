@@ -554,7 +554,7 @@ export default class GameScene extends Phaser.Scene {
         this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
         
         // Update UI
-        this.uiScene.refreshUI();
+            this.uiScene.refreshUI();
         
         return true;
     }
@@ -746,11 +746,11 @@ export default class GameScene extends Phaser.Scene {
         // Add bonus points for leftover resources
         if (resourcesBringVictoryPoints) {
             bonusPoints = Math.floor(
-                resources[RESOURCES.STEEL] / 2 +
-                resources[RESOURCES.CONCRETE] / 2 +
-                resources[RESOURCES.WATER] / 2 +
-                resources[RESOURCES.FUEL] * 2
-            );
+            resources[RESOURCES.STEEL] / 2 +
+            resources[RESOURCES.CONCRETE] / 2 +
+            resources[RESOURCES.WATER] / 2 +
+            resources[RESOURCES.FUEL] * 2
+        );
         }
         
         const finalScore = reputation + bonusPoints;
