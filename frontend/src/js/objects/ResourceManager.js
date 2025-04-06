@@ -1,4 +1,4 @@
-import { RESOURCES } from '../config/game-data';
+import { RESOURCES, VICTORY_GOAL } from '../config/game-data';
 
 export default class ResourceManager {
     constructor(scene) {
@@ -47,7 +47,20 @@ export default class ResourceManager {
             this.onResourceChange(resourceType, this.resources[resourceType]);
         }
         
+        // Check for victory condition when reputation increases
+        if (resourceType === RESOURCES.REPUTATION) {
+            this.checkVictoryCondition();
+        }
+        
         return true;
+    }
+    
+    // Check if the player has reached the victory goal
+    checkVictoryCondition() {
+        if (this.resources[RESOURCES.REPUTATION] >= VICTORY_GOAL) {
+            // Trigger victory in the game scene
+            this.scene.playerVictory();
+        }
     }
     
     // Check if resources are sufficient for a cost object
