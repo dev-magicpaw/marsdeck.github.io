@@ -24,8 +24,8 @@ export default class GameScene extends Phaser.Scene {
         // Initialize turn counter
         this.currentTurn = 1;
         
-        // Draw initial hand
-        this.cardManager.drawCards(4);
+        // Ensure player starts with specific cards
+        this.setupStartingHand();
     }
 
     create() {
@@ -522,5 +522,26 @@ export default class GameScene extends Phaser.Scene {
         if (this.uiScene) {
             this.uiScene.showGameOver(finalScore, reputation, bonusPoints);
         }
+    }
+
+    // Set up specific starting cards for the player
+    setupStartingHand() {
+        // Clear any cards that might be in the hand
+        this.cardManager.hand = [];
+        
+        // Add a Drone Depo card
+        this.cardManager.hand.push({
+            type: 'building',
+            building: BUILDINGS.DRONE_DEPO
+        });
+        
+        // Add a Wind Turbine card
+        this.cardManager.hand.push({
+            type: 'building',
+            building: BUILDINGS.WIND_TURBINE
+        });
+        
+        // Draw 2 more random cards to complete starting hand
+        this.cardManager.drawCards(2);
     }
 } 
