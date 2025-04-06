@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -29,6 +29,29 @@ export default class GameScene extends Phaser.Scene {
         
         // Card choice options
         this.cardChoices = [];
+        
+        // Store launch cost for easier access
+        this.launchCost = BUILDINGS.LAUNCH_PAD.launchCost;
+        this.launchReward = BUILDINGS.LAUNCH_PAD.launchReward;
+    }
+
+    preload() {
+        // Load building sprites
+        this.load.image('droneDepo', 'assets/buildings/drone_depo.png');
+        this.load.image('ironMine', 'assets/buildings/iron_mine.png');
+        this.load.image('concreteMixer', 'assets/buildings/concrete_mixer.png');
+        this.load.image('solarPanel', 'assets/buildings/solar_panel.png');
+        this.load.image('windTurbine', 'assets/buildings/wind_turbine.png');
+        this.load.image('waterPump', 'assets/buildings/water_pump.png');
+        this.load.image('steelworks', 'assets/buildings/steelworks.png');
+        this.load.image('fuelRefinery', 'assets/buildings/fuel_refinery.png');
+        this.load.image('launchPad', 'assets/buildings/launch_pad.png');
+        this.load.image('launchPadSurrounding', 'assets/buildings/launch_pad_surrounding.png');
+        
+        // Rocket sprites are already loaded in BootScene
+        
+        // Load terrain and terrain feature sprites
+        // ... existing code ...
     }
 
     create() {
@@ -53,6 +76,9 @@ export default class GameScene extends Phaser.Scene {
         this.time.delayedCall(500, () => {
             this.showCardChoices();
         });
+        
+        // Set up refresh for rocket sprites
+        this.refreshRocketSprites();
     }
     
     // Create the visual grid
@@ -257,6 +283,9 @@ export default class GameScene extends Phaser.Scene {
                 this.gridContainer.add(surroundingSprite);
                 adjCell.buildingSprite = surroundingSprite;
             }
+            
+            // Make sure the rocket appears immediately
+            this.refreshRocketSprites();
         }
         
         // Immediate production for certain buildings
@@ -294,7 +323,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Show cell info in UI
         if (this.uiScene) {
-            this.uiScene.showCellInfo(cell);
+            this.uiScene.showCellInfo(cell, this);
         }
     }
     
@@ -327,31 +356,157 @@ export default class GameScene extends Phaser.Scene {
     
     // End the current turn
     endTurn() {
-        // Process production from all buildings
+        // Process building production first
         this.processProduction();
         
-        // Reset non-accumulating resources
-        this.resourceManager.resetNonAccumulatingResources();
+        // Reset resources (if needed)
         
-        // Increment turn counter
-        this.currentTurn++;
-        
-        // Check for game end condition
-        if (this.currentTurn > MAX_TURNS) {
+        // Process end game condition
+        if (this.currentTurn >= this.maxTurns) {
             this.gameOver();
             return;
         }
         
-        // Show card choices for the next turn
+        // Process rocket returns
+        const returnedRockets = this.gridManager.processRocketReturns();
+        if (returnedRockets > 0) {
+            this.uiScene.showMessage(`${returnedRockets} rocket${returnedRockets > 1 ? 's' : ''} returned to launch pad${returnedRockets > 1 ? 's' : ''}`);
+            this.refreshRocketSprites();
+        }
+        
+        // Increment turn counter
+        this.currentTurn++;
+        
+        // Update rocket states since resources may have changed
+        this.updateRocketStates();
+        
+        // Give the player a card choice
         this.showCardChoices();
         
         // Update UI
-        if (this.uiScene) {
-            this.uiScene.refreshUI();
+        this.uiScene.setTurnCounter(this.currentTurn);
+        this.uiScene.refreshResourceDisplay();
+        this.uiScene.refreshUI();
+    }
+    
+    // Update all rocket states based on available resources
+    updateRocketStates() {
+        // Loop through grid and update all rockets
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                const cell = this.gridManager.getCell(x, y);
+                if (cell && cell.building === 'launchPad' && cell.hasRocket) {
+                    this.gridManager.updateRocketState(x, y);
+                }
+            }
+        }
+        
+        // Refresh rocket sprites to match state
+        this.refreshRocketSprites();
+    }
+    
+    // Refresh all rocket sprites
+    refreshRocketSprites() {
+        // Loop through grid and update rocket sprites based on state
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                const cell = this.gridManager.getCell(x, y);
+                if (cell && cell.building === 'launchPad') {
+                    // Check if we need to add or update a rocket sprite
+                    if (cell.hasRocket) {
+                        // Determine texture based on state
+                        const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
+                        
+                        // Create or update sprite
+                        if (!cell.rocketSprite) {
+                            // Create new sprite
+                            const xPos = x * CELL_SIZE + (CELL_SIZE / 2);
+                            const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
+                            cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
+                            cell.rocketSprite.setOrigin(0.5, 0.5);
+                            cell.rocketSprite.displayWidth = CELL_SIZE * 0.7;
+                            cell.rocketSprite.displayHeight = CELL_SIZE * 0.7;
+                            this.gridContainer.add(cell.rocketSprite);
+                        } else {
+                            // Update existing sprite
+                            cell.rocketSprite.setTexture(texture);
+                            cell.rocketSprite.setVisible(true);
+                        }
+                    } else if (cell.rocketSprite) {
+                        // Hide rocket sprite if no rocket
+                        cell.rocketSprite.setVisible(false);
+                    }
+                }
+            }
         }
     }
     
-    // Process production from all buildings on the grid
+    // Launch a rocket from a launch pad
+    launchRocket(x, y) {
+        const cell = this.gridManager.getCell(x, y);
+        
+        // Check if valid
+        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket || cell.rocketState !== 'fueled') {
+            return false;
+        }
+        
+        // Check if player has enough resources
+        if (!this.resourceManager.hasSufficientResources(this.launchCost)) {
+            this.uiScene.showMessage("Not enough resources to launch rocket");
+            return false;
+        }
+        
+        // Deduct resources
+        for (const resource in this.launchCost) {
+            this.resourceManager.modifyResource(resource, -this.launchCost[resource]);
+        }
+        
+        // Award reputation
+        this.resourceManager.modifyResource(RESOURCES.REPUTATION, this.launchReward);
+        
+        // Launch rocket in grid manager (updates state)
+        if (!this.gridManager.launchRocket(x, y)) {
+            return false;
+        }
+        
+        // Animate rocket launch
+        if (cell.rocketSprite) {
+            // Clone the rocket sprite for animation
+            const rocketSprite = cell.rocketSprite;
+            const launchAnimation = this.add.sprite(rocketSprite.x, rocketSprite.y, 'rocketInFlight');
+            launchAnimation.setOrigin(0.5, 0.5);
+            launchAnimation.displayWidth = rocketSprite.displayWidth;
+            launchAnimation.displayHeight = rocketSprite.displayHeight;
+            this.gridContainer.add(launchAnimation);
+            
+            // Hide the original sprite
+            rocketSprite.setVisible(false);
+            
+            // Create launch animation
+            this.tweens.add({
+                targets: launchAnimation,
+                y: rocketSprite.y - 300,
+                scaleX: 0.1,
+                scaleY: 0.1,
+                alpha: 0,
+                duration: 1500,
+                ease: 'Cubic.easeOut',
+                onComplete: () => {
+                    launchAnimation.destroy();
+                }
+            });
+        }
+        
+        // Show message
+        this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
+        
+        // Update UI
+        this.uiScene.refreshResourceDisplay();
+        
+        return true;
+    }
+    
+    // Process building production for all buildings
     processProduction() {
         const buildings = this.gridManager.getAllBuildings();
         
@@ -360,6 +515,9 @@ export default class GameScene extends Phaser.Scene {
         
         // Second wave: resource transformation (steelworks, fuel refinery)
         this.processSecondWaveProduction(buildings);
+        
+        // Update rocket states after processing production
+        this.updateRocketStates();
     }
     
     // Process first wave - resource extraction buildings

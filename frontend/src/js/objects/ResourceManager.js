@@ -3,10 +3,11 @@ import { RESOURCES } from '../config/game-data';
 export default class ResourceManager {
     constructor(scene) {
         this.scene = scene;
+        // Starting resources
         this.resources = {
             [RESOURCES.IRON]: 0,
-            [RESOURCES.STEEL]: 10, // Starting resources
-            [RESOURCES.CONCRETE]: 10,
+            [RESOURCES.STEEL]: 40, 
+            [RESOURCES.CONCRETE]: 40,
             [RESOURCES.WATER]: 0,
             [RESOURCES.FUEL]: 0,
             [RESOURCES.DRONES]: 10,
