@@ -385,7 +385,7 @@ export default class UIScene extends Phaser.Scene {
     
     // Update turn counter
     updateTurnDisplay() {
-        this.turnText.setText(`Turn: ${this.gameScene.currentTurn}`);
+        this.turnText.setText(`Turn: ${this.gameScene.currentTurn}/${this.gameScene.maxTurns}`);
     }
     
     // Create a card sprite
