@@ -850,25 +850,34 @@ export default class UIScene extends Phaser.Scene {
                  this.selectedCell.hasRocket) {
             hasActions = true;
             
+            // Get cost and reward information from BUILDINGS definition
+            const building = Object.values(BUILDINGS).find(b => b.id === 'launchPad');
+            const fuelCost = building.launchCost[RESOURCES.FUEL];
+            const steelCost = building.launchCost[RESOURCES.STEEL];
+            const reputationReward = building.launchReward;
+            
+            // Create button text with costs and benefits
+            const launchText = `Launch: -${fuelCost} Fuel, -${steelCost} Steel, +${reputationReward} Rep`;
+            
             // Check if the rocket is fueled
             const isFueled = this.selectedCell.rocketState === 'fueled';
             
             // Create launch button (enabled or disabled based on state)
             if (isFueled) {
                 // Enabled launch button
-                const launchButton = this.createActionButton('Launch', () => {
+                const launchButton = this.createActionButton(launchText, () => {
                     // Launch rocket from the launch pad
                     this.gameScene.launchRocket(this.selectedCell.x, this.selectedCell.y);
                     
                     // Clear selection and refresh UI
                     this.clearInfoPanel();
                     this.refreshUI();
-                }, 0x0066cc); // Blue color for launch button
+                }, 0x0066cc, 300); // Blue color for launch button with larger size
                 
                 this.actionsContainer.add(launchButton);
             } else {
                 // Disabled launch button
-                const launchButton = this.createDisabledButton('Launch', 'Need fuel to launch rocket');
+                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 180, 45);
                 this.actionsContainer.add(launchButton);
             }
         }
@@ -878,10 +887,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Helper to create action buttons
-    createActionButton(text, callback, buttonColor = 0x994500) {
-        const buttonWidth = 100;
-        const buttonHeight = 30;
-        
+    createActionButton(text, callback, buttonColor = 0x994500, buttonWidth = 100, buttonHeight = 30) {
         const button = this.add.container(0, 0);
         
         // Button background
@@ -906,7 +912,7 @@ export default class UIScene extends Phaser.Scene {
         // Add hover effect
         button.on('pointerover', () => {
             bg.clear();
-            bg.fillStyle(buttonColor === 0x994500 ? 0xcc6600 : 0xff0000, 1);
+            bg.fillStyle(buttonColor === 0x994500 ? 0xcc6600 : buttonColor * 1.2, 1);
             bg.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 5);
         });
         
@@ -923,10 +929,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Helper to create disabled action buttons
-    createDisabledButton(text, tooltipText) {
-        const buttonWidth = 100;
-        const buttonHeight = 30;
-        
+    createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30) {
         const button = this.add.container(0, 0);
         
         // Button background
