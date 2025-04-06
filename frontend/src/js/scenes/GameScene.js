@@ -348,10 +348,20 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // Process rocket returns
-        const returnedRockets = this.gridManager.processRocketReturns();
-        if (returnedRockets > 0) {
-            this.uiScene.showMessage(`${returnedRockets} rocket${returnedRockets > 1 ? 's' : ''} returned to launch pad${returnedRockets > 1 ? 's' : ''}`);
-            this.refreshRocketSprites();
+        const returningRockets = this.gridManager.processRocketReturns();
+        if (returningRockets > 0) {
+            this.uiScene.showMessage(`${returningRockets} rocket${returningRockets > 1 ? 's' : ''} returned to launch pad${returningRockets > 1 ? 's' : ''}`);
+            
+            // Find launch pads that got rockets back and animate their landing
+            for (let y = 0; y < this.gridManager.gridSize; y++) {
+                for (let x = 0; x < this.gridManager.gridSize; x++) {
+                    const cell = this.gridManager.getCell(x, y);
+                    if (cell && cell.building === 'launchPad' && cell.hasRocket && 
+                        cell.justLanded === true) {
+                        this.animateRocketLanding(x, y);
+                    }
+                }
+            }
         }
         
         // Increment turn counter
@@ -367,22 +377,6 @@ export default class GameScene extends Phaser.Scene {
         this.uiScene.refreshUI();
     }
     
-    // Update all rocket states based on available resources
-    updateRocketStates() {
-        // Loop through grid and update all rockets
-        for (let y = 0; y < this.gridManager.gridSize; y++) {
-            for (let x = 0; x < this.gridManager.gridSize; x++) {
-                const cell = this.gridManager.getCell(x, y);
-                if (cell && cell.building === 'launchPad' && cell.hasRocket) {
-                    this.gridManager.updateRocketState(x, y);
-                }
-            }
-        }
-        
-        // Refresh rocket sprites to match state
-        this.refreshRocketSprites();
-    }
-    
     // Refresh all rocket sprites
     refreshRocketSprites() {
         // Loop through grid and update rocket sprites based on state
@@ -390,6 +384,11 @@ export default class GameScene extends Phaser.Scene {
             for (let x = 0; x < this.gridManager.gridSize; x++) {
                 const cell = this.gridManager.getCell(x, y);
                 if (cell && cell.building === 'launchPad') {
+                    // Skip rockets that just landed - they'll get their sprites after animation
+                    if (cell.justLanded) {
+                        continue;
+                    }
+                    
                     // Check if we need to add or update a rocket sprite
                     if (cell.hasRocket) {
                         // Determine texture based on state
@@ -417,6 +416,79 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         }
+    }
+    
+    // Animate rocket landing on a launch pad
+    animateRocketLanding(x, y) {
+        const cell = this.gridManager.getCell(x, y);
+        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket) {
+            return;
+        }
+        
+        // Calculate position at center of cell
+        const xPos = x * CELL_SIZE + (CELL_SIZE / 2);
+        const yPos = y * CELL_SIZE + (CELL_SIZE / 2);
+        
+        // If there's already a rocket sprite, hide it until landing completes
+        if (cell.rocketSprite) {
+            cell.rocketSprite.setVisible(false);
+        }
+        
+        // Create landing animation sprite starting from above
+        const landingAnimation = this.add.sprite(xPos, yPos - 300, 'rocketInFlight');
+        landingAnimation.setOrigin(0.5, 0.5);
+        landingAnimation.displayWidth = CELL_SIZE * 0.1; // Start small
+        landingAnimation.displayHeight = CELL_SIZE * 0.1;
+        landingAnimation.setAlpha(0.2); // Start faded
+        this.gridContainer.add(landingAnimation);
+        
+        // Create landing animation (reverse of launch)
+        this.tweens.add({
+            targets: landingAnimation,
+            y: yPos,
+            scaleX: 0.7,  // End at normal size
+            scaleY: 0.7,
+            alpha: 1,  // Fully visible at end
+            duration: 1500,
+            ease: 'Cubic.easeIn',
+            onComplete: () => {
+                landingAnimation.destroy();
+                // Show the real rocket sprite after landing
+                if (cell.rocketSprite) {
+                    // Determine texture based on state (fuel status)
+                    const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
+                    cell.rocketSprite.setTexture(texture);
+                    cell.rocketSprite.setVisible(true);
+                } else {
+                    // Create a new rocket sprite
+                    const texture = cell.rocketState === 'fueled' ? 'rocketFueled' : 'rocketUnFueled';
+                    cell.rocketSprite = this.add.sprite(xPos, yPos, texture);
+                    cell.rocketSprite.setOrigin(0.5, 0.5);
+                    cell.rocketSprite.displayWidth = CELL_SIZE * 0.7;
+                    cell.rocketSprite.displayHeight = CELL_SIZE * 0.7;
+                    this.gridContainer.add(cell.rocketSprite);
+                }
+                
+                // Mark the rocket as no longer just landed
+                cell.justLanded = false;
+            }
+        });
+    }
+    
+    // Update all rocket states based on available resources
+    updateRocketStates() {
+        // Loop through grid and update all rockets
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                const cell = this.gridManager.getCell(x, y);
+                if (cell && cell.building === 'launchPad' && cell.hasRocket) {
+                    this.gridManager.updateRocketState(x, y);
+                }
+            }
+        }
+        
+        // Refresh rocket sprites to match state
+        this.refreshRocketSprites();
     }
     
     // Launch a rocket from a launch pad

@@ -33,7 +33,8 @@ export default class GridManager {
                     buildingSprite: null, // Sprite for building
                     rocketSprite: null, // Sprite for rocket
                     hasRocket: false, // Whether this cell has a rocket
-                    rocketState: null // State of the rocket (null, 'unfueled', 'fueled', 'in-flight')
+                    rocketState: null, // State of the rocket (null, 'unfueled', 'fueled', 'in-flight')
+                    justLanded: false // Flag for animation
                 });
             }
             this.grid.push(row);
@@ -225,6 +226,7 @@ export default class GridManager {
             const cell = this.getCell(rocket.x, rocket.y);
             if (cell && cell.building === 'launchPad') {
                 cell.hasRocket = true;
+                cell.justLanded = true; // Mark that this rocket just landed for animation
                 this.updateRocketState(rocket.x, rocket.y);
             }
         }
