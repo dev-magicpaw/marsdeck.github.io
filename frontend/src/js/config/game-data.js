@@ -211,5 +211,16 @@ export const BUILDINGS = {
         consumption: {},
         terrainRequirement: null,
         texture: 'launchPad'
+    },
+    LAUNCH_PAD_SURROUNDING: {
+        id: 'launchPadSurrounding',
+        name: 'Launch Pad Surrounding',
+        shortName: 'Launch Area',
+        description: 'Part of the launch pad area, cannot be built on',
+        cost: {}, // No cost as it's placed automatically
+        production: {},
+        consumption: {},
+        terrainRequirement: null,
+        texture: 'launchPad' // Using the same texture as launch pad
     }
 }; 

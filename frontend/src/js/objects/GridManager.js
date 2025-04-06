@@ -102,7 +102,44 @@ export default class GridManager {
             return false;
         }
         
+        // Special case for Launch Pad - check adjacent tiles
+        if (building.id === 'launchPad') {
+            // Get all adjacent cells
+            const adjacentCells = this.getAdjacentCells(x, y);
+            
+            // Check if any adjacent cell has a mountain or building
+            for (const adjCell of adjacentCells) {
+                if (adjCell.feature === TERRAIN_FEATURES.MOUNTAIN.id || adjCell.building) {
+                    return false; // Can't place if adjacent to mountain or building
+                }
+            }
+        }
+        
         return true;
+    }
+    
+    // Get all adjacent cells (orthogonally)
+    getAdjacentCells(x, y) {
+        const directions = [
+            { dx: 0, dy: -1 }, // North
+            { dx: 1, dy: 0 },  // East
+            { dx: 0, dy: 1 },  // South
+            { dx: -1, dy: 0 }  // West
+        ];
+        
+        const adjacentCells = [];
+        
+        for (const dir of directions) {
+            const newX = x + dir.dx;
+            const newY = y + dir.dy;
+            const cell = this.getCell(newX, newY);
+            
+            if (cell) {
+                adjacentCells.push(cell);
+            }
+        }
+        
+        return adjacentCells;
     }
     
     // Place a building on a cell
