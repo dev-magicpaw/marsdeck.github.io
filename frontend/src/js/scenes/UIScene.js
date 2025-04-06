@@ -58,7 +58,7 @@ export default class UIScene extends Phaser.Scene {
         this.createPanel(width - 350, 420, 350, 80, 0x222222, 0.8); // Actions panel
         
         // Calculate card panel width for 8 cards (each card is 80px wide with 5px spacing)
-        const maxCards = 7;
+        const maxCards = 8;
         const cardWidth = 80;
         const cardSpacing = 5;
         const cardsWidth = (cardWidth + cardSpacing) * maxCards;
@@ -73,10 +73,9 @@ export default class UIScene extends Phaser.Scene {
         // Space between map and cards panel
         const verticalSpacing = 20;
         
-        // Create cards panel under the map spanning most of the width (with margin)
-        // Align left border with the game map and add vertical spacing
+        // Create cards panel under the map starting from the left edge of the screen
         this.createPanel(
-            mapOffset, 
+            0, 
             mapOffset + mapSize + verticalSpacing - margin, 
             cardsWidth + margin * 2, 
             150 + margin * 2,
@@ -196,7 +195,7 @@ export default class UIScene extends Phaser.Scene {
         const margin = 10; // Same margin as in createLayout
         const verticalSpacing = 20; // Add space between map and cards
    
-        const x = mapOffset + margin;
+        const x = margin; // Start from the left edge plus margin
         const y = mapOffset + mapSize + verticalSpacing;
         
         // Create container for cards
