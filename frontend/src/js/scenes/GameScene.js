@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_HAND_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -470,14 +470,9 @@ export default class GameScene extends Phaser.Scene {
             // Add the selected card to hand
             const selectedCard = this.cardChoices[choiceIndex];
             
-            // Add to hand if there's room
-            if (this.cardManager.hand.length < MAX_HAND_SIZE) {
-                this.cardManager.hand.push(selectedCard);
-                this.uiScene.showMessage(`Added ${selectedCard.building.name} to your hand`);
-            } else {
-                this.uiScene.showMessage("Your hand is full! Card discarded.");
-                this.cardManager.discardPile.push(selectedCard);
-            }
+            // Always add to hand, even if over the limit
+            this.cardManager.hand.push(selectedCard);
+            this.uiScene.showMessage(`Added ${selectedCard.building.name} to your hand`);
             
             // Discard the other choices
             for (let i = 0; i < this.cardChoices.length; i++) {
@@ -491,6 +486,9 @@ export default class GameScene extends Phaser.Scene {
             
             // Update UI
             this.uiScene.refreshUI();
+            
+            // Check if hand is over the limit and update end turn button
+            this.uiScene.updateEndTurnButton();
         }
     }
     
