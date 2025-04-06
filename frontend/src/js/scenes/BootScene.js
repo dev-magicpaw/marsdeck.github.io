@@ -43,8 +43,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('steelworks', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_08.png'));
         this.load.image('waterPump', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_11.png'));
         this.load.image('windTurbine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_01.png'));
-        this.load.image('windTurbineSurrounding', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_large_square.png'));
-        
+        this.load.image('windTurbineSurrounding', require('../../assets/images/ui_pack_space/Extra/Double/panel_square_screws_upside_down.png'));
+
         // Load rocket sprites
         this.load.image('rocketUnFueled', require('../../assets/images/space_rockets/Missiles/spaceMissiles_008.png'));
         this.load.image('rocketFueled', require('../../assets/images/space_rockets/Missiles/spaceMissiles_009.png'));
