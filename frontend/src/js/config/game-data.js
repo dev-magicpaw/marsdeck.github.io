@@ -6,7 +6,7 @@ export const MAX_HAND_SIZE = 6; // Maximum cards in hand
 export const MAX_CARD_SLOTS = 8; // Maximum slots to display in the UI
 
 // The amount of reputation needed to win the game
-export const VICTORY_GOAL = 25;
+export const VICTORY_GOAL = 10;
 
 // Resource types
 export const RESOURCES = {
