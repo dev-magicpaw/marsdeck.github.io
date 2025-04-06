@@ -206,7 +206,6 @@ export const BUILDINGS = {
             [RESOURCES.DRONES]: 1
         },
         production: {
-            [RESOURCES.REPUTATION]: 0 // Special case - handled by game logic
         },
         consumption: {},
         terrainRequirement: null,
