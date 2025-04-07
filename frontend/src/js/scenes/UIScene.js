@@ -133,7 +133,7 @@ export default class UIScene extends Phaser.Scene {
         // Position cards panel under the map with consistent spacing
         this.createPanel(
             0, 
-            mapOffset + mapSize + verticalSpacing, // Position after map + spacing
+            mapOffset + mapSize,// + verticalSpacing, // Position after map + spacing
             cardsWidth + margin * 2, 
             this.cardHeight + margin * 2,
             0x222222, 
@@ -316,7 +316,7 @@ export default class UIScene extends Phaser.Scene {
     createHandPanel() {
         // Calculate position for cards panel under the map
         const resourcePanelHeight = 50;
-        const verticalSpacing = 20;
+        const verticalSpacing = 10;
         const mapSize = 9 * 64; // 9 tiles of 64px each
         const mapOffset = resourcePanelHeight + verticalSpacing; // Start map right after resources panel + spacing
         const margin = 10;
