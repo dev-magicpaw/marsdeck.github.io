@@ -1085,9 +1085,16 @@ export default class UIScene extends Phaser.Scene {
         // Restart button
         const rewardsButton = this.add.container(width / 2, height / 2 + 100);
         
-        const buttonBg = this.add.graphics();
-        buttonBg.fillStyle(0x0066cc, 1);  // Blue button for victory
-        buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+        // Use nine-slice for the button with blueGlossSquareButton texture
+        const buttonWidth = 150;
+        const buttonHeight = 40;
+        const buttonBg = this.add.nineslice(
+            0,0,
+            'blueGlossSquareButton',              // texture key
+            null,                                 // frame (null for default)
+            buttonWidth, buttonHeight,            // size
+            10, 10, 10, 10                        // slice sizes: left, right, top, bottom
+        );
         
         const buttonText = this.add.text(
             0, 
@@ -1099,7 +1106,7 @@ export default class UIScene extends Phaser.Scene {
         rewardsButton.add(buttonBg);
         rewardsButton.add(buttonText);
         
-        rewardsButton.setInteractive(new Phaser.Geom.Rectangle(-75, -20, 150, 40), Phaser.Geom.Rectangle.Contains);
+        rewardsButton.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
         
         rewardsButton.on('pointerdown', () => {
             // Restart the game
@@ -1109,15 +1116,11 @@ export default class UIScene extends Phaser.Scene {
         });
         
         rewardsButton.on('pointerover', () => {
-            buttonBg.clear();
-            buttonBg.fillStyle(0x0099ff, 1);
-            buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+            buttonBg.setTint(0xaaccff); // Light blue tint for hover
         });
         
         rewardsButton.on('pointerout', () => {
-            buttonBg.clear();
-            buttonBg.fillStyle(0x0066cc, 1);
-            buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
+            buttonBg.clearTint(); // Clear tint on pointer out
         });
     }
     
@@ -1287,14 +1290,6 @@ export default class UIScene extends Phaser.Scene {
         // Button background - either use texture or graphics
         let bg;
         if (textureName) {
-            // Use nine-slice for texture-based buttons with a gray tint
-            bg = this.add.nineslice(
-                0, 0,                   // position
-                textureName,            // texture key
-                null,                   // frame (null for default)
-                buttonWidth, buttonHeight, // size
-                10, 10, 10, 10          // slice sizes: left, right, top, bottom
-            );
             bg.setOrigin(0, 0);
             bg.setTint(0x888888); // Gray tint for disabled appearance
             bg.setAlpha(0.7);     // Semi-transparent
