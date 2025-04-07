@@ -89,7 +89,7 @@ export default class GameScene extends Phaser.Scene {
     
     // Create the visual grid
     createGrid() {
-        this.gridContainer = this.add.container(50, 50); // Offset from top-left
+        this.gridContainer = this.add.container(50, 80); // Offset from top-left
         
         // Create cells
         for (let y = 0; y < this.gridManager.gridSize; y++) {
