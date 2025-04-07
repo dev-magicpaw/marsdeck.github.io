@@ -1034,9 +1034,23 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        const panel = this.add.graphics();
-        panel.fillStyle(0x000066, 0.8);  // Blue background for victory
-        panel.fillRect(width / 2 - 200, height / 2 - 150, 400, 300);
+        // Use nine-slice for the victory panel background with blue tint
+        const panelWidth = 400;
+        const panelHeight = 300;
+        const panelX = width / 2;
+        const panelY = height / 2;
+        
+        // Create the victory panel background with nine-slice
+        const panel = this.add.nineslice(
+            panelX, panelY,                     // position
+            'victoryPanelBackground',           // texture key
+            null,                               // frame (null for default)
+            panelWidth, panelHeight,            // size
+            15, 15, 15, 15                      // slice sizes: left, right, top, bottom
+        );
+        
+        // Apply blue tint
+        panel.setTint(0x0055aa);
         
         // Title
         this.add.text(
