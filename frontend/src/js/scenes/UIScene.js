@@ -82,7 +82,10 @@ export default class UIScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         
         // Create panel backgrounds
-        this.createPanel(width - 450, 0, 450, 100, 0x222222, 0.8); // Resources panel
+        // Resources panel now spans full width at the top
+        this.createPanel(0, 0, width, 50, 0x222222, 0.8); // Resources panel
+        
+        // Adjust other panels to be below the map
         this.createPanel(width - 450, 110, 450, 300, 0x222222, 0.8); // Info panel
         this.createPanel(width - 450, 420, 450, 80, 0x222222, 0.8); // Actions panel
         this.choicePanelBg = this.createPanel(width - 450, 510, 450, 200, 0x222222, 0.8); // Choice panel
@@ -122,62 +125,47 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createResourcesPanel() {
-        const x = this.cameras.main.width - 440;
-        const y = 10;
-        
-        // Header
-        this.add.text(x, y, 'RESOURCES', { 
-            fontSize: '20px', 
-            fontFamily: 'Arial', 
-            color: '#ffffff'
-        });
+        const width = this.cameras.main.width;
         
         // Resource counters
         const resourceTypes = Object.values(RESOURCES);
         this.resourceTexts = {};
         
-        // Custom resource display order in column-based layout
+        // Custom resource display order in a single row
         const displayOrder = [
-            // First column
             RESOURCES.ENERGY,
             RESOURCES.DRONES,
-            
-            // Second column
             RESOURCES.IRON,
             RESOURCES.STEEL,
-            
-            // Third column
             RESOURCES.WATER,
             RESOURCES.FUEL,
-            
-            // Fourth column
             RESOURCES.CONCRETE
         ];
         
-        // Create text for each resource type in the specified order
-        const columns = 4;
-        const columnSpacing = 105; // Increased spacing for wider panel
-        const rowSpacing = 25;
+        // Calculate spacing between resources
+        const totalResources = displayOrder.length;
+        const spacing = width / (totalResources + 1); // +1 to add margins on sides
         
+        // Create text for each resource type in a single row
         displayOrder.forEach((resourceType, index) => {
-            // Calculate column and row position
-            const column = Math.floor(index / 2);
-            const row = index % 2;
-            
-            // Calculate x and y offsets
-            const xOffset = column * columnSpacing;
-            const yOffset = 30 + row * rowSpacing;
+            // Calculate x position to spread resources evenly
+            const xPos = spacing * (index + 1); // +1 to start after left margin
             
             // Create readable label from resource type
             const label = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
             
             this.resourceTexts[resourceType] = this.add.text(
-                x + xOffset, 
-                y + yOffset, 
+                xPos, 
+                25, // Vertically center in the 50px high panel
                 `${label}: 0`, 
-                { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff' }
-            );
-        });        
+                { 
+                    fontSize: '16px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff',
+                    align: 'center'
+                }
+            ).setOrigin(0.5, 0.5); // Center both horizontally and vertically
+        });
     }
     
     createInfoPanel() {
