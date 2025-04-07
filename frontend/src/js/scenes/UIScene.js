@@ -656,18 +656,6 @@ export default class UIScene extends Phaser.Scene {
                     }
                 }
             }
-            
-            // Add special effects or other card-specific UI elements
-            if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
-                // Display special effect indicators if needed
-                const effectsText = this.add.text(
-                    5,
-                    this.cardHeight - 20,
-                    "Special Effect",
-                    { fontSize: '10px', fontFamily: 'Arial', color: '#0000ff' }
-                );
-                cardContainer.add(effectsText);
-            }
         }
         
         return cardContainer;
@@ -1681,44 +1669,53 @@ export default class UIScene extends Phaser.Scene {
             
             // Card content (if it's a building card)
             if (card.type === 'building') {
-                // Building name
+                // Card name - use name from card type if available, otherwise use building name
+                const cardName = card.cardType ? card.cardType.name : card.building.shortName;
+                
                 const nameText = this.add.text(
                     this.cardWidth / 2, 
                     10, 
-                    card.building.shortName, 
+                    cardName, 
                     { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
                 );
                 nameText.setOrigin(0.5, 0);
                 cardContainer.add(nameText);
                 
-                // Building icon
-                const icon = this.add.sprite(this.cardWidth / 2, 45, card.building.texture);
+                // Building icon - use cardTexture if available, otherwise use building texture
+                const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
+                                   card.cardType.cardTexture : 
+                                   (card.building ? card.building.texture : 'placeholderTexture');
+                
+                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
                 icon.setDisplaySize(40, 40);
                 icon.setOrigin(0.5);
                 cardContainer.add(icon);
                 
-                // Cost text
-                let costY = 75;
-                for (const resource in card.building.cost) {
-                    if (card.building.cost[resource] > 0) {
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        
-                        // Check if player has enough of this resource
-                        const requiredAmount = card.building.cost[resource];
-                        const playerAmount = this.resourceManager.getResource(resource);
-                        const hasEnough = playerAmount >= requiredAmount;
-                        
-                        // Set color based on resource availability
-                        const textColor = hasEnough ? '#000000' : '#ff0000';
-                        
-                        const costText = this.add.text(
-                            5, 
-                            costY, 
-                            `${resourceName}: ${card.building.cost[resource]}`, 
-                            { fontSize: '10px', fontFamily: 'Arial', color: textColor }
-                        );
-                        cardContainer.add(costText);
-                        costY += 12;
+                // Only show costs if card has a building
+                if (card.building) {
+                    // Cost text
+                    let costY = 75;
+                    for (const resource in card.building.cost) {
+                        if (card.building.cost[resource] > 0) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            
+                            // Check if player has enough of this resource
+                            const requiredAmount = card.building.cost[resource];
+                            const playerAmount = this.resourceManager.getResource(resource);
+                            const hasEnough = playerAmount >= requiredAmount;
+                            
+                            // Set color based on resource availability
+                            const textColor = hasEnough ? '#000000' : '#ff0000';
+                            
+                            const costText = this.add.text(
+                                5, 
+                                costY, 
+                                `${resourceName}: ${card.building.cost[resource]}`, 
+                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                            );
+                            cardContainer.add(costText);
+                            costY += 12;
+                        }
                     }
                 }
             }

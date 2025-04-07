@@ -47,6 +47,22 @@ export default class CardManager {
         }
     }
     
+    // Fallback method to create a default deck if DECK_COMPOSITION is invalid
+    createDefaultDeck() {
+        // Add one of each card type defined in CARD_TYPES
+        Object.values(CARD_TYPES).forEach(cardType => {
+            const building = cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
+                BUILDINGS[key].id === cardType.buildingId
+            )] : null;
+            
+            this.deck.push({
+                type: 'building',
+                cardType: cardType,
+                building: building
+            });
+        });
+    }
+    
     // Shuffle the deck using Fisher-Yates algorithm
     shuffleDeck() {
         for (let i = this.deck.length - 1; i > 0; i--) {

@@ -861,7 +861,13 @@ export default class GameScene extends Phaser.Scene {
             
             // Always add to hand, even if over the limit
             this.cardManager.hand.push(selectedCard);
-            this.uiScene.showMessage(`Added ${selectedCard.building.name} to your hand`);
+            
+            // Get card name from cardType if available, otherwise fallback to building name
+            const cardName = selectedCard.cardType ? 
+                selectedCard.cardType.name : 
+                (selectedCard.building ? selectedCard.building.name : 'Card');
+                
+            this.uiScene.showMessage(`Added ${cardName} to your hand`);
             
             // Discard the other choices
             for (let i = 0; i < this.cardChoices.length; i++) {
