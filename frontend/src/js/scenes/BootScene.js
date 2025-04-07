@@ -78,6 +78,9 @@ export default class BootScene extends Phaser.Scene {
         
         // Load discard button texture
         this.load.image('discardButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_large.png'));
+        
+        // Load victory panel background texture
+        this.load.image('victoryPanelBackground', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_large_square.png'));
     }
 
     create() {
