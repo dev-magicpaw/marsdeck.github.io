@@ -440,7 +440,7 @@ export default class UIScene extends Phaser.Scene {
         const buttonHeight = 30;
         
         // Create end turn button using the texture
-        const buttonBg = this.add.sprite(0, 0, 'endTurnButton');
+        const buttonBg = this.add.sprite(0, 0, 'blueGlossSquareButton');
         buttonBg.setDisplaySize(buttonWidth, buttonHeight);
         buttonBg.setOrigin(0, 0);
         
@@ -1191,7 +1191,7 @@ export default class UIScene extends Phaser.Scene {
                     // Clear selection and refresh UI
                     this.clearInfoPanel();
                     this.refreshUI();
-                }, 0x0066cc, 300, this.buttonHeight, 'endTurnButton'); // Use blue texture with larger width and consistent height
+                }, 0x0066cc, 300, this.buttonHeight, 'blueGlossSquareButton'); // Use blue texture with larger width and consistent height
                 
                 // Position the button
                 launchButton.y = buttonY;
@@ -1201,7 +1201,7 @@ export default class UIScene extends Phaser.Scene {
                 buttonY += this.buttonHeight + buttonSpacing;
             } else {
                 // Disabled launch button - now we'll use a grayed-out version of the texture
-                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 300, this.buttonHeight, 'endTurnButton');
+                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 300, this.buttonHeight, 'blueGlossSquareButton');
                 
                 // Position the button
                 launchButton.y = buttonY;
