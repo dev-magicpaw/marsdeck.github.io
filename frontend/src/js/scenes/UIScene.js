@@ -195,54 +195,69 @@ export default class UIScene extends Phaser.Scene {
     createInfoPanel() {
         const width = this.cameras.main.width;
         const resourcePanelHeight = 50;
-        const verticalSpacing = 20;
+        const horizontalSpacing = 20;
+        const verticalSpacing = 10;
+        const contentHorizontalSpacing = horizontalSpacing;
+        const contenVerticalSpacing = verticalSpacing + 40; 
+        const rightPanelWidth = 450;
+        const rightPanelX = width - rightPanelWidth;
         
-        const x = width - 440;
-        const y = resourcePanelHeight + verticalSpacing; // Position right after resources panel + spacing
+        // Calculate panel position
+        const panelY = resourcePanelHeight + verticalSpacing;
         
-        // Header
-        this.add.text(x, y, 'INFORMATION', { 
+        // Create main container for the panel
+        this.infoPanelContainer = this.add.container(rightPanelX, panelY);
+        
+        // Header with left padding
+        const headerText = this.add.text(horizontalSpacing, verticalSpacing, 'INFORMATION', { 
             fontSize: '20px', 
             fontFamily: 'Arial', 
             color: '#ffffff'
         });
         
-        // Create info content
+        // Create info content with padding
         this.infoTitle = this.add.text(
-            x, 
-            y + 30, 
+            contentHorizontalSpacing, 
+            contenVerticalSpacing, 
             '', 
             { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
         );
         
         this.infoContent = this.add.text(
-            x, 
-            y + 55, 
+            contentHorizontalSpacing, 
+            contenVerticalSpacing + 15, 
             '', 
-            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 430 } }
+            { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 410 } }
         );
         
-        // Create a sprite placeholder for selected entity
-        this.infoSprite = this.add.sprite(x + 225, y + 170, 'gridTile');
+        // Create a sprite placeholder for selected entity - centered horizontally
+        this.infoSprite = this.add.sprite(rightPanelWidth / 2, 190, 'gridTile');
         this.infoSprite.setVisible(false);
+        
+        // Add all to container
+        this.infoPanelContainer.add(headerText);
+        this.infoPanelContainer.add(this.infoTitle);
+        this.infoPanelContainer.add(this.infoContent);
+        this.infoPanelContainer.add(this.infoSprite);
     }
     
     createActionsPanel() {
         const width = this.cameras.main.width;
         const resourcePanelHeight = 50;
         const infoPanelHeight = 300;
-        const verticalSpacing = 20;
+        const verticalSpacing = 10;
+        const horizontalSpacing = 20;
         const rightPanelWidth = 450;
         const rightPanelX = width - rightPanelWidth;
         
         // Calculate panel position (same as in createLayout)
         const panelY = resourcePanelHeight + verticalSpacing + infoPanelHeight + verticalSpacing;
         
-        // Create main container for the panel
+        // Create main container for the panel (positioned at the panel's top-left corner)
         this.actionsPanelContainer = this.add.container(rightPanelX, panelY);
         
-        // Header - positioned relative to container with padding
-        this.actionsTitle = this.add.text(20, 20, 'ACTIONS', { 
+        // Header with left padding
+        this.actionsTitle = this.add.text(horizontalSpacing, verticalSpacing, 'ACTIONS', { 
             fontSize: '20px', 
             fontFamily: 'Arial', 
             color: '#ffffff'
@@ -251,7 +266,7 @@ export default class UIScene extends Phaser.Scene {
         // Container for action buttons - positioned below title with padding
         this.actionsContainer = this.add.container(20, 60);
         
-        // Add both to the panel container
+        // Add to panel container
         this.actionsPanelContainer.add(this.actionsTitle);
         this.actionsPanelContainer.add(this.actionsContainer);
         
@@ -264,7 +279,10 @@ export default class UIScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         const bottomPanelHeight = 50;
         const choicePanelHeight = 200;
-        const verticalSpacing = 20;
+        const verticalSpacing = 10;
+        const horizontalSpacing = 20;
+        const cardsVerticalSpacing = verticalSpacing + 30;
+        const cardsHorizontalSpacing = horizontalSpacing;
         const rightPanelWidth = 450;
         const rightPanelX = width - rightPanelWidth;
         
@@ -275,14 +293,14 @@ export default class UIScene extends Phaser.Scene {
         this.choicePanelContainer = this.add.container(rightPanelX, panelY);
         
         // Header - positioned relative to container with padding
-        this.choiceTitle = this.add.text(20, 20, 'CHOOSE A CARD', { 
+        this.choiceTitle = this.add.text(horizontalSpacing, verticalSpacing, 'CHOOSE A CARD', { 
             fontSize: '20px', 
             fontFamily: 'Arial', 
             color: '#ffffff'
         });
         
         // Container for card choices - positioned below title with padding
-        this.choiceContainer = this.add.container(20, 60);
+        this.choiceContainer = this.add.container(cardsHorizontalSpacing, cardsVerticalSpacing);
         
         // Add both to the panel container
         this.choicePanelContainer.add(this.choiceTitle);
@@ -759,8 +777,9 @@ export default class UIScene extends Phaser.Scene {
                 // Add all other information to the main content text
                 this.infoContent.setText(card.building.description + "\n\nConstruction Cost:");
                 
-                // Position for cost texts
+                // Position for cost texts - now relative to the info panel container
                 let yOffset = this.infoContent.y + this.infoContent.height + 5;
+                let xOffset = this.infoContent.x;
                 
                 // Add each resource cost with appropriate color
                 for (const resource in card.building.cost) {
@@ -773,11 +792,14 @@ export default class UIScene extends Phaser.Scene {
                     const textColor = hasEnough ? '#ffffff' : '#ff0000';
                     
                     const costText = this.add.text(
-                        this.infoContent.x, 
+                        xOffset,
                         yOffset, 
                         `${resourceName}: ${card.building.cost[resource]}`, 
                         { fontSize: '14px', fontFamily: 'Arial', color: textColor }
                     );
+                    
+                    // Add to the info panel container
+                    this.infoPanelContainer.add(costText);
                     
                     // Store text for later cleanup
                     this.costTexts.push(costText);
@@ -787,12 +809,17 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Position for the additional content after the costs
                 this.additionalContent = this.add.text(
-                    this.infoContent.x,
+                    xOffset,
                     yOffset + 10, // Add 10px spacing after costs
                     "",
-                    { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 330 } }
+                    { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 410 } }
                 );
-                this.costTexts.push(this.additionalContent); // Add to cost texts for cleanup
+                
+                // Add to the info panel container
+                this.infoPanelContainer.add(this.additionalContent);
+                
+                // Add to cost texts for cleanup
+                this.costTexts.push(this.additionalContent);
                 
                 // Continue with the rest of the information
                 let additionalText = "";
