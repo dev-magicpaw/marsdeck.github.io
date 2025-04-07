@@ -1082,7 +1082,7 @@ export default class UIScene extends Phaser.Scene {
             { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
         ).setOrigin(0.5);
         
-        // Restart button
+        // Rewards button
         const rewardsButton = this.add.container(width / 2, height / 2 + 100);
         
         // Use nine-slice for the button with blueGlossSquareButton texture
@@ -1109,10 +1109,7 @@ export default class UIScene extends Phaser.Scene {
         rewardsButton.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
         
         rewardsButton.on('pointerdown', () => {
-            // Restart the game
-            this.scene.stop('UIScene');
-            this.scene.stop('GameScene');
-            this.scene.start('GameScene');
+            this.showRewards();
         });
         
         rewardsButton.on('pointerover', () => {
@@ -1122,6 +1119,205 @@ export default class UIScene extends Phaser.Scene {
         rewardsButton.on('pointerout', () => {
             buttonBg.clearTint(); // Clear tint on pointer out
         });
+    }
+    
+    // Show rewards panel with selectable rewards
+    showRewards() {
+        // Create rewards panel
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create panel that covers most of the screen as specified (50px from each edge)
+        const panelX = 25;
+        const panelY = 25;
+        const panelWidth = width - 2 * panelX;
+        const panelHeight = height - 2 * panelY;
+        
+        // Create the panel background
+        const panel = this.add.graphics();
+        panel.fillStyle(0x222233, 0.9);
+        panel.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Add panel border
+        panel.lineStyle(4, 0x4444aa, 1);
+        panel.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Title
+        this.add.text(
+            width / 2, 
+            panelY + 40, 
+            'SELECT YOUR REWARD', 
+            { fontSize: '32px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Create container for all reward elements
+        const rewardsContainer = this.add.container(0, 0);
+        
+        // Create 3 reward slots
+        const slotWidth = 250;
+        const slotHeight = 350;
+        const slotSpacing = 50;
+        const slotsY = panelY + 120;
+        
+        // Calculate total width of all slots with spacing
+        const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
+        // Calculate starting X position to center all slots
+        const startX = (width - totalSlotsWidth) / 2;
+        
+        // Sample reward data with actual effects
+        const rewards = [
+            {
+                name: "Resource Boost",
+                image: "steelworks",
+                description: "Get +50 Steel, +20 Concrete, and +30 Fuel to boost your economy",
+                effect: () => {
+                    this.resourceManager.modifyResource(RESOURCES.STEEL, 50);
+                    this.resourceManager.modifyResource(RESOURCES.CONCRETE, 20);
+                    this.resourceManager.modifyResource(RESOURCES.FUEL, 30);
+                    this.selectReward("Resource Boost");
+                }
+            },
+            {
+                name: "Drone Army",
+                image: "droneDepo",
+                description: "Receive 15 additional drones and 10 energy to power your expansion",
+                effect: () => {
+                    this.resourceManager.modifyResource(RESOURCES.DRONES, 15);
+                    this.resourceManager.modifyResource(RESOURCES.ENERGY, 10);
+                    this.selectReward("Drone Army");
+                }
+            },
+            {
+                name: "Production Boost",
+                image: "rocketFueled",
+                description: "Get +5 reputation and draw 3 cards to accelerate your colony growth",
+                effect: () => {
+                    this.resourceManager.modifyResource(RESOURCES.REPUTATION, 5);
+                    // Draw 3 cards - this would need to be implemented in CardManager
+                    // For now, we'll just apply the reputation boost
+                    this.selectReward("Production Boost");
+                }
+            }
+        ];
+        
+        // Create each reward slot
+        rewards.forEach((reward, index) => {
+            const slotX = startX + (index * (slotWidth + slotSpacing));
+            
+            // Slot background
+            const slotBg = this.add.nineslice(
+                slotX + slotWidth/2, slotsY + slotHeight/2,
+                'cardBackground',
+                null,
+                slotWidth, slotHeight,
+                15, 15, 35, 15
+            );
+            slotBg.setTint(0x3366aa);
+            rewardsContainer.add(slotBg);
+            
+            // Reward name
+            const nameText = this.add.text(
+                slotX + slotWidth/2, 
+                slotsY + 18, 
+                reward.name, 
+                { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' }
+            ).setOrigin(0.5);
+            rewardsContainer.add(nameText);
+            
+            // Reward image
+            const rewardImage = this.add.sprite(
+                slotX + slotWidth/2,
+                slotsY + 120,
+                reward.image
+            );
+            rewardImage.setDisplaySize(120, 120);
+            rewardsContainer.add(rewardImage);
+            
+            // Reward description
+            const descriptionText = this.add.text(
+                slotX + slotWidth/2, 
+                slotsY + 220, 
+                reward.description, 
+                { 
+                    fontSize: '16px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff', 
+                    align: 'center',
+                    wordWrap: { width: slotWidth - 30 } 
+                }
+            ).setOrigin(0.5);
+            rewardsContainer.add(descriptionText);
+            
+            // Select button
+            const selectButton = this.createActionButton(
+                "SELECT", 
+                reward.effect, 
+                0x33cc33, 
+                120, 
+                40, 
+                'blueGlossSquareButton'
+            );
+            selectButton.x = slotX + slotWidth/2 - 60;
+            selectButton.y = slotsY + slotHeight - 60;
+            rewardsContainer.add(selectButton);
+        });
+    }
+    
+    // Handle reward selection
+    selectReward(rewardName) {
+        // Display a message about the selected reward
+        this.showMessage(`Selected reward: ${rewardName}`);
+        
+        // Create a confirmation box
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create the confirmation panel
+        const confirmPanel = this.add.graphics();
+        confirmPanel.fillStyle(0x000000, 0.8);
+        confirmPanel.fillRect(width/2 - 200, height/2 - 100, 400, 200);
+        confirmPanel.lineStyle(2, 0xffffff, 1);
+        confirmPanel.strokeRect(width/2 - 200, height/2 - 100, 400, 200);
+        
+        // Confirmation text
+        const confirmText = this.add.text(
+            width/2,
+            height/2 - 50,
+            `You selected: ${rewardName}`,
+            { fontSize: '24px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Subtext
+        const subText = this.add.text(
+            width/2,
+            height/2,
+            'Your reward has been applied!',
+            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Continue button
+        const continueButton = this.createActionButton(
+            "CONTINUE", 
+            () => {
+                // Clean up UI
+                confirmPanel.destroy();
+                confirmText.destroy();
+                subText.destroy();
+                continueButton.destroy();
+                
+                // Restart the game with new rewards applied
+                this.scene.stop('UIScene');
+                this.scene.stop('GameScene');
+                this.scene.start('GameScene');
+            }, 
+            0x0066aa, 
+            150, 
+            40, 
+            'blueGlossSquareButton'
+        );
+        
+        continueButton.x = width/2 - 75; // Center the button
+        continueButton.y = height/2 + 50;
     }
     
     // Update the actions panel based on selected entity
