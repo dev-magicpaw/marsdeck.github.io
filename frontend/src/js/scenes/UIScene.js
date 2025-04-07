@@ -1127,27 +1127,29 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Create panel that covers most of the screen as specified (50px from each edge)
+        // Create panel that covers most of the screen as specified (25px from each edge)
         const panelX = 25;
         const panelY = 25;
         const panelWidth = width - 2 * panelX;
         const panelHeight = height - 2 * panelY;
         
-        // Create the panel background
-        const panel = this.add.graphics();
-        panel.fillStyle(0x222233, 0.9);
-        panel.fillRect(panelX, panelY, panelWidth, panelHeight);
-        
-        // Add panel border
-        panel.lineStyle(4, 0x4444aa, 1);
-        panel.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        // Create the panel background using nine-slice with the requested texture
+        const panel = this.add.nineslice(
+            panelX + panelWidth/2, panelY + panelHeight/2, // center position
+            'panelGlassScrews',                            // texture key
+            null,                                          // frame (null for default)
+            panelWidth, panelHeight,                       // size
+            30, 30, 30, 30                                 // slice sizes: left, right, top, bottom
+        );
+        panel.setOrigin(0.5);
+        panel.setTint(0x999999); // Apply a blue tint to match the game theme
         
         // Title
         this.add.text(
             width / 2, 
             panelY + 40, 
             'SELECT YOUR REWARD', 
-            { fontSize: '32px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+            { fontSize: '32px', fontFamily: 'Arial', color: '#0b5394', align: 'center' }
         ).setOrigin(0.5);
         
         // Create container for all reward elements
@@ -1220,7 +1222,7 @@ export default class UIScene extends Phaser.Scene {
                 slotX + slotWidth/2, 
                 slotsY + 18, 
                 reward.name, 
-                { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' }
+                { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' } // Keep 20px font size
             ).setOrigin(0.5);
             rewardsContainer.add(nameText);
             
@@ -1259,8 +1261,22 @@ export default class UIScene extends Phaser.Scene {
             );
             selectButton.x = slotX + slotWidth/2 - 60;
             selectButton.y = slotsY + slotHeight - 60;
+            
+            // Add a subtle pulsing animation to the select button to make it stand out
+            this.tweens.add({
+                targets: selectButton,
+                scaleX: 1.05,
+                scaleY: 1.05,
+                duration: 800,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+            
             rewardsContainer.add(selectButton);
         });
+        
+        // Close button is not needed
     }
     
     // Handle reward selection
