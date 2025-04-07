@@ -1,4 +1,4 @@
-import { BUILDINGS, DECK_COMPOSITION, MAX_CARD_SLOTS } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS } from '../config/game-data';
 
 export default class CardManager {
     constructor(scene) {
@@ -7,7 +7,7 @@ export default class CardManager {
         this.hand = [];
         this.discardPile = [];
         
-        // Initialize the deck with building cards
+        // Initialize the deck with cards
         this.initializeDeck();
         this.shuffleDeck();
     }
@@ -17,12 +17,13 @@ export default class CardManager {
         this.deck = [];
         
         // Add cards based on the DECK_COMPOSITION configuration
-        Object.entries(DECK_COMPOSITION).forEach(([buildingId, count]) => {
-            // Find the building definition
-            const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
+        Object.entries(DECK_COMPOSITION).forEach(([cardId, count]) => {
+            // Find the card definition
+            const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
             
-            // Skip if building not found or shouldn't have cards
-            if (!building || !building.createCard) {
+            // Skip if card not found
+            if (!cardType) {
+                console.warn(`Card type ${cardId} not found in CARD_TYPES configuration.`);
                 return;
             }
             
@@ -30,7 +31,10 @@ export default class CardManager {
             for (let i = 0; i < count; i++) {
                 this.deck.push({
                     type: 'building',
-                    building: building
+                    cardType: cardType,
+                    building: cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
+                        BUILDINGS[key].id === cardType.buildingId
+                    )] : null
                 });
             }
         });
@@ -41,27 +45,6 @@ export default class CardManager {
             console.warn('Deck composition is empty or invalid. Using default deck.');
             this.createDefaultDeck();
         }
-    }
-    
-    // Fallback method to create a default deck if DECK_COMPOSITION is invalid
-    createDefaultDeck() {
-        // Add multiple copies of each building
-        Object.values(BUILDINGS).forEach(building => {
-            // Skip buildings that shouldn't have cards created for them
-            if (!building.createCard) {
-                return;
-            }
-            
-            // The number of copies depends on the rarity/importance
-            const numCopies = building.id === 'launchPad' ? 1 : 3;
-            
-            for (let i = 0; i < numCopies; i++) {
-                this.deck.push({
-                    type: 'building',
-                    building: building
-                });
-            }
-        });
     }
     
     // Shuffle the deck using Fisher-Yates algorithm

@@ -82,8 +82,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null, // Can be built anywhere
-        texture: 'droneDepo',
-        createCard: true
+        texture: 'droneDepo'
     },
     IRON_MINE: {
         id: 'ironMine',
@@ -101,8 +100,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.METAL.id,
-        texture: 'ironMine',
-        createCard: true
+        texture: 'ironMine'
     },
     STEELWORKS: {
         id: 'steelworks',
@@ -122,8 +120,7 @@ export const BUILDINGS = {
             [RESOURCES.IRON]: 2
         },
         terrainRequirement: null,
-        texture: 'steelworks',
-        createCard: true
+        texture: 'steelworks'
     },
     CONCRETE_HARVESTER: {
         id: 'concreteMixer',
@@ -141,8 +138,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'concreteMixer',
-        createCard: true
+        texture: 'concreteMixer'
     },
     WATER_PUMP: {
         id: 'waterPump',
@@ -160,8 +156,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.WATER.id,
-        texture: 'waterPump',
-        createCard: true
+        texture: 'waterPump'
     },
     FUEL_REFINERY: {
         id: 'fuelRefinery',
@@ -181,8 +176,7 @@ export const BUILDINGS = {
             [RESOURCES.WATER]: 2
         },
         terrainRequirement: null,
-        texture: 'fuelRefinery',
-        createCard: true
+        texture: 'fuelRefinery'
     },
     WIND_TURBINE: {
         id: 'windTurbine',
@@ -198,8 +192,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'windTurbine',
-        createCard: true
+        texture: 'windTurbine'
     },
     SOLAR_PANELS: {
         id: 'solarPanel',
@@ -216,8 +209,7 @@ export const BUILDINGS = {
         },
         consumption: {},
         terrainRequirement: null,
-        texture: 'solarPanel',
-        createCard: true
+        texture: 'solarPanel'
     },
     LAUNCH_PAD: {
         id: 'launchPad',
@@ -240,8 +232,7 @@ export const BUILDINGS = {
             [RESOURCES.STEEL]: 10
         },
         // Reputation earned per launch
-        launchReward: 10,
-        createCard: true
+        launchReward: 10
     },
     LAUNCH_PAD_SURROUNDING: {
         id: 'launchPadSurrounding',
@@ -252,8 +243,7 @@ export const BUILDINGS = {
         production: {},
         consumption: {},
         terrainRequirement: null,
-        texture: 'launchPadSurrounding', // Now using its own unique texture
-        createCard: false
+        texture: 'launchPadSurrounding' // Now using its own unique texture
     },
     WIND_TURBINE_SURROUNDING: {
         id: 'windTurbineSurrounding',
@@ -264,29 +254,98 @@ export const BUILDINGS = {
         production: {},
         consumption: {},
         terrainRequirement: null,
-        texture: 'windTurbineSurrounding',
-        createCard: false
+        texture: 'windTurbineSurrounding'
     }
+};
+
+// Card types definition - allows for more flexible card configuration
+export const CARD_TYPES = {
+    // Standard building cards
+    DRONE_DEPO_CARD: {
+        id: 'droneDepoCard',
+        name: 'Drone Depo',
+        description: 'Build a drone depo to produce drones',
+        buildingId: 'droneDepo',
+        cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
+        rarity: 'common',
+    },
+    IRON_MINE_CARD: {
+        id: 'ironMineCard',
+        name: 'Iron Mine',
+        description: 'Build an iron mine on a metal deposit',
+        buildingId: 'ironMine',
+        rarity: 'common',
+    },
+    STEELWORKS_CARD: {
+        id: 'steelworksCard',
+        name: 'Steelworks',
+        description: 'Build a steelworks to convert iron to steel',
+        buildingId: 'steelworks',
+        rarity: 'uncommon',
+    },
+    CONCRETE_HARVESTER_CARD: {
+        id: 'concreteMixerCard',
+        name: 'Concrete',
+        description: 'Build a concrete harvester to produce concrete',
+        buildingId: 'concreteMixer',
+        rarity: 'common',
+    },
+    WATER_PUMP_CARD: {
+        id: 'waterPumpCard',
+        name: 'Water Pump',
+        description: 'Build a water pump on a water deposit',
+        buildingId: 'waterPump',
+        rarity: 'common',
+    },
+    FUEL_REFINERY_CARD: {
+        id: 'fuelRefineryCard',
+        name: 'Fuel',
+        description: 'Build a fuel refinery to convert water to fuel',
+        buildingId: 'fuelRefinery',
+        rarity: 'uncommon',
+    },
+    WIND_TURBINE_CARD: {
+        id: 'windTurbineCard',
+        name: 'Wind',
+        description: 'Build a wind turbine to generate energy',
+        buildingId: 'windTurbine',
+        rarity: 'common',
+    },
+    SOLAR_PANEL_CARD: {
+        id: 'solarPanelCard',
+        name: 'Solar',
+        description: 'Build solar panels to generate energy',
+        buildingId: 'solarPanel',
+        rarity: 'common',
+    },
+    LAUNCH_PAD_CARD: {
+        id: 'launchPadCard',
+        name: 'Launch Pad',
+        description: 'Build a launch pad to send rockets for reputation',
+        buildingId: 'launchPad',
+        rarity: 'rare',
+    }
+    // You can add more card types here, including special cards that don't directly map to buildings
 };
 
 // Deck composition - defines how many copies of each card type will be in the deck
 export const DECK_COMPOSITION = {
-    // Format: buildingId: numberOfCopies
-    'droneDepo': 3,       // More drone depos for early resource generation
-    'ironMine': 5,        // Regular resource production buildings
-    'steelworks': 3,
-    'concreteMixer': 5,
-    'waterPump': 5,
-    'fuelRefinery': 3,
-    'windTurbine': 4,     // More wind turbines for energy generation
-    'solarPanel': 4,      // More solar panels for energy generation
-    'launchPad': 1        // Only one launch pad as it's a special building
+    // Format: cardId: numberOfCopies
+    'droneDepoCard': 3,
+    'ironMineCard': 5,
+    'steelworksCard': 3,
+    'concreteMixerCard': 5,
+    'waterPumpCard': 5,
+    'fuelRefineryCard': 3,
+    'windTurbineCard': 4,
+    'solarPanelCard': 4,
+    'launchPadCard': 1
 };
 
 // Starting hand configuration - specific cards to always include in starting hand
 export const STARTING_HAND = {
-    // Format: buildingId: true/false
-    'droneDepo': true,   // Always include drone depo in starting hand
-    'windTurbine': true, // Always include wind turbine in starting hand
-    'launchPad': true    // Always include launch pad in starting hand
+    // Format: cardId: true/false
+    'droneDepoCard': true,
+    'windTurbineCard': true,
+    'launchPadCard': true
 }; 
