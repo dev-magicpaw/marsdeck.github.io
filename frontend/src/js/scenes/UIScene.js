@@ -1262,17 +1262,6 @@ export default class UIScene extends Phaser.Scene {
             selectButton.x = slotX + slotWidth/2 - 60;
             selectButton.y = slotsY + slotHeight - 60;
             
-            // Add a subtle pulsing animation to the select button to make it stand out
-            this.tweens.add({
-                targets: selectButton,
-                scaleX: 1.05,
-                scaleY: 1.05,
-                duration: 800,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut'
-            });
-            
             rewardsContainer.add(selectButton);
         });
         
