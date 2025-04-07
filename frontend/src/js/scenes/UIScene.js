@@ -501,8 +501,10 @@ export default class UIScene extends Phaser.Scene {
         const textureKey = card.type === 'building' ? 'cardBackground' : 'cardTemplate';
         
         if (card.type === 'building') {
-            // Use NineSlice for building cards
-            // The corner sizes are set to 10px for all corners
+            // Use NineSlice for building cards with adjusted slice sizes
+            // Top slice is larger (35px) to account for the header area
+            // Bottom slice is 15px for the rounded corner
+            // Left and right are 10px for the rounded corners
             cardBg = this.add.nineslice(
                 0, 0,               // position
                 textureKey,         // texture key
@@ -1282,13 +1284,17 @@ export default class UIScene extends Phaser.Scene {
             // Card background using NineSlice for better UI scaling
             let cardBg;
             
-            // Use NineSlice for better scaling
+            // Use NineSlice for better scaling with adjusted slice sizes
+            // Match the same slice sizes as createCardSprite for consistency
+            // Top slice is larger (35px) to account for the header area
+            // Bottom slice is 15px for the rounded corner
+            // Left and right are 10px for the rounded corners
             cardBg = this.add.nineslice(
                 0, 0,                // position
                 'cardBackground',    // texture key
                 null,                // frame (null for default)
                 this.cardWidth, this.cardHeight, // size
-                10, 10, 10, 10       // slice sizes: left, right, top, bottom
+                10, 10, 35, 15       // slice sizes: left, right, top, bottom
             );
             cardBg.setOrigin(0, 0);
             
