@@ -247,6 +247,8 @@ export default class UIScene extends Phaser.Scene {
         const infoPanelHeight = 300;
         const verticalSpacing = 10;
         const horizontalSpacing = 20;
+        const firstButtonVerticalSpacing = verticalSpacing + 30;
+        const firstButtonHorizontalSpacing = horizontalSpacing;
         const rightPanelWidth = 450;
         const rightPanelX = width - rightPanelWidth;
         
@@ -263,8 +265,8 @@ export default class UIScene extends Phaser.Scene {
             color: '#ffffff'
         });
         
-        // Container for action buttons - positioned below title with padding
-        this.actionsContainer = this.add.container(20, 60);
+        // Container for action buttons
+        this.actionsContainer = this.add.container(firstButtonHorizontalSpacing, firstButtonVerticalSpacing); // Changed from 60 to 45
         
         // Add to panel container
         this.actionsPanelContainer.add(this.actionsTitle);
@@ -1106,6 +1108,8 @@ export default class UIScene extends Phaser.Scene {
         this.actionsContainer.removeAll(true);
         
         let hasActions = false;
+        let buttonY = 0; // Track vertical position for multiple buttons
+        const buttonSpacing = 10; // Spacing between buttons
         
         // If we have a selected card, show discard action
         if (this.selectedCardIndex !== null) {
@@ -1133,7 +1137,12 @@ export default class UIScene extends Phaser.Scene {
                 this.showMessage('Card discarded');
             }, 0xcc0000, 100, 30, 'discardButton'); // Use red texture for discard button
             
+            // Position the button
+            discardButton.y = buttonY;
             this.actionsContainer.add(discardButton);
+            
+            // Update vertical position for next button
+            buttonY += this.buttonHeight + buttonSpacing;
         }
         // If we have a selected Launch Pad with a rocket, show launch action
         else if (this.selectedCell && 
@@ -1165,11 +1174,22 @@ export default class UIScene extends Phaser.Scene {
                     this.refreshUI();
                 }, 0x0066cc, 300, this.buttonHeight, 'endTurnButton'); // Use blue texture with larger width and consistent height
                 
+                // Position the button
+                launchButton.y = buttonY;
                 this.actionsContainer.add(launchButton);
+                
+                // Update vertical position for next button
+                buttonY += this.buttonHeight + buttonSpacing;
             } else {
                 // Disabled launch button - now we'll use a grayed-out version of the texture
                 const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 300, this.buttonHeight, 'endTurnButton');
+                
+                // Position the button
+                launchButton.y = buttonY;
                 this.actionsContainer.add(launchButton);
+                
+                // Update vertical position for next button
+                buttonY += this.buttonHeight + buttonSpacing;
             }
         }
         
