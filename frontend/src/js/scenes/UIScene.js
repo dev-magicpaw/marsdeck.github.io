@@ -355,9 +355,14 @@ export default class UIScene extends Phaser.Scene {
                 xPos = i * (this.cardWidth + this.cardSpacing) + 2* this.cardSpacing;
             }
             
-            // Add slot background
-            const slotBg = this.add.sprite(xPos, 0, 'cardSlotBackground');
-            slotBg.setDisplaySize(this.cardWidth, this.cardHeight);
+            // Add slot background using NineSlice for better UI scaling
+            const slotBg = this.add.nineslice(
+                xPos, 0,                     // position
+                'cardSlotBackground',        // texture key
+                null,                        // frame (null for default)
+                this.cardWidth, this.cardHeight, // size
+                10, 10, 10, 10               // slice sizes: left, right, top, bottom (uniform corners)
+            );
             slotBg.setOrigin(0, 0);
             slotBg.setAlpha(0.7); // Make it slightly transparent
             
