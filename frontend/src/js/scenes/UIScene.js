@@ -1083,7 +1083,7 @@ export default class UIScene extends Phaser.Scene {
         ).setOrigin(0.5);
         
         // Restart button
-        const restartButton = this.add.container(width / 2, height / 2 + 100);
+        const rewardsButton = this.add.container(width / 2, height / 2 + 100);
         
         const buttonBg = this.add.graphics();
         buttonBg.fillStyle(0x0066cc, 1);  // Blue button for victory
@@ -1092,29 +1092,29 @@ export default class UIScene extends Phaser.Scene {
         const buttonText = this.add.text(
             0, 
             0, 
-            'PLAY AGAIN', 
+            'REWARDS', 
             { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
         ).setOrigin(0.5);
         
-        restartButton.add(buttonBg);
-        restartButton.add(buttonText);
+        rewardsButton.add(buttonBg);
+        rewardsButton.add(buttonText);
         
-        restartButton.setInteractive(new Phaser.Geom.Rectangle(-75, -20, 150, 40), Phaser.Geom.Rectangle.Contains);
+        rewardsButton.setInteractive(new Phaser.Geom.Rectangle(-75, -20, 150, 40), Phaser.Geom.Rectangle.Contains);
         
-        restartButton.on('pointerdown', () => {
+        rewardsButton.on('pointerdown', () => {
             // Restart the game
             this.scene.stop('UIScene');
             this.scene.stop('GameScene');
             this.scene.start('GameScene');
         });
         
-        restartButton.on('pointerover', () => {
+        rewardsButton.on('pointerover', () => {
             buttonBg.clear();
             buttonBg.fillStyle(0x0099ff, 1);
             buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
         });
         
-        restartButton.on('pointerout', () => {
+        rewardsButton.on('pointerout', () => {
             buttonBg.clear();
             buttonBg.fillStyle(0x0066cc, 1);
             buttonBg.fillRoundedRect(-75, -20, 150, 40, 5);
@@ -1223,9 +1223,14 @@ export default class UIScene extends Phaser.Scene {
         // Button background - either use texture or graphics
         let bg;
         if (textureName) {
-            // Use the provided texture
-            bg = this.add.sprite(0, 0, textureName);
-            bg.setDisplaySize(buttonWidth, buttonHeight);
+            // Use nine-slice for texture-based buttons for better UI scaling
+            bg = this.add.nineslice(
+                0, 0,                   // position
+                textureName,            // texture key
+                null,                   // frame (null for default)
+                buttonWidth, buttonHeight, // size
+                10, 10, 10, 10          // slice sizes: left, right, top, bottom
+            );
             bg.setOrigin(0, 0);
         } else {
             // Use graphics (for backward compatibility)
@@ -1282,9 +1287,14 @@ export default class UIScene extends Phaser.Scene {
         // Button background - either use texture or graphics
         let bg;
         if (textureName) {
-            // Use the provided texture with a gray tint
-            bg = this.add.sprite(0, 0, textureName);
-            bg.setDisplaySize(buttonWidth, buttonHeight);
+            // Use nine-slice for texture-based buttons with a gray tint
+            bg = this.add.nineslice(
+                0, 0,                   // position
+                textureName,            // texture key
+                null,                   // frame (null for default)
+                buttonWidth, buttonHeight, // size
+                10, 10, 10, 10          // slice sizes: left, right, top, bottom
+            );
             bg.setOrigin(0, 0);
             bg.setTint(0x888888); // Gray tint for disabled appearance
             bg.setAlpha(0.7);     // Semi-transparent
