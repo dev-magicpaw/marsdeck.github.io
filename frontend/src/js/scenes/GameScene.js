@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, STARTING_HAND, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, CELL_SIZE, MAX_TURNS, RESOURCES, STARTING_HAND, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
 import { SAMPLE_MAP } from '../config/map-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
@@ -871,23 +871,29 @@ export default class GameScene extends Phaser.Scene {
         // Add cards specified in STARTING_HAND configuration
         const startingCards = [];
         
-        // Collect all buildings that should be in the starting hand
-        Object.entries(STARTING_HAND).forEach(([buildingId, shouldInclude]) => {
+        // Collect all cards that should be in the starting hand
+        Object.entries(STARTING_HAND).forEach(([cardId, shouldInclude]) => {
             if (shouldInclude) {
-                // Find the building by ID
-                const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
-                if (building) {
-                    startingCards.push(building);
+                // Find the card definition by ID
+                const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
+                if (cardType) {
+                    // Find the building if the card has a buildingId
+                    const building = cardType.buildingId ? 
+                        Object.values(BUILDINGS).find(b => b.id === cardType.buildingId) : null;
+                    
+                    // Create the card object
+                    startingCards.push({
+                        type: 'building',
+                        cardType: cardType,
+                        building: building
+                    });
                 }
             }
         });
         
         // Add the starting cards to hand
-        startingCards.forEach(building => {
-            this.cardManager.hand.push({
-                type: 'building',
-                building: building
-            });
+        startingCards.forEach(card => {
+            this.cardManager.hand.push(card);
         });
         
         // Draw remaining random cards to complete starting hand
