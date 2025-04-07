@@ -81,35 +81,59 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
+        // Define consistent spacing
+        const verticalSpacing = 10; // Space between major elements, keep it at 10 px
+        
+        // Define panel heights
+        const resourcePanelHeight = 50;
+        const infoPanelHeight = 300;
+        const choicePanelHeight = 200;
+        const bottomPanelHeight = 50;
+        
+        // Calculate action panel height to fill remaining space
+        const totalFixedHeight = resourcePanelHeight + infoPanelHeight + choicePanelHeight + bottomPanelHeight + (4 * verticalSpacing);
+        const actionsPanelHeight = height - totalFixedHeight;
+        
+        // Map dimensions (from GameScene)
+        const mapSize = 9 * 64; // 9 tiles of 64px each
+        const mapOffset = resourcePanelHeight + verticalSpacing; // Start map right after resources panel + spacing
+        
         // Create panel backgrounds
-        // Resources panel now spans full width at the top
-        this.createPanel(0, 0, width, 50, 0x222222, 0.8); // Resources panel
+        // Resources panel spans full width at the top
+        this.createPanel(0, 0, width, resourcePanelHeight, 0x222222, 0.8); // Resources panel
         
-        // Adjust other panels to be below the map
-        this.createPanel(width - 450, 110, 450, 300, 0x222222, 0.8); // Info panel
-        this.createPanel(width - 450, 420, 450, 80, 0x222222, 0.8); // Actions panel
-        this.choicePanelBg = this.createPanel(width - 450, 510, 450, 200, 0x222222, 0.8); // Choice panel
+        // Right side panels - calculate positions from top and bottom
+        const rightPanelWidth = 450;
+        const rightPanelX = width - rightPanelWidth;
         
-        // Create bottom panel with same width as right panels
-        this.bottomPanelBg = this.createPanel(width - 450, height - 50, 450, 50, 0x222222, 0.8);
+        // Info panel starts right after resources panel
+        this.createPanel(rightPanelX, resourcePanelHeight + verticalSpacing, 
+                        rightPanelWidth, infoPanelHeight, 0x222222, 0.8); // Info panel
+        
+        // Actions panel fills space between Info and Choice panels
+        const actionsPanelY = resourcePanelHeight + verticalSpacing + infoPanelHeight + verticalSpacing;
+        this.createPanel(rightPanelX, actionsPanelY,
+                        rightPanelWidth, actionsPanelHeight, 0x222222, 0.8); // Actions panel
+        
+        // Choice panel sits above bottom panel
+        const choicePanelY = height - bottomPanelHeight - verticalSpacing - choicePanelHeight;
+        this.choicePanelBg = this.createPanel(rightPanelX, choicePanelY,
+                                             rightPanelWidth, choicePanelHeight, 0x222222, 0.8); // Choice panel
+        
+        // Bottom panel at the very bottom
+        this.bottomPanelBg = this.createPanel(rightPanelX, height - bottomPanelHeight,
+                                             rightPanelWidth, bottomPanelHeight, 0x222222, 0.8);
         
         // Calculate card panel width for MAX_CARD_SLOTS cards
         const cardsWidth = (this.cardWidth + this.cardSpacing) * MAX_CARD_SLOTS;
         
-        // Position cards panel under the map (map is offset at 50,50 in GameScene)
-        const mapSize = 9 * 64; // 9 tiles of 64px each
-        const mapOffset = 50;
-        
         // Add margins around the cards panel (10px on each side)
         const margin = 10;
         
-        // Space between map and cards panel
-        const verticalSpacing = 20;
-        
-        // Create cards panel under the map starting from the left edge of the screen
+        // Position cards panel under the map with consistent spacing
         this.createPanel(
             0, 
-            mapOffset + mapSize + verticalSpacing - margin, 
+            mapOffset + mapSize + verticalSpacing, // Position after map + spacing
             cardsWidth + margin * 2, 
             this.cardHeight + margin * 2,
             0x222222, 
@@ -169,8 +193,12 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createInfoPanel() {
-        const x = this.cameras.main.width - 440;
-        const y = 120;
+        const width = this.cameras.main.width;
+        const resourcePanelHeight = 50;
+        const verticalSpacing = 20;
+        
+        const x = width - 440;
+        const y = resourcePanelHeight + verticalSpacing; // Position right after resources panel + spacing
         
         // Header
         this.add.text(x, y, 'INFORMATION', { 
@@ -200,52 +228,81 @@ export default class UIScene extends Phaser.Scene {
     }
     
     createActionsPanel() {
-        const x = this.cameras.main.width - 440;
-        const y = 430;
+        const width = this.cameras.main.width;
+        const resourcePanelHeight = 50;
+        const infoPanelHeight = 300;
+        const verticalSpacing = 20;
+        const rightPanelWidth = 450;
+        const rightPanelX = width - rightPanelWidth;
         
-        // Header
-        this.actionsTitle = this.add.text(x, y, 'ACTIONS', { 
+        // Calculate panel position (same as in createLayout)
+        const panelY = resourcePanelHeight + verticalSpacing + infoPanelHeight + verticalSpacing;
+        
+        // Create main container for the panel
+        this.actionsPanelContainer = this.add.container(rightPanelX, panelY);
+        
+        // Header - positioned relative to container with padding
+        this.actionsTitle = this.add.text(20, 20, 'ACTIONS', { 
             fontSize: '20px', 
             fontFamily: 'Arial', 
             color: '#ffffff'
         });
         
-        // Container for action buttons
-        this.actionsContainer = this.add.container(x, y + 30);
+        // Container for action buttons - positioned below title with padding
+        this.actionsContainer = this.add.container(20, 60);
+        
+        // Add both to the panel container
+        this.actionsPanelContainer.add(this.actionsTitle);
+        this.actionsPanelContainer.add(this.actionsContainer);
         
         // Only hide the container initially, keep title visible
         this.actionsContainer.setVisible(false);
     }
     
     createChoicePanel() {
-        const x = this.cameras.main.width - 440;
-        const y = 520;
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        const bottomPanelHeight = 50;
+        const choicePanelHeight = 200;
+        const verticalSpacing = 20;
+        const rightPanelWidth = 450;
+        const rightPanelX = width - rightPanelWidth;
         
-        // Header
-        this.choiceTitle = this.add.text(x, y, 'CHOOSE A CARD', { 
+        // Calculate panel position (same as in createLayout)
+        const panelY = height - bottomPanelHeight - verticalSpacing - choicePanelHeight;
+        
+        // Create main container for the panel
+        this.choicePanelContainer = this.add.container(rightPanelX, panelY);
+        
+        // Header - positioned relative to container with padding
+        this.choiceTitle = this.add.text(20, 20, 'CHOOSE A CARD', { 
             fontSize: '20px', 
             fontFamily: 'Arial', 
             color: '#ffffff'
         });
         
-        // Container for card choices
-        this.choiceContainer = this.add.container(x, y + 30);
+        // Container for card choices - positioned below title with padding
+        this.choiceContainer = this.add.container(20, 60);
+        
+        // Add both to the panel container
+        this.choicePanelContainer.add(this.choiceTitle);
+        this.choicePanelContainer.add(this.choiceContainer);
         
         // Hide choice panel initially
-        this.choiceTitle.setVisible(false);
-        this.choiceContainer.setVisible(false);
-        this.choicePanelBg.visible = false; // Hide background too
+        this.choicePanelContainer.setVisible(false);
+        this.choicePanelBg.visible = false;
     }
     
     createHandPanel() {
         // Calculate position for cards panel under the map
-        const mapOffset = 50;
+        const resourcePanelHeight = 50;
+        const verticalSpacing = 20;
         const mapSize = 9 * 64; // 9 tiles of 64px each
-        const margin = 10; // Same margin as in createLayout
-        const verticalSpacing = 20; // Add space between map and cards
-   
+        const mapOffset = resourcePanelHeight + verticalSpacing; // Start map right after resources panel + spacing
+        const margin = 10;
+        
         const x = margin; // Start from the left edge plus margin
-        const y = mapOffset + mapSize + verticalSpacing;
+        const y = mapOffset + mapSize + verticalSpacing; // Position after map + spacing
         
         // Create container for card slots (backgrounds)
         this.cardSlotsContainer = this.add.container(x, y);
@@ -1252,16 +1309,14 @@ export default class UIScene extends Phaser.Scene {
         this.choiceContainer.removeAll(true);
         
         if (cards.length === 0) {
-            this.choiceTitle.setVisible(false);
-            this.choiceContainer.setVisible(false);
+            this.choicePanelContainer.setVisible(false);
             this.choicePanelBg.visible = false; // Hide background when no cards
             return;
         }
         
-        // Show title and background
-        this.choiceTitle.setVisible(true);
-        this.choiceContainer.setVisible(true);
-        this.choicePanelBg.visible = true; // Show background when cards are shown
+        // Show panel and background
+        this.choicePanelContainer.setVisible(true);
+        this.choicePanelBg.visible = true;
         
         cards.forEach((card, index) => {
             const xPos = index * (this.cardWidth + this.cardSpacing);
@@ -1273,10 +1328,6 @@ export default class UIScene extends Phaser.Scene {
             let cardBg;
             
             // Use NineSlice for better scaling with adjusted slice sizes
-            // Match the same slice sizes as createCardSprite for consistency
-            // Top slice is larger (35px) to account for the header area
-            // Bottom slice is 15px for the rounded corner
-            // Left and right are 10px for the rounded corners
             cardBg = this.add.nineslice(
                 0, 0,                // position
                 'cardBackground',    // texture key
@@ -1308,12 +1359,12 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Building icon
                 const icon = this.add.sprite(this.cardWidth / 2, 45, card.building.texture);
-                icon.setDisplaySize(40, 40); // Match the size in hand cards
+                icon.setDisplaySize(40, 40);
                 icon.setOrigin(0.5);
                 cardContainer.add(icon);
                 
                 // Cost text
-                let costY = 75; // Adjusted to match hand cards
+                let costY = 75;
                 for (const resource in card.building.cost) {
                     if (card.building.cost[resource] > 0) {
                         const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
@@ -1348,8 +1399,7 @@ export default class UIScene extends Phaser.Scene {
         this.gameScene.selectCardChoice(choiceIndex);
         
         // Hide the choice panel
-        this.choiceTitle.setVisible(false);
-        this.choiceContainer.setVisible(false);
-        this.choicePanelBg.visible = false; // Hide background when choice is made
+        this.choicePanelContainer.setVisible(false);
+        this.choicePanelBg.visible = false;
     }
 } 
