@@ -1214,41 +1214,38 @@ export default class UIScene extends Phaser.Scene {
         // Calculate starting X position to center all slots
         const startX = (width - totalSlotsWidth) / 2;
         
-        // Sample reward data with actual effects
-        const rewards = [
-            {
-                name: "Resource Boost",
-                image: "steelworks",
-                description: "Get +50 Steel, +20 Concrete, and +30 Fuel to boost your economy",
-                effect: () => {
-                    this.resourceManager.modifyResource(RESOURCES.STEEL, 50);
-                    this.resourceManager.modifyResource(RESOURCES.CONCRETE, 20);
-                    this.resourceManager.modifyResource(RESOURCES.FUEL, 30);
-                    this.selectReward("Resource Boost");
-                }
-            },
-            {
-                name: "Drone Army",
-                image: "droneDepo",
-                description: "Receive 15 additional drones and 10 energy to power your expansion",
-                effect: () => {
-                    this.resourceManager.modifyResource(RESOURCES.DRONES, 15);
-                    this.resourceManager.modifyResource(RESOURCES.ENERGY, 10);
-                    this.selectReward("Drone Army");
-                }
-            },
-            {
-                name: "Production Boost",
-                image: "rocketFueled",
-                description: "Get +5 reputation and draw 3 cards to accelerate your colony growth",
-                effect: () => {
-                    this.resourceManager.modifyResource(RESOURCES.REPUTATION, 5);
-                    // Draw 3 cards - this would need to be implemented in CardManager
-                    // For now, we'll just apply the reputation boost
-                    this.selectReward("Production Boost");
-                }
-            }
+        // Get rewards from REWARDS object in specific order
+        const rewardIds = [
+            'steelworksStartingReward',    // Starting Steelworks Card
+            'extraFuelRefineriesReward',   // Extra Fuel Refineries
+            'improvedWindTurbineReward'    // Improved Wind Turbine
         ];
+        
+        // Get the requested rewards from the RewardsManager
+        const rewards = rewardIds.map(rewardId => {
+            const reward = this.rewardsManager.findRewardById(rewardId);
+            
+            if (!reward) {
+                console.error(`Reward with ID ${rewardId} not found`);
+                return null;
+            }
+            
+            return {
+                id: reward.id,
+                name: reward.name,
+                image: reward.image,
+                description: reward.description,
+                reputationCost: reward.reputationCost,
+                effect: () => {
+                    const unlocked = this.rewardsManager.unlockReward(reward.id);
+                    if (unlocked) {
+                        this.selectReward(reward.name);
+                    } else {
+                        this.showMessage(`Not enough reputation to unlock ${reward.name}`);
+                    }
+                }
+            };
+        }).filter(reward => reward !== null);
         
         // Create each reward slot
         rewards.forEach((reward, index) => {
@@ -1286,7 +1283,7 @@ export default class UIScene extends Phaser.Scene {
             // Reward description
             const descriptionText = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + 220, 
+                slotsY + 200, 
                 reward.description, 
                 { 
                     fontSize: '16px', 
@@ -1298,19 +1295,47 @@ export default class UIScene extends Phaser.Scene {
             ).setOrigin(0.5);
             rewardsContainer.add(descriptionText);
             
-            // Select button
-            const selectButton = this.createActionButton(
-                "SELECT", 
-                reward.effect, 
-                0x33cc33, 
-                120, 
-                40, 
-                'blueGlossSquareButton'
-            );
-            selectButton.x = slotX + slotWidth/2 - 60;
-            selectButton.y = slotsY + slotHeight - 60;
+            // Cost display
+            const costText = this.add.text(
+                slotX + slotWidth/2, 
+                slotsY + 260, 
+                `Cost: ${reward.reputationCost} Reputation`, 
+                { 
+                    fontSize: '16px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffcc00', 
+                    align: 'center'
+                }
+            ).setOrigin(0.5);
+            rewardsContainer.add(costText);
             
-            rewardsContainer.add(selectButton);
+            // Select button
+            const canAfford = this.resourceManager.getResource(RESOURCES.REPUTATION) >= reward.reputationCost;
+            
+            if (canAfford) {
+                const selectButton = this.createActionButton(
+                    "UNLOCK", 
+                    reward.effect, 
+                    0x33cc33, 
+                    120, 
+                    40, 
+                    'blueGlossSquareButton'
+                );
+                selectButton.x = slotX + slotWidth/2 - 60;
+                selectButton.y = slotsY + slotHeight - 40;
+                rewardsContainer.add(selectButton);
+            } else {
+                const disabledButton = this.createDisabledButton(
+                    "UNLOCK", 
+                    "Not enough reputation", 
+                    120, 
+                    40, 
+                    'blueGlossSquareButton'
+                );
+                disabledButton.x = slotX + slotWidth/2 - 60;
+                disabledButton.y = slotsY + slotHeight - 40;
+                rewardsContainer.add(disabledButton);
+            }
         });
         
         // Close button is not needed
