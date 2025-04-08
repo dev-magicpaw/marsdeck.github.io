@@ -46,6 +46,26 @@ export default class ResourceManager {
         return true;
     }
     
+    // Add resources (positive amount only)
+    addResource(resourceType, amount) {
+        if (amount < 0) {
+            console.warn('Cannot add negative resources. Use spendResource instead.');
+            return false;
+        }
+        
+        return this.modifyResource(resourceType, amount);
+    }
+    
+    // Spend resources (positive amount to spend)
+    spendResource(resourceType, amount) {
+        if (amount < 0) {
+            console.warn('Cannot spend negative resources. Use addResource instead.');
+            return false;
+        }
+        
+        return this.modifyResource(resourceType, -amount);
+    }
+    
     // Check if the player has reached the victory goal
     checkVictoryCondition() {
         if (this.resources[RESOURCES.REPUTATION] >= VICTORY_GOAL) {
@@ -73,7 +93,7 @@ export default class ResourceManager {
         
         // Then consume each resource
         for (const resourceType in costObject) {
-            this.modifyResource(resourceType, -costObject[resourceType]);
+            this.spendResource(resourceType, costObject[resourceType]);
         }
         
         return true;

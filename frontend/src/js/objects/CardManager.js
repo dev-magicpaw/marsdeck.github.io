@@ -1,4 +1,4 @@
-import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, STARTING_HAND } from '../config/game-data';
 
 export default class CardManager {
     constructor(scene) {
@@ -18,32 +18,45 @@ export default class CardManager {
         
         // Add cards based on the DECK_COMPOSITION configuration
         Object.entries(DECK_COMPOSITION).forEach(([cardId, count]) => {
-            // Find the card definition
-            const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
-            
-            // Skip if card not found
-            if (!cardType) {
-                console.warn(`Card type ${cardId} not found in CARD_TYPES configuration.`);
-                return;
-            }
-            
-            // Add the specified number of copies to the deck
-            for (let i = 0; i < count; i++) {
-                this.deck.push({
-                    type: 'building',
-                    cardType: cardType,
-                    building: cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
-                        BUILDINGS[key].id === cardType.buildingId
-                    )] : null
-                });
-            }
+            this.addCardToDeck(cardId, count);
         });
+        
+        // Apply deck cards from rewards if rewards manager exists
+        if (this.scene.rewardsManager) {
+            const rewardCards = this.scene.rewardsManager.getDeckRewardCards();
+            Object.entries(rewardCards).forEach(([cardId, count]) => {
+                this.addCardToDeck(cardId, count);
+            });
+        }
         
         // If the deck is empty (e.g., if DECK_COMPOSITION is invalid),
         // fall back to the default deck creation logic
         if (this.deck.length === 0) {
             console.warn('Deck composition is empty or invalid. Using default deck.');
             this.createDefaultDeck();
+        }
+    }
+    
+    // Helper method to add cards to the deck
+    addCardToDeck(cardId, count) {
+        // Find the card definition
+        const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
+        
+        // Skip if card not found
+        if (!cardType) {
+            console.warn(`Card type ${cardId} not found in CARD_TYPES configuration.`);
+            return;
+        }
+        
+        // Add the specified number of copies to the deck
+        for (let i = 0; i < count; i++) {
+            this.deck.push({
+                type: 'building',
+                cardType: cardType,
+                building: cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
+                    BUILDINGS[key].id === cardType.buildingId
+                )] : null
+            });
         }
     }
     
@@ -98,6 +111,58 @@ export default class CardManager {
         }
         
         return drawnCards;
+    }
+    
+    // Set up specific starting cards for the player
+    // Moved from GameScene to CardManager
+    setupStartingHand() {
+        // Clear any cards that might be in the hand
+        this.hand = [];
+        const startingHandSize = 4; // Total cards we want in starting hand
+        
+        // Add cards specified in STARTING_HAND configuration
+        const startingCards = [];
+        
+        // 1. Collect all cards that should be in the starting hand from base config
+        Object.entries(STARTING_HAND).forEach(([cardId, shouldInclude]) => {
+            if (shouldInclude) {
+                this.addCardToStartingCards(cardId, startingCards);
+            }
+        });
+        
+        // 2. Add cards from Starting hand rewards if rewards manager exists
+        if (this.scene.rewardsManager) {
+            const rewardCardIds = this.scene.rewardsManager.getStartingHandRewardCards();
+            rewardCardIds.forEach(cardId => {
+                this.addCardToStartingCards(cardId, startingCards);
+            });
+        }
+        
+        // Add the starting cards to hand
+        startingCards.forEach(card => {
+            this.hand.push(card);
+        });
+        
+        // 3. Draw remaining random cards to complete starting hand
+        this.drawCards(startingHandSize - startingCards.length);
+    }
+    
+    // Helper method to add a card to starting cards array
+    addCardToStartingCards(cardId, startingCards) {
+        // Find the card definition by ID
+        const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
+        if (cardType) {
+            // Find the building if the card has a buildingId
+            const building = cardType.buildingId ? 
+                Object.values(BUILDINGS).find(b => b.id === cardType.buildingId) : null;
+            
+            // Create the card object
+            startingCards.push({
+                type: 'building',
+                cardType: cardType,
+                building: building
+            });
+        }
     }
     
     // Discard a card from hand

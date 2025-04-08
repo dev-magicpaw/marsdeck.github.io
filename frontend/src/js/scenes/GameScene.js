@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CARD_TYPES, CELL_SIZE, MAX_TURNS, RESOURCES, STARTING_HAND, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
 import { SAMPLE_MAP } from '../config/map-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
+import RewardsManager from '../objects/RewardsManager';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -17,6 +18,7 @@ export default class GameScene extends Phaser.Scene {
         // Initialize game state
         this.gridManager = new GridManager(this);
         this.resourceManager = new ResourceManager(this);
+        this.rewardsManager = new RewardsManager(this);
         this.cardManager = new CardManager(this);
         
         // Choose which map to use
@@ -31,7 +33,7 @@ export default class GameScene extends Phaser.Scene {
         this.maxTurns = MAX_TURNS;
         
         // Ensure player starts with specific cards
-        this.setupStartingHand();
+        this.cardManager.setupStartingHand();
         
         // Card choice options
         this.cardChoices = [];
@@ -72,7 +74,8 @@ export default class GameScene extends Phaser.Scene {
             gameScene: this,
             gridManager: this.gridManager,
             resourceManager: this.resourceManager,
-            cardManager: this.cardManager
+            cardManager: this.cardManager,
+            rewardsManager: this.rewardsManager
         });
         
         // Set up input handling
@@ -696,69 +699,103 @@ export default class GameScene extends Phaser.Scene {
     
     // Process building production for all buildings
     processProduction() {
-        const buildings = this.gridManager.getAllBuildings();
+        // TODO: collect producing and consuming buildings separately.
+        //   This would allow to get rid of the processing flag.
+        // Track which cells have buildings with production
+        const buildingsWithProduction = [];
         
-        // First wave: resource extraction (iron, water, concrete)
-        this.processFirstWaveProduction(buildings);
+        // Collect all buildings on the map
+        for (let y = 0; y < this.gridManager.gridSize; y++) {
+            for (let x = 0; x < this.gridManager.gridSize; x++) {
+                const cell = this.gridManager.getCell(x, y);
+                if (cell && cell.building && !cell.processing) {
+                    // Get building definition
+                    const buildingId = cell.building;
+                    const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
+                    
+                    if (building) {
+                        buildingsWithProduction.push({ x, y, building });
+                    }
+                }
+            }
+        }
         
-        // Second wave: resource transformation (steelworks, fuel refinery)
-        this.processSecondWaveProduction(buildings);
-        
-        // Update rocket states after processing production
-        this.updateRocketStates();
+        // Process production in two waves: first producers, then consumers
+        this.processFirstWaveProduction(buildingsWithProduction);
+        this.processSecondWaveProduction(buildingsWithProduction);
     }
     
-    // Process first wave - resource extraction buildings
+    // First wave: Process buildings that only produce (no consumption)
     processFirstWaveProduction(buildings) {
-        const firstWaveBuildings = ['ironMine', 'waterPump', 'concreteMixer'];
-        
-        buildings.forEach(building => {
-            const buildingData = Object.values(BUILDINGS).find(b => b.id === building.buildingId);
+        buildings.forEach(({ x, y, building }) => {
+            const cell = this.gridManager.getCell(x, y);
             
-            if (buildingData && firstWaveBuildings.includes(buildingData.id)) {
-                // Add production without consuming energy
-                for (const resource in buildingData.production) {
-                    this.resourceManager.modifyResource(resource, buildingData.production[resource]);
-                    
-                    // Show message
-                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                    this.uiScene.showMessage(`${buildingData.name} produced ${buildingData.production[resource]} ${resourceName}`);
+            // Skip if this building has consumption requirements
+            if (Object.keys(building.consumption || {}).length > 0) {
+                return;
+            }
+            
+            // Apply production
+            let produced = false;
+            if (building.production) {
+                // Get production values with any building upgrades applied
+                let productionValues = { ...building.production };
+                if (this.rewardsManager) {
+                    productionValues = this.rewardsManager.applyBuildingUpgrades(building.id, productionValues);
                 }
+                
+                // Apply production for each resource
+                Object.entries(productionValues).forEach(([resource, amount]) => {
+                    this.resourceManager.addResource(resource, amount);
+                    produced = true;
+                });
+            }
+            
+            // Mark as processed
+            if (produced) {
+                cell.processing = true;
             }
         });
     }
     
-    // Process second wave - resource transformation buildings
+    // Second wave: Process buildings that consume resources
     processSecondWaveProduction(buildings) {
-        const secondWaveBuildings = ['steelworks', 'fuelRefinery'];
-        
-        buildings.forEach(building => {
-            const buildingData = Object.values(BUILDINGS).find(b => b.id === building.buildingId);
+        buildings.forEach(({ x, y, building }) => {
+            const cell = this.gridManager.getCell(x, y);
             
-            if (buildingData && secondWaveBuildings.includes(buildingData.id)) {
-                // Create a consumption object without energy requirement
-                const resourceConsumption = {};
-                for (const resource in buildingData.consumption) {
-                    if (resource !== RESOURCES.ENERGY) {
-                        resourceConsumption[resource] = buildingData.consumption[resource];
+            // Skip if already processed
+            if (cell.processing) {
+                // Reset the processing flag for next turn
+                cell.processing = false;
+                return;
+            }
+            
+            // Check if this building has consumption requirements
+            const hasConsumption = Object.keys(building.consumption || {}).length > 0;
+            if (!hasConsumption) {
+                return;
+            }
+            
+            // Check if we have enough resources to consume
+            const canConsume = this.resourceManager.hasSufficientResources(building.consumption);
+            if (canConsume) {
+                // Consume resources
+                Object.entries(building.consumption).forEach(([resource, amount]) => {
+                    this.resourceManager.spendResource(resource, amount);
+                });
+                
+                // Apply production
+                if (building.production) {
+                    // Get production values with any building upgrades applied
+                    let productionValues = { ...building.production };
+                    if (this.rewardsManager) {
+                        productionValues = this.rewardsManager.applyBuildingUpgrades(building.id, productionValues);
                     }
-                }
-                
-                // Check if we have resources for consumption (excluding energy)
-                const canConsume = this.resourceManager.hasSufficientResources(resourceConsumption);
-                
-                if (canConsume) {
-                    // Consume resources (excluding energy)
-                    this.resourceManager.consumeResources(resourceConsumption);
                     
-                    // Add production
-                    for (const resource in buildingData.production) {
-                        this.resourceManager.modifyResource(resource, buildingData.production[resource]);
-                        
-                        // Show message
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        this.uiScene.showMessage(`${buildingData.name} produced ${buildingData.production[resource]} ${resourceName}`);
-                    }
+                    // Apply production for each resource
+                    Object.entries(productionValues).forEach(([resource, amount]) => {
+                        this.resourceManager.addResource(resource, amount);
+                    });
                 }
             }
         });
@@ -872,44 +909,6 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     
-    // Set up specific starting cards for the player
-    setupStartingHand() {
-        // Clear any cards that might be in the hand
-        this.cardManager.hand = [];
-        const startingHandSize = 4; // Total cards we want in starting hand
-        
-        // Add cards specified in STARTING_HAND configuration
-        const startingCards = [];
-        
-        // Collect all cards that should be in the starting hand
-        Object.entries(STARTING_HAND).forEach(([cardId, shouldInclude]) => {
-            if (shouldInclude) {
-                // Find the card definition by ID
-                const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
-                if (cardType) {
-                    // Find the building if the card has a buildingId
-                    const building = cardType.buildingId ? 
-                        Object.values(BUILDINGS).find(b => b.id === cardType.buildingId) : null;
-                    
-                    // Create the card object
-                    startingCards.push({
-                        type: 'building',
-                        cardType: cardType,
-                        building: building
-                    });
-                }
-            }
-        });
-        
-        // Add the starting cards to hand
-        startingCards.forEach(card => {
-            this.cardManager.hand.push(card);
-        });
-        
-        // Draw remaining random cards to complete starting hand
-        this.cardManager.drawCards(startingHandSize - startingCards.length);
-    }
-
     // Show shading on illegal tiles for the selected building
     showIllegalTiles(building) {
         // Clear any existing shading first
