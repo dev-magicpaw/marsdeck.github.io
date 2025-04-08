@@ -1537,7 +1537,14 @@ export default class UIScene extends Phaser.Scene {
         // Button background - either use texture or graphics
         let bg;
         if (textureName) {
-            bg = this.add.sprite(0, 0, textureName);
+            // Use nine-slice for texture-based buttons for better UI scaling
+            bg = this.add.nineslice(
+                0, 0,                   // position
+                textureName,            // texture key
+                null,                   // frame (null for default)
+                buttonWidth, buttonHeight, // size
+                10, 10, 10, 10          // slice sizes: left, right, top, bottom
+            );
             bg.setOrigin(0, 0);
             bg.setTint(0x888888); // Gray tint for disabled appearance
             bg.setAlpha(0.7);     // Semi-transparent
