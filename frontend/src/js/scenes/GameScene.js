@@ -916,12 +916,12 @@ export default class GameScene extends Phaser.Scene {
     
     // Player victory when reputation goal is reached
     playerVictory() {
-        // Advance to next level and save progress
-        const hasNextLevel = levelManager.advanceToNextLevel();
-        levelManager.saveLevelProgress();
-        
         // Get current reputation
         const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+        
+        // Advance to next level and save progress
+        levelManager.advanceToNextLevel();
+        levelManager.saveLevelProgress();
         
         // Stop game input
         this.input.enabled = false;

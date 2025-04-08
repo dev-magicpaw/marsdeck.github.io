@@ -1,4 +1,5 @@
 import { RESOURCES, REWARDS } from '../config/game-data';
+import levelManager from './LevelManager';
 
 export default class RewardsManager {
     constructor(scene) {
@@ -10,6 +11,40 @@ export default class RewardsManager {
             deckCards: [],     // IDs of unlocked deck cards rewards
             buildingUpgrade: [] // IDs of unlocked building upgrade rewards
         };
+        
+        // Load already unlocked rewards from levelManager if available
+        this.loadUnlockedRewardsFromLevelManager();
+    }
+    
+    // Load unlocked rewards from level manager persistent rewards
+    loadUnlockedRewardsFromLevelManager() {
+        if (levelManager && levelManager.LEVEL_PROGRESS && levelManager.LEVEL_PROGRESS.persistentRewards) {
+            const persistentRewardIds = levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds || [];
+            
+            // Categorize each reward into the appropriate list based on its application type
+            persistentRewardIds.forEach(rewardId => {
+                const reward = this.findRewardById(rewardId);
+                if (reward && reward.applicationType) {
+                    switch (reward.applicationType) {
+                        case 'startingHand':
+                            if (!this.unlockedRewards.startingHand.includes(rewardId)) {
+                                this.unlockedRewards.startingHand.push(rewardId);
+                            }
+                            break;
+                        case 'deckCards':
+                            if (!this.unlockedRewards.deckCards.includes(rewardId)) {
+                                this.unlockedRewards.deckCards.push(rewardId);
+                            }
+                            break;
+                        case 'buildingUpgrade':
+                            if (!this.unlockedRewards.buildingUpgrade.includes(rewardId)) {
+                                this.unlockedRewards.buildingUpgrade.push(rewardId);
+                            }
+                            break;
+                    }
+                }
+            });
+        }
     }
     
     // Get all available rewards grouped by type
