@@ -1175,7 +1175,7 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Create panel that covers most of the screen as specified (10px from each edge)
+        // Create panel that covers most of the screen as specified (Keep it 10px from each edge!)
         const panelX = 10;
         const panelY = 10;
         const panelWidth = width - 2 * panelX;
@@ -1347,7 +1347,29 @@ export default class UIScene extends Phaser.Scene {
             }
         });
         
-        // Close button is not needed
+        // TO NEXT MISSION button at the bottom center
+        const nextMissionButton = this.createActionButton(
+            "TO NEXT MISSION", 
+            () => {
+                // Clean up UI elements
+                panel.destroy();
+                rewardsContainer.destroy();
+                nextMissionButton.destroy();
+                
+                // Start a new game 
+                this.scene.stop('UIScene');
+                this.scene.stop('GameScene');
+                this.scene.start('GameScene');
+            }, 
+            0x0066aa, 
+            200, 
+            50, 
+            'blueGlossSquareButton'
+        );
+        nextMissionButton.x = width / 2 - 100; // Center horizontally
+        nextMissionButton.y = height - panelY - 60; // Position at bottom of panel
+
+        // Do NOT add any close button!
     }
     
     // Handle reward selection
