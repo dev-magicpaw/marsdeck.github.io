@@ -328,17 +328,33 @@ export default class GameScene extends Phaser.Scene {
             }
         }
         
-        // Immediate production for certain buildings
-        if (building.id === 'droneDepo' || building.id === 'solarPanel' || building.id === 'windTurbine') {
+        // Handle immediate production for buildings that produce ENERGY or DRONES
+        if (building.production) {
             // Apply building upgrades to the production values
             let upgradedProduction = this.applyBuildingUpgrades(building.id, {...building.production});
             
-            for (const resource in upgradedProduction) {
-                this.resourceManager.modifyResource(resource, upgradedProduction[resource]);
-                
-                // Show message about production
-                const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                this.uiScene.showMessage(`${building.name} produced ${upgradedProduction[resource]} ${resourceName}`);
+            // Extract only ENERGY and DRONES for immediate production
+            const immediateResources = {
+                [RESOURCES.ENERGY]: upgradedProduction[RESOURCES.ENERGY],
+                [RESOURCES.DRONES]: upgradedProduction[RESOURCES.DRONES]
+            };
+            
+            // Remove undefined values
+            Object.keys(immediateResources).forEach(key => {
+                if (immediateResources[key] === undefined) {
+                    delete immediateResources[key];
+                }
+            });
+            
+            // If there are immediate resources to produce
+            if (Object.keys(immediateResources).length > 0) {
+                for (const resource in immediateResources) {
+                    this.resourceManager.modifyResource(resource, immediateResources[resource]);
+                    
+                    // Show message about production
+                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    this.uiScene.showMessage(`${building.name} produced ${immediateResources[resource]} ${resourceName}`);
+                }
             }
         }
         
