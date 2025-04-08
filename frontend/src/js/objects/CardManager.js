@@ -1,5 +1,5 @@
 import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, REWARDS, STARTING_HAND } from '../config/game-data';
-import { LEVEL_PROGRESS } from '../config/level-configs';
+import levelManager from './LevelManager';
 
 export default class CardManager {
     constructor(scene) {
@@ -43,8 +43,8 @@ export default class CardManager {
     
     // Process rewards from level progression
     processLevelProgressionRewards() {
-        if (LEVEL_PROGRESS.persistentRewards.rewardIds && LEVEL_PROGRESS.persistentRewards.rewardIds.length > 0) {
-            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds && levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.length > 0) {
+            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
                 // Find the reward in all reward categories
                 let reward = this.findRewardById(rewardId);
                 
@@ -184,8 +184,8 @@ export default class CardManager {
         }
         
         // 3. Process persistent rewards from level progression for starting hand
-        if (LEVEL_PROGRESS.persistentRewards.rewardIds) {
-            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds) {
+            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
                 const reward = this.findRewardById(rewardId);
                 
                 if (reward && reward.applicationType === 'startingHand' && reward.effect && reward.effect.cardId) {

@@ -1,11 +1,11 @@
 import { RESOURCES, STARTING_RESOURCES } from '../config/game-data';
-import { getCurrentVictoryGoal, getStartingResourcesForCurrentLevel } from '../config/level-configs';
+import levelManager from './LevelManager';
 
 export default class ResourceManager {
     constructor(scene) {
         this.scene = scene;
         // Get level-specific starting resources or fall back to default
-        const levelResources = getStartingResourcesForCurrentLevel();
+        const levelResources = levelManager.getStartingResourcesForCurrentLevel();
         this.resources = levelResources || { ...STARTING_RESOURCES };
         
         // Resources that don't accumulate between turns (e.g., energy)
@@ -71,7 +71,7 @@ export default class ResourceManager {
     // Check if the player has reached the victory goal
     checkVictoryCondition() {
         // Get current level's victory goal
-        const victoryGoal = getCurrentVictoryGoal();
+        const victoryGoal = levelManager.getCurrentVictoryGoal();
         
         if (this.resources[RESOURCES.REPUTATION] >= victoryGoal) {
             // Trigger victory in the game scene
