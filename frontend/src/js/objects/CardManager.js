@@ -1,4 +1,4 @@
-import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, STARTING_HAND } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, REWARDS, STARTING_HAND } from '../config/game-data';
 import { LEVEL_PROGRESS } from '../config/level-configs';
 
 export default class CardManager {
@@ -30,13 +30,8 @@ export default class CardManager {
             });
         }
         
-        // Add cards from level progression persistent rewards
-        if (LEVEL_PROGRESS.persistentRewards.cards) {
-            LEVEL_PROGRESS.persistentRewards.cards.forEach(cardId => {
-                // Add one copy of each persistent reward card
-                this.addCardToDeck(cardId, 1);
-            });
-        }
+        // Process persistent rewards from level progression
+        this.processLevelProgressionRewards();
         
         // If the deck is empty (e.g., if DECK_COMPOSITION is invalid),
         // fall back to the default deck creation logic
@@ -44,6 +39,48 @@ export default class CardManager {
             console.warn('Deck composition is empty or invalid. Using default deck.');
             this.createDefaultDeck();
         }
+    }
+    
+    // Process rewards from level progression
+    processLevelProgressionRewards() {
+        if (LEVEL_PROGRESS.persistentRewards.rewardIds && LEVEL_PROGRESS.persistentRewards.rewardIds.length > 0) {
+            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+                // Find the reward in all reward categories
+                let reward = this.findRewardById(rewardId);
+                
+                if (!reward) {
+                    console.warn(`Reward ${rewardId} not found in REWARDS configuration.`);
+                    return;
+                }
+                
+                if (reward.applicationType == 'deckCards') {
+                    if (reward.effect && reward.effect.cardId) {
+                        const count = reward.effect.count || 1;
+                        this.addCardToDeck(reward.effect.cardId, count);
+                    }
+                }
+            });
+        }
+    }
+    
+    // Find a reward by ID across all categories
+    findRewardById(rewardId) {
+        // Search in all reward categories
+        const allCategories = [
+            REWARDS.STARTING_HAND_REWARDS,
+            REWARDS.DECK_CARDS_REWARDS,
+            REWARDS.BUILDING_UPGRADE_REWARDS
+        ];
+        
+        for (const category of allCategories) {
+            for (const key in category) {
+                if (category[key].id === rewardId) {
+                    return category[key];
+                }
+            }
+        }
+        
+        return null;
     }
     
     // Helper method to add cards to the deck
@@ -146,15 +183,23 @@ export default class CardManager {
             });
         }
         
-        // No longer trying to add random persistent reward cards to the starting hand
-        // They're already added to the deck when the deck is initialized
+        // 3. Process persistent rewards from level progression for starting hand
+        if (LEVEL_PROGRESS.persistentRewards.rewardIds) {
+            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+                const reward = this.findRewardById(rewardId);
+                
+                if (reward && reward.applicationType === 'startingHand' && reward.effect && reward.effect.cardId) {
+                    this.addCardToStartingCards(reward.effect.cardId, startingCards);
+                }
+            });
+        }
         
         // Add the starting cards to hand
         startingCards.forEach(card => {
             this.hand.push(card);
         });
         
-        // 3. Draw remaining random cards to complete starting hand
+        // 4. Draw remaining random cards to complete starting hand
         this.drawCards(startingHandSize - startingCards.length);
     }
     

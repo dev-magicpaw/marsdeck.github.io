@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
-import { advanceToNextLevel, getCurrentLevel, getCurrentTurnLimit, getMapForCurrentLevel, saveLevelProgress } from '../config/level-configs';
+import { advanceToNextLevel, getCurrentLevel, getCurrentTurnLimit, getMapForCurrentLevel, LEVEL_PROGRESS, saveLevelProgress } from '../config/level-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -723,10 +723,8 @@ export default class GameScene extends Phaser.Scene {
         this.refreshRocketSprites();
     }
     
-    // Process building production for all buildings
+    // Process building production for all buildings on the grid
     processProduction() {
-        // TODO: collect producing and consuming buildings separately.
-        //   This would allow to get rid of the processing flag.
         // Track which cells have buildings with production
         const buildingsWithProduction = [];
         
@@ -765,10 +763,7 @@ export default class GameScene extends Phaser.Scene {
             let produced = false;
             if (building.production) {
                 // Get production values with any building upgrades applied
-                let productionValues = { ...building.production };
-                if (this.rewardsManager) {
-                    productionValues = this.rewardsManager.applyBuildingUpgrades(building.id, productionValues);
-                }
+                let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
                 
                 // Apply production for each resource
                 Object.entries(productionValues).forEach(([resource, amount]) => {
@@ -813,10 +808,7 @@ export default class GameScene extends Phaser.Scene {
                 // Apply production
                 if (building.production) {
                     // Get production values with any building upgrades applied
-                    let productionValues = { ...building.production };
-                    if (this.rewardsManager) {
-                        productionValues = this.rewardsManager.applyBuildingUpgrades(building.id, productionValues);
-                    }
+                    let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
                     
                     // Apply production for each resource
                     Object.entries(productionValues).forEach(([resource, amount]) => {
@@ -825,6 +817,40 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
+    }
+    
+    // Apply building upgrades from level progression rewards
+    applyBuildingUpgrades(buildingId, productionValues) {
+        // First, apply upgrades from the rewards manager if it exists
+        if (this.rewardsManager) {
+            productionValues = this.rewardsManager.applyBuildingUpgrades(buildingId, productionValues);
+        }
+        
+        // Then apply upgrades from level progression rewards
+        if (LEVEL_PROGRESS.persistentRewards.rewardIds) {
+            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+                // Find the reward in the CardManager
+                const reward = this.cardManager.findRewardById(rewardId);
+                
+                if (reward && 
+                    reward.applicationType === 'buildingUpgrade' && 
+                    reward.effect && 
+                    reward.effect.buildingId === buildingId && 
+                    reward.effect.resourceBonus) {
+                    
+                    // Apply resource bonuses to production
+                    for (const [resourceType, bonus] of Object.entries(reward.effect.resourceBonus)) {
+                        if (productionValues[resourceType]) {
+                            productionValues[resourceType] += bonus;
+                        } else {
+                            productionValues[resourceType] = bonus;
+                        }
+                    }
+                }
+            });
+        }
+        
+        return productionValues;
     }
     
     // Game over - calculate final score
