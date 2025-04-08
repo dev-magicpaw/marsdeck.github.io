@@ -1175,9 +1175,9 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Create panel that covers most of the screen as specified (25px from each edge)
-        const panelX = 25;
-        const panelY = 25;
+        // Create panel that covers most of the screen as specified (10px from each edge)
+        const panelX = 10;
+        const panelY = 10;
         const panelWidth = width - 2 * panelX;
         const panelHeight = height - 2 * panelY;
         
@@ -1198,6 +1198,15 @@ export default class UIScene extends Phaser.Scene {
             panelY + 40, 
             'SELECT YOUR REWARD', 
             { fontSize: '32px', fontFamily: 'Arial', color: '#0b5394', align: 'center' }
+        ).setOrigin(0.5);
+        
+        // Available reputation display
+        const currentReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+        this.add.text(
+            width / 2, 
+            panelY + 75, 
+            `Available reputation: ${currentReputation}`, 
+            { fontSize: '20px', fontFamily: 'Arial', color: '#ffcc00', align: 'center' }
         ).setOrigin(0.5);
         
         // Create container for all reward elements
