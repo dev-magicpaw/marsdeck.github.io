@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
-import { advanceToNextLevel, getCurrentLevel, getCurrentTurnLimit, getMapForCurrentLevel, LEVEL_PROGRESS, saveLevelProgress } from '../config/level-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
+import levelManager from '../objects/LevelManager';
 import ResourceManager from '../objects/ResourceManager';
 import RewardsManager from '../objects/RewardsManager';
 
@@ -22,13 +22,13 @@ export default class GameScene extends Phaser.Scene {
         this.cardManager = new CardManager(this);
         
         // Get current level information
-        this.currentLevel = getCurrentLevel();
+        this.currentLevel = levelManager.getCurrentLevel();
         
         // Get turn limit from level config
-        this.maxTurns = getCurrentTurnLimit();
+        this.maxTurns = levelManager.getCurrentTurnLimit();
         
         // Load the map configuration for current level
-        const mapConfig = getMapForCurrentLevel();
+        const mapConfig = levelManager.getMapForCurrentLevel();
         if (mapConfig) {
             this.gridManager.loadMapConfig(mapConfig);
         } else {
@@ -808,8 +808,8 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // Then apply upgrades from level progression rewards
-        if (LEVEL_PROGRESS.persistentRewards.rewardIds) {
-            LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
+        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds) {
+            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
                 // Find the reward in the CardManager
                 const reward = this.cardManager.findRewardById(rewardId);
                 
@@ -863,8 +863,8 @@ export default class GameScene extends Phaser.Scene {
     // Player victory when reputation goal is reached
     playerVictory() {
         // Advance to next level and save progress
-        const hasNextLevel = advanceToNextLevel();
-        saveLevelProgress();
+        const hasNextLevel = levelManager.advanceToNextLevel();
+        levelManager.saveLevelProgress();
         
         // Get current reputation
         const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);

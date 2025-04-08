@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { GAME_LEVELS, getCurrentLevel, LEVEL_PROGRESS, loadLevelProgress, saveLevelProgress } from '../config/level-configs';
+import { GAME_LEVELS } from '../config/level-configs';
+import levelManager from '../objects/LevelManager';
 
 export default class LevelSelectScene extends Phaser.Scene {
     constructor() {
@@ -8,7 +9,7 @@ export default class LevelSelectScene extends Phaser.Scene {
 
     init() {
         // Try to load saved level progress
-        loadLevelProgress();
+        levelManager.loadLevelProgress();
     }
 
     create() {
@@ -32,7 +33,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         title.setOrigin(0.5, 0);
         
         // Create current level info
-        const currentLevel = getCurrentLevel();
+        const currentLevel = levelManager.getCurrentLevel();
         const currentLevelInfo = this.add.text(width / 2, 100, 
             `Current Level: ${currentLevel.name}`, {
             fontSize: '18px',
@@ -55,8 +56,8 @@ export default class LevelSelectScene extends Phaser.Scene {
             const y = startY + row * buttonSpacing;
             
             // Check if level is unlocked
-            const isUnlocked = LEVEL_PROGRESS.unlockedLevels.includes(level.id);
-            const isCompleted = LEVEL_PROGRESS.completedLevels[level.id];
+            const isUnlocked = levelManager.LEVEL_PROGRESS.unlockedLevels.includes(level.id);
+            const isCompleted = levelManager.LEVEL_PROGRESS.completedLevels[level.id];
             
             // Create button background
             const buttonColor = isCompleted ? 0x00FF00 : (isUnlocked ? 0x0088FF : 0x555555);
@@ -95,7 +96,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                 // Add click event
                 button.on('pointerdown', () => {
                     // Set this level as current level
-                    LEVEL_PROGRESS.currentLevelId = level.id;
+                    levelManager.LEVEL_PROGRESS.currentLevelId = level.id;
                     
                     // Start the game
                     this.scene.start('GameScene');
@@ -159,16 +160,16 @@ export default class LevelSelectScene extends Phaser.Scene {
     // Reset all game progress
     resetGameProgress() {
         // Reset all progress
-        LEVEL_PROGRESS.completedLevels = {};
-        LEVEL_PROGRESS.unlockedLevels = ['level1'];
-        LEVEL_PROGRESS.currentLevelId = 'level1';
-        LEVEL_PROGRESS.persistentRewards = {
+        levelManager.LEVEL_PROGRESS.completedLevels = {};
+        levelManager.LEVEL_PROGRESS.unlockedLevels = ['level1'];
+        levelManager.LEVEL_PROGRESS.currentLevelId = 'level1';
+        levelManager.LEVEL_PROGRESS.persistentRewards = {
             rewardIds: [],
             resourceBonuses: {}
         };
         
         // Save the reset progress
-        saveLevelProgress();
+        levelManager.saveLevelProgress();
         
         // Show confirmation message
         const confirmText = this.add.text(
