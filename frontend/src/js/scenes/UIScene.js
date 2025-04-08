@@ -1211,6 +1211,7 @@ export default class UIScene extends Phaser.Scene {
         
         // Create container for all reward elements
         const rewardsContainer = this.add.container(0, 0);
+        rewardsContainer.name = 'rewardsContainer';
         
         // Create 3 reward slots
         const slotWidth = 250;
@@ -1231,7 +1232,7 @@ export default class UIScene extends Phaser.Scene {
         ];
         
         // Get the requested rewards from the RewardsManager
-        const rewards = rewardIds.map(rewardId => {
+        const rewards = rewardIds.map((rewardId, mapIndex) => {
             const reward = this.rewardsManager.findRewardById(rewardId);
             
             if (!reward) {
@@ -1248,11 +1249,23 @@ export default class UIScene extends Phaser.Scene {
                 effect: () => {
                     const unlocked = this.rewardsManager.unlockReward(reward.id);
                     if (unlocked) {
-                        this.selectReward(reward.name);
+                        // Show message
+                        this.showMessage(`Unlocked: ${reward.name}`);
+                        
+                        // Update available reputation display
+                        const updatedReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+                        this.updateReputationDisplay(updatedReputation);
+                        
+                        // Replace the button with "UNLOCKED" label for this specific reward
+                        this.replaceUnlockButtonWithLabel(mapIndex, reward.name);
+                        
+                        // Update other reward buttons that might be affected by new reputation amount
+                        this.updateRewardButtons(rewards, mapIndex);
                     } else {
                         this.showMessage(`Not enough reputation to unlock ${reward.name}`);
                     }
-                }
+                },
+                isUnlocked: this.rewardsManager.isRewardUnlocked(reward.id)
             };
         }).filter(reward => reward !== null);
         
@@ -1319,9 +1332,27 @@ export default class UIScene extends Phaser.Scene {
             rewardsContainer.add(costText);
             
             // Select button
-            const canAfford = this.resourceManager.getResource(RESOURCES.REPUTATION) >= reward.reputationCost;
-            
-            if (canAfford) {
+            const isUnlocked = reward.isUnlocked;
+            const canAfford = !isUnlocked && this.resourceManager.getResource(RESOURCES.REPUTATION) >= reward.reputationCost;
+            const unlockButtonVerticalShift = 45;
+            const unlockButtonHorizontalShift = 60;
+
+            if (isUnlocked) {
+                // If already unlocked, show an "UNLOCKED" label
+                const unlockedLabel = this.add.text(
+                    slotX + slotWidth/2, 
+                    slotsY + slotHeight - 40,
+                    "UNLOCKED", 
+                    { 
+                        fontSize: '16px', 
+                        fontFamily: 'Arial', 
+                        color: '#ffcc00', 
+                        align: 'center',
+                        fontWeight: 'bold'
+                    }
+                ).setOrigin(0.5);
+                rewardsContainer.add(unlockedLabel);
+            } else if (canAfford) {
                 const selectButton = this.createActionButton(
                     "UNLOCK", 
                     reward.effect, 
@@ -1330,8 +1361,10 @@ export default class UIScene extends Phaser.Scene {
                     40, 
                     'blueGlossSquareButton'
                 );
-                selectButton.x = slotX + slotWidth/2 - 60;
-                selectButton.y = slotsY + slotHeight - 40;
+                selectButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
+                selectButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
+                // Store the button reference in the reward object for later updates
+                reward.button = selectButton;
                 rewardsContainer.add(selectButton);
             } else {
                 const disabledButton = this.createDisabledButton(
@@ -1341,8 +1374,8 @@ export default class UIScene extends Phaser.Scene {
                     40, 
                     'blueGlossSquareButton'
                 );
-                disabledButton.x = slotX + slotWidth/2 - 60;
-                disabledButton.y = slotsY + slotHeight - 40;
+                disabledButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
+                disabledButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
                 rewardsContainer.add(disabledButton);
             }
         });
@@ -1372,63 +1405,256 @@ export default class UIScene extends Phaser.Scene {
         // Do NOT add any close button!
     }
     
-    // Handle reward selection
-    selectReward(rewardName) {
-        // Display a message about the selected reward
-        this.showMessage(`Selected reward: ${rewardName}`);
-        
-        // Create a confirmation box
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
-        
-        // Create the confirmation panel
-        const confirmPanel = this.add.graphics();
-        confirmPanel.fillStyle(0x000000, 0.8);
-        confirmPanel.fillRect(width/2 - 200, height/2 - 100, 400, 200);
-        confirmPanel.lineStyle(2, 0xffffff, 1);
-        confirmPanel.strokeRect(width/2 - 200, height/2 - 100, 400, 200);
-        
-        // Confirmation text
-        const confirmText = this.add.text(
-            width/2,
-            height/2 - 50,
-            `You selected: ${rewardName}`,
-            { fontSize: '24px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
-        
-        // Subtext
-        const subText = this.add.text(
-            width/2,
-            height/2,
-            'Your reward has been applied!',
-            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
-        
-        // Continue button
-        const continueButton = this.createActionButton(
-            "CONTINUE", 
-            () => {
-                // Clean up UI
-                confirmPanel.destroy();
-                confirmText.destroy();
-                subText.destroy();
-                continueButton.destroy();
-                
-                // Restart the game with new rewards applied
-                this.scene.stop('UIScene');
-                this.scene.stop('GameScene');
-                this.scene.start('GameScene');
-            }, 
-            0x0066aa, 
-            150, 
-            40, 
-            'blueGlossSquareButton'
+    // Handle reward selection - replacing the old selectReward method with these new helper methods
+    updateReputationDisplay(reputation) {
+        // Find and update the reputation text in the rewards panel
+        const reputationText = this.children.list.find(child => 
+            child.type === 'Text' && 
+            child.text && 
+            child.text.startsWith('Available reputation')
         );
         
-        continueButton.x = width/2 - 75; // Center the button
-        continueButton.y = height/2 + 50;
+        if (reputationText) {
+            reputationText.setText(`Available reputation: ${reputation}`);
+        }
+    }
+
+    replaceUnlockButtonWithLabel(rewardIndex, rewardName) {
+        // Find the container that holds the reward slot
+        const rewardsContainer = this.children.list.find(child => 
+            child.type === 'Container' && 
+            child.name === 'rewardsContainer'
+        );
+        
+        if (!rewardsContainer) return;
+        
+        // Calculate the position where the button should be (same calculation as in the original code)
+        const width = this.cameras.main.width;
+        const slotWidth = 250;
+        const slotHeight = 350;
+        const slotSpacing = 50;
+        const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
+        const startX = (width - totalSlotsWidth) / 2;
+        const slotX = startX + (rewardIndex * (slotWidth + slotSpacing));
+        const slotsY = this.children.list.find(child => 
+            child.type === 'Text' && 
+            child.text && 
+            child.text.startsWith('SELECT YOUR REWARD')
+        ).y + 80; // Approximate value to position properly
+        
+        // Find the button by checking all container children and identifying the matching button
+        // This is more reliable than position-based lookup
+        const buttonToRemove = rewardsContainer.list.find(child => 
+            child.type === 'Container' && 
+            child.list && 
+            child.list[1] && // Check if it has a text element
+            child.list[1].text === 'UNLOCK' &&
+            child.x >= slotX && // Check if it's in the approximate horizontal range for this slot
+            child.x < slotX + slotWidth
+        );
+        
+        if (buttonToRemove) {
+            rewardsContainer.remove(buttonToRemove, true);
+            
+            // Create and add the "UNLOCKED" label
+            const unlockedLabel = this.add.text(
+                slotX + slotWidth/2, 
+                slotsY + slotHeight - 40,
+                "UNLOCKED", 
+                { 
+                    fontSize: '16px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffcc00', 
+                    align: 'center',
+                    fontWeight: 'bold'
+                }
+            ).setOrigin(0.5);
+            
+            rewardsContainer.add(unlockedLabel);
+        } else {
+            console.warn(`Could not find UNLOCK button for reward index ${rewardIndex}`);
+        }
+    }
+
+    updateRewardButtons(rewards, excludeIndex) {
+        // Current reputation after unlocking
+        const currentReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+        
+        // Find the rewards container
+        const rewardsContainer = this.children.list.find(child => 
+            child.type === 'Container' && 
+            child.name === 'rewardsContainer'
+        );
+        
+        if (!rewardsContainer) return;
+        
+        // Update buttons for other rewards based on new reputation
+        rewards.forEach((reward, index) => {
+            // Skip the one we just unlocked
+            if (index === excludeIndex || reward.isUnlocked) return;
+            
+            const canAfford = currentReputation >= reward.reputationCost;
+            
+            // If this reward has a button reference
+            if (reward.button) {
+                const buttonX = reward.button.x;
+                const buttonY = reward.button.y;
+                
+                // Remove the old button
+                rewardsContainer.remove(reward.button, true);
+                
+                // Add appropriate new button
+                if (canAfford) {
+                    const newButton = this.createActionButton(
+                        "UNLOCK", 
+                        reward.effect, 
+                        0x33cc33, 
+                        120, 
+                        40, 
+                        'blueGlossSquareButton'
+                    );
+                    newButton.x = buttonX;
+                    newButton.y = buttonY;
+                    reward.button = newButton;
+                    rewardsContainer.add(newButton);
+                } else {
+                    const disabledButton = this.createDisabledButton(
+                        "UNLOCK", 
+                        "Not enough reputation", 
+                        120, 
+                        40, 
+                        'blueGlossSquareButton'
+                    );
+                    disabledButton.x = buttonX;
+                    disabledButton.y = buttonY;
+                    reward.button = null;
+                    rewardsContainer.add(disabledButton);
+                }
+            }
+        });
     }
     
+    // Show card choices for player selection
+    showCardChoices(cards) {
+        // Clear any previous choices
+        this.choiceContainer.removeAll(true);
+        
+        if (cards.length === 0) {
+            this.choicePanelContainer.setVisible(false);
+            this.choicePanelBg.visible = false; // Hide background when no cards
+            return;
+        }
+        
+        // Show panel and background
+        this.choicePanelContainer.setVisible(true);
+        this.choicePanelBg.visible = true;
+        
+        cards.forEach((card, index) => {
+            const xPos = index * (this.cardWidth + this.cardSpacing);
+            
+            // Create card container
+            const cardContainer = this.add.container(xPos, 0);
+            
+            // Card background using NineSlice for better UI scaling
+            let cardBg;
+            
+            // Use NineSlice for better scaling with adjusted slice sizes
+            cardBg = this.add.nineslice(
+                0, 0,                // position
+                'cardBackground',    // texture key
+                null,                // frame (null for default)
+                this.cardWidth, this.cardHeight, // size
+                10, 10, 35, 15       // slice sizes: left, right, top, bottom
+            );
+            cardBg.setOrigin(0, 0);
+            
+            cardContainer.add(cardBg);
+            
+            // Make card interactive
+            cardBg.setInteractive();
+            cardBg.on('pointerdown', () => {
+                this.onCardChoiceClick(index);
+            });
+            
+            // Card content (if it's a building card)
+            if (card.type === 'building') {
+                // Card name - use name from card type if available, otherwise use building name
+                const cardName = card.cardType ? card.cardType.name : card.building.shortName;
+                
+                const nameText = this.add.text(
+                    this.cardWidth / 2, 
+                    10, 
+                    cardName, 
+                    { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
+                );
+                nameText.setOrigin(0.5, 0);
+                cardContainer.add(nameText);
+                
+                // Building icon - use cardTexture if available, otherwise use building texture
+                const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
+                                   card.cardType.cardTexture : 
+                                   (card.building ? card.building.texture : 'placeholderTexture');
+                
+                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
+                icon.setDisplaySize(40, 40);
+                icon.setOrigin(0.5);
+                cardContainer.add(icon);
+                
+                // Show costs from card type if available
+                if (card.cardType && card.cardType.cost) {
+                    // Cost text
+                    let costY = 75;
+                    for (const resource in card.cardType.cost) {
+                        if (card.cardType.cost[resource] > 0) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            
+                            // Check if player has enough of this resource
+                            const requiredAmount = card.cardType.cost[resource];
+                            const playerAmount = this.resourceManager.getResource(resource);
+                            const hasEnough = playerAmount >= requiredAmount;
+                            
+                            // Set color based on resource availability
+                            const textColor = hasEnough ? '#000000' : '#ff0000';
+                            
+                            const costText = this.add.text(
+                                5, 
+                                costY, 
+                                `${resourceName}: ${card.cardType.cost[resource]}`, 
+                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                            );
+                            cardContainer.add(costText);
+                            costY += 12;
+                        }
+                    }
+                }
+                
+                // Add special effects or other card-specific UI elements
+                if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
+                    // Display special effect indicators if needed
+                    const effectsText = this.add.text(
+                        5,
+                        this.cardHeight - 20,
+                        "Special Effect",
+                        { fontSize: '10px', fontFamily: 'Arial', color: '#0000ff' }
+                    );
+                    cardContainer.add(effectsText);
+                }
+            }
+            
+            this.choiceContainer.add(cardContainer);
+        });
+    }
+    
+    // Handle card choice click
+    onCardChoiceClick(choiceIndex) {
+        // Tell the game scene which card was chosen
+        this.gameScene.selectCardChoice(choiceIndex);
+        
+        // Hide the choice panel
+        this.choicePanelContainer.setVisible(false);
+        this.choicePanelBg.visible = false;
+    }
+
     // Update the actions panel based on selected entity
     updateActionsPanel() {
         // Clear existing buttons
@@ -1685,126 +1911,5 @@ export default class UIScene extends Phaser.Scene {
             this.tooltip.destroy();
             this.tooltip = null;
         }
-    }
-    
-    // Show card choices for player selection
-    showCardChoices(cards) {
-        // Clear any previous choices
-        this.choiceContainer.removeAll(true);
-        
-        if (cards.length === 0) {
-            this.choicePanelContainer.setVisible(false);
-            this.choicePanelBg.visible = false; // Hide background when no cards
-            return;
-        }
-        
-        // Show panel and background
-        this.choicePanelContainer.setVisible(true);
-        this.choicePanelBg.visible = true;
-        
-        cards.forEach((card, index) => {
-            const xPos = index * (this.cardWidth + this.cardSpacing);
-            
-            // Create card container
-            const cardContainer = this.add.container(xPos, 0);
-            
-            // Card background using NineSlice for better UI scaling
-            let cardBg;
-            
-            // Use NineSlice for better scaling with adjusted slice sizes
-            cardBg = this.add.nineslice(
-                0, 0,                // position
-                'cardBackground',    // texture key
-                null,                // frame (null for default)
-                this.cardWidth, this.cardHeight, // size
-                10, 10, 35, 15       // slice sizes: left, right, top, bottom
-            );
-            cardBg.setOrigin(0, 0);
-            
-            cardContainer.add(cardBg);
-            
-            // Make card interactive
-            cardBg.setInteractive();
-            cardBg.on('pointerdown', () => {
-                this.onCardChoiceClick(index);
-            });
-            
-            // Card content (if it's a building card)
-            if (card.type === 'building') {
-                // Card name - use name from card type if available, otherwise use building name
-                const cardName = card.cardType ? card.cardType.name : card.building.shortName;
-                
-                const nameText = this.add.text(
-                    this.cardWidth / 2, 
-                    10, 
-                    cardName, 
-                    { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
-                );
-                nameText.setOrigin(0.5, 0);
-                cardContainer.add(nameText);
-                
-                // Building icon - use cardTexture if available, otherwise use building texture
-                const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
-                                   card.cardType.cardTexture : 
-                                   (card.building ? card.building.texture : 'placeholderTexture');
-                
-                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
-                icon.setDisplaySize(40, 40);
-                icon.setOrigin(0.5);
-                cardContainer.add(icon);
-                
-                // Show costs from card type if available
-                if (card.cardType && card.cardType.cost) {
-                    // Cost text
-                    let costY = 75;
-                    for (const resource in card.cardType.cost) {
-                        if (card.cardType.cost[resource] > 0) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            
-                            // Check if player has enough of this resource
-                            const requiredAmount = card.cardType.cost[resource];
-                            const playerAmount = this.resourceManager.getResource(resource);
-                            const hasEnough = playerAmount >= requiredAmount;
-                            
-                            // Set color based on resource availability
-                            const textColor = hasEnough ? '#000000' : '#ff0000';
-                            
-                            const costText = this.add.text(
-                                5, 
-                                costY, 
-                                `${resourceName}: ${card.cardType.cost[resource]}`, 
-                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
-                            );
-                            cardContainer.add(costText);
-                            costY += 12;
-                        }
-                    }
-                }
-                
-                // Add special effects or other card-specific UI elements
-                if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
-                    // Display special effect indicators if needed
-                    const effectsText = this.add.text(
-                        5,
-                        this.cardHeight - 20,
-                        "Special Effect",
-                        { fontSize: '10px', fontFamily: 'Arial', color: '#0000ff' }
-                    );
-                    cardContainer.add(effectsText);
-                }
-            }
-            
-            this.choiceContainer.add(cardContainer);
-        });
-    }
-    
-    // Handle card choice click
-    onCardChoiceClick(choiceIndex) {
-        // Tell the game scene which card was chosen
-        this.gameScene.selectCardChoice(choiceIndex);
-        
-        // Hide the choice panel
-        this.choicePanelContainer.setVisible(false);
-        this.choicePanelBg.visible = false;
     }
 } 

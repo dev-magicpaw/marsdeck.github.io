@@ -405,7 +405,7 @@ export const REWARDS = {
             description: 'Add two Fuel Refinery cards to your deck',
             image: 'fuelRefinery',
             applicationType: 'deckCards',
-            reputationCost: 7,
+            reputationCost: 5,
             effect: {
                 cardId: 'fuelRefineryCard',
                 count: 2
@@ -421,7 +421,7 @@ export const REWARDS = {
             description: 'Wind Turbines produce 2 more energy',
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
-            reputationCost: 15,
+            reputationCost: 5,
             effect: {
                 buildingId: 'windTurbine',
                 resourceBonus: {
