@@ -98,7 +98,7 @@ export const GAME_LEVELS = [
       [RESOURCES.WATER]: 10,
       [RESOURCES.FUEL]: 120,
       [RESOURCES.DRONES]: 15,
-      [RESOURCES.ENERGY]: 5,
+      [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
@@ -126,7 +126,7 @@ export const GAME_LEVELS = [
       [RESOURCES.WATER]: 30,
       [RESOURCES.FUEL]: 150,
       [RESOURCES.DRONES]: 20,
-      [RESOURCES.ENERGY]: 10,
+      [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {

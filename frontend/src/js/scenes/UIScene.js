@@ -737,12 +737,23 @@ export default class UIScene extends Phaser.Scene {
                     }
                 }
                 
-                // Production
+                // Production - apply building upgrades
                 if (Object.keys(building.production).length > 0) {
+                    const upgradedProduction = gameScene.applyBuildingUpgrades(building.id, {...building.production});
+                    
                     content += "Production:\n";
-                    for (const resource in building.production) {
+                    for (const resource in upgradedProduction) {
                         const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        content += `${resourceName}: +${building.production[resource]}\n`;
+                        const baseValue = building.production[resource];
+                        const upgradedValue = upgradedProduction[resource];
+                        
+                        // Show upgraded value with base value in parentheses if different
+                        const valueDiff = upgradedValue - baseValue;
+                        if (valueDiff > 0) {
+                            content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                        } else {
+                            content += `${resourceName}: +${baseValue}\n`;
+                        }
                     }
                 }
                 
@@ -870,12 +881,29 @@ export default class UIScene extends Phaser.Scene {
                         }
                     }
                     
-                    // Production
+                    // Production - apply building upgrades
                     if (Object.keys(card.building.production).length > 0) {
+                        let upgradedProduction = {...card.building.production};
+                        
+                        // Only try to get upgraded values if gameScene is available
+                        if (this.scene.manager.getScene('GameScene')) {
+                            const gameScene = this.scene.manager.getScene('GameScene');
+                            upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
+                        }
+                        
                         additionalText += "Production:\n";
-                        for (const resource in card.building.production) {
+                        for (const resource in upgradedProduction) {
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            additionalText += `${resourceName}: +${card.building.production[resource]}\n`;
+                            const baseValue = card.building.production[resource];
+                            const upgradedValue = upgradedProduction[resource];
+                            
+                            // Show upgraded value with base value in parentheses if different
+                            const valueDiff = upgradedValue - baseValue;
+                            if (valueDiff > 0) {
+                                additionalText += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                            } else {
+                                additionalText += `${resourceName}: +${baseValue}\n`;
+                            }
                         }
                     }
                     
@@ -914,12 +942,29 @@ export default class UIScene extends Phaser.Scene {
                         }
                     }
                     
-                    // Production
+                    // Production - apply building upgrades
                     if (Object.keys(card.building.production).length > 0) {
+                        let upgradedProduction = {...card.building.production};
+                        
+                        // Only try to get upgraded values if gameScene is available
+                        if (this.scene.manager.getScene('GameScene')) {
+                            const gameScene = this.scene.manager.getScene('GameScene');
+                            upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
+                        }
+                        
                         content += "Production:\n";
-                        for (const resource in card.building.production) {
+                        for (const resource in upgradedProduction) {
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            content += `${resourceName}: +${card.building.production[resource]}\n`;
+                            const baseValue = card.building.production[resource];
+                            const upgradedValue = upgradedProduction[resource];
+                            
+                            // Show upgraded value with base value in parentheses if different
+                            const valueDiff = upgradedValue - baseValue;
+                            if (valueDiff > 0) {
+                                content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                            } else {
+                                content += `${resourceName}: +${baseValue}\n`;
+                            }
                         }
                     }
                     
