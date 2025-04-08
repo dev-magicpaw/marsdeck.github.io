@@ -349,12 +349,15 @@ export default class GameScene extends Phaser.Scene {
         
         // Immediate production for certain buildings
         if (building.id === 'droneDepo' || building.id === 'solarPanel' || building.id === 'windTurbine') {
-            for (const resource in building.production) {
-                this.resourceManager.modifyResource(resource, building.production[resource]);
+            // Apply building upgrades to the production values
+            let upgradedProduction = this.applyBuildingUpgrades(building.id, {...building.production});
+            
+            for (const resource in upgradedProduction) {
+                this.resourceManager.modifyResource(resource, upgradedProduction[resource]);
                 
                 // Show message about production
                 const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                this.uiScene.showMessage(`${building.name} produced ${building.production[resource]} ${resourceName}`);
+                this.uiScene.showMessage(`${building.name} produced ${upgradedProduction[resource]} ${resourceName}`);
             }
         }
         
