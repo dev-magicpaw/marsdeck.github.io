@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import BootScene from '../scenes/BootScene';
 import GameScene from '../scenes/GameScene';
+import LevelSelectScene from '../scenes/LevelSelectScene';
 import UIScene from '../scenes/UIScene';
 
 const config = {
@@ -9,7 +10,7 @@ const config = {
     height: 800,
     parent: 'game-container',
     backgroundColor: '#333333',
-    scene: [BootScene, GameScene, UIScene],
+    scene: [BootScene, LevelSelectScene, GameScene, UIScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
