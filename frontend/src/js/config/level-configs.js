@@ -7,7 +7,7 @@ export const GAME_LEVELS = [
     id: 'level1',
     name: 'Tutorial Colony',
     description: 'Learn the basics of colony building',
-    mapId: 'TUTORIAL_MAP',
+    mapId: 'SAMPLE_MAP',
     turnLimit: 20,
     reputationGoal: 10,
     startingResources: {
