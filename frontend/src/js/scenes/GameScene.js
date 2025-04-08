@@ -784,8 +784,16 @@ export default class GameScene extends Phaser.Scene {
                 // Get production values with any building upgrades applied
                 let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
                 
-                // Apply production for each resource
+                // Filter out ENERGY and DRONES which should only be produced on construction
+                const filteredProduction = {};
                 Object.entries(productionValues).forEach(([resource, amount]) => {
+                    if (resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES) {
+                        filteredProduction[resource] = amount;
+                    }
+                });
+                
+                // Apply production for each resource
+                Object.entries(filteredProduction).forEach(([resource, amount]) => {
                     this.resourceManager.addResource(resource, amount);
                     produced = true;
                 });
@@ -829,8 +837,16 @@ export default class GameScene extends Phaser.Scene {
                     // Get production values with any building upgrades applied
                     let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
                     
-                    // Apply production for each resource
+                    // Filter out ENERGY and DRONES which should only be produced on construction
+                    const filteredProduction = {};
                     Object.entries(productionValues).forEach(([resource, amount]) => {
+                        if (resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES) {
+                            filteredProduction[resource] = amount;
+                        }
+                    });
+                    
+                    // Apply production for each resource
+                    Object.entries(filteredProduction).forEach(([resource, amount]) => {
                         this.resourceManager.addResource(resource, amount);
                     });
                 }
