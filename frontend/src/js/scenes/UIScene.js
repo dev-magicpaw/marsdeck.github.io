@@ -1269,12 +1269,13 @@ export default class UIScene extends Phaser.Scene {
         // Calculate starting X position to center all slots
         const startX = (width - totalSlotsWidth) / 2;
         
-        // Get rewards from REWARDS object in specific order
-        const rewardIds = [
-            'steelworksStartingReward',    // Starting Steelworks Card
-            'extraFuelRefineriesReward',   // Extra Fuel Refineries
-            'improvedWindTurbineReward'    // Improved Wind Turbine
-        ];
+        // Get the reward IDs from the current level configuration
+        const gameScene = this.scene.get('GameScene');
+        let rewardIds = [];
+        
+        if (gameScene && gameScene.currentLevel && gameScene.currentLevel.rewards) {
+            rewardIds = gameScene.currentLevel.rewards.rewardIds || [];
+        }
         
         // Get the requested rewards from the RewardsManager
         const rewards = rewardIds.map((rewardId, mapIndex) => {

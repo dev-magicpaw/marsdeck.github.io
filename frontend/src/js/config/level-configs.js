@@ -22,6 +22,7 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.CONCRETE_CARD.id,
+        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id,
         REWARDS.BUILDING_UPGRADE_REWARDS.IMPROVED_WIND_TURBINE.id
       ],
       resources: {
