@@ -1,4 +1,5 @@
 import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, STARTING_HAND } from '../config/game-data';
+import { LEVEL_PROGRESS } from '../config/level-configs';
 
 export default class CardManager {
     constructor(scene) {
@@ -26,6 +27,14 @@ export default class CardManager {
             const rewardCards = this.scene.rewardsManager.getDeckRewardCards();
             Object.entries(rewardCards).forEach(([cardId, count]) => {
                 this.addCardToDeck(cardId, count);
+            });
+        }
+        
+        // Add cards from level progression persistent rewards
+        if (LEVEL_PROGRESS.persistentRewards.cards) {
+            LEVEL_PROGRESS.persistentRewards.cards.forEach(cardId => {
+                // Add one copy of each persistent reward card
+                this.addCardToDeck(cardId, 1);
             });
         }
         
@@ -114,7 +123,6 @@ export default class CardManager {
     }
     
     // Set up specific starting cards for the player
-    // Moved from GameScene to CardManager
     setupStartingHand() {
         // Clear any cards that might be in the hand
         this.hand = [];
@@ -137,6 +145,9 @@ export default class CardManager {
                 this.addCardToStartingCards(cardId, startingCards);
             });
         }
+        
+        // No longer trying to add random persistent reward cards to the starting hand
+        // They're already added to the deck when the deck is initialized
         
         // Add the starting cards to hand
         startingCards.forEach(card => {
