@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, MAX_TURNS, RESOURCES, TERRAIN_FEATURES, VICTORY_GOAL } from '../config/game-data';
-import { SAMPLE_MAP } from '../config/map-configs';
+import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { advanceToNextLevel, getCurrentLevel, getCurrentTurnLimit, getMapForCurrentLevel, saveLevelProgress } from '../config/level-configs';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import ResourceManager from '../objects/ResourceManager';
@@ -21,16 +21,23 @@ export default class GameScene extends Phaser.Scene {
         this.rewardsManager = new RewardsManager(this);
         this.cardManager = new CardManager(this);
         
-        // Choose which map to use
-        // Option 1: Generate a random map
-        // this.gridManager.generateRandomMap();
+        // Get current level information
+        this.currentLevel = getCurrentLevel();
         
-        // Option 2: Load a predefined map configuration
-        this.gridManager.loadMapConfig(SAMPLE_MAP);
+        // Get turn limit from level config
+        this.maxTurns = getCurrentTurnLimit();
+        
+        // Load the map configuration for current level
+        const mapConfig = getMapForCurrentLevel();
+        if (mapConfig) {
+            this.gridManager.loadMapConfig(mapConfig);
+        } else {
+            // Fallback to random map generation if no map config found
+            this.gridManager.generateRandomMap();
+        }
         
         // Initialize turn counter
         this.currentTurn = 1;
-        this.maxTurns = MAX_TURNS;
         
         // Ensure player starts with specific cards
         this.cardManager.setupStartingHand();
@@ -829,6 +836,10 @@ export default class GameScene extends Phaser.Scene {
     
     // Player victory when reputation goal is reached
     playerVictory() {
+        // Advance to next level and save progress
+        const hasNextLevel = advanceToNextLevel();
+        saveLevelProgress();
+        
         // Get current reputation
         const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
         
@@ -838,9 +849,9 @@ export default class GameScene extends Phaser.Scene {
         // Show victory message
         this.uiScene.showMessage(`VICTORY! You've reached ${reputation} reputation points`);
         
-        // Show victory screen
+        // Show victory screen in UIScene
         if (this.uiScene) {
-            this.uiScene.showVictory(reputation, VICTORY_GOAL);
+            this.uiScene.showVictory(reputation, this.currentLevel.reputationGoal);
         }
     }
 
