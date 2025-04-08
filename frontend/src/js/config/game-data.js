@@ -217,7 +217,7 @@ export const CARD_TYPES = {
         description: 'Build a drone depo to produce drones',
         buildingId: 'droneDepo',
         cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
@@ -229,7 +229,7 @@ export const CARD_TYPES = {
         name: 'Iron Mine',
         description: 'Build an iron mine on a metal deposit',
         buildingId: 'ironMine',
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 1,
@@ -243,7 +243,7 @@ export const CARD_TYPES = {
         name: 'Steelworks',
         description: 'Build a steelworks to convert iron to steel',
         buildingId: 'steelworks',
-        rarity: 'uncommon',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 2,
@@ -257,7 +257,7 @@ export const CARD_TYPES = {
         name: 'Concrete',
         description: 'Build a concrete harvester to produce concrete',
         buildingId: 'concreteMixer',
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
@@ -271,7 +271,7 @@ export const CARD_TYPES = {
         name: 'Water Pump',
         description: 'Build a water pump on a water deposit',
         buildingId: 'waterPump',
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
@@ -285,7 +285,7 @@ export const CARD_TYPES = {
         name: 'Fuel',
         description: 'Build a fuel refinery to convert water to fuel',
         buildingId: 'fuelRefinery',
-        rarity: 'uncommon',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 3,
             [RESOURCES.STEEL]: 2,
@@ -299,7 +299,7 @@ export const CARD_TYPES = {
         name: 'Wind',
         description: 'Build a wind turbine to generate energy',
         buildingId: 'windTurbine',
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 3,
             [RESOURCES.STEEL]: 1
@@ -311,7 +311,7 @@ export const CARD_TYPES = {
         name: 'Solar',
         description: 'Build solar panels to generate energy',
         buildingId: 'solarPanel',
-        rarity: 'common',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
@@ -324,15 +324,26 @@ export const CARD_TYPES = {
         name: 'Launch Pad',
         description: 'Build a launch pad to send rockets for reputation',
         buildingId: 'launchPad',
-        rarity: 'rare',
+        cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 4,
             [RESOURCES.STEEL]: 3,
             [RESOURCES.DRONES]: 1
         },
         specialEffects: []
-    }
-    // You can add more card types here, including special cards that don't directly map to buildings
+    },
+    IRON_MINE_PREFAB_CARD: {
+        id: 'ironMinePrefabCard',
+        name: '*Iron Mine*',
+        description: 'Build an iron mine on a metal deposit. Being a prefab this card requires way less resources to build.',
+        buildingId: 'ironMine',
+        cardType: 'prefab',
+        cost: {
+            [RESOURCES.DRONES]: 2,
+            [RESOURCES.ENERGY]: 1
+        },
+        specialEffects: []
+    },
 };
 
 // Deck composition - defines how many copies of each card type will be in the deck
@@ -361,15 +372,15 @@ export const STARTING_HAND = {
 export const REWARDS = {
     // Starting hand card rewards - add specific card to starting hand
     STARTING_HAND_REWARDS: {
-        STEELWORKS_CARD: {
-            id: 'steelworksStartingReward',
-            name: 'Starting Steelworks Card',
-            description: 'Start with a Steelworks card in your hand',
-            image: 'steelworks', // Using existing texture
+        IRON_MINE_PREFAB_STARTING_REWARD: {
+            id: 'ironMinePrefabStartingReward',
+            name: 'Iron Mine Prefab',
+            description: 'Start with an additional Iron Mine Prefab card in your hand',
+            image: 'ironMine', // Using existing texture
             applicationType: 'startingHand',
-            reputationCost: 5,
+            reputationCost: 10,
             effect: {
-                cardId: 'steelworksCard'
+                cardId: 'ironMinePrefabCard'
             }
         },
         CONCRETE_CARD: {
