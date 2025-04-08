@@ -239,8 +239,12 @@ export default class GameScene extends Phaser.Scene {
             return;
         }
         
+        // Get the cost from the selected card's cardType
+        const cost = this.selectedCard && this.selectedCard.cardType && this.selectedCard.cardType.cost ? 
+                     this.selectedCard.cardType.cost : {};
+        
         // Check resource requirements
-        if (!this.resourceManager.hasSufficientResources(building.cost)) {
+        if (!this.resourceManager.hasSufficientResources(cost)) {
             console.log('Not enough resources');
             // Show UI error message
             if (this.uiScene) {
@@ -250,7 +254,7 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // Consume resources
-        this.resourceManager.consumeResources(building.cost);
+        this.resourceManager.consumeResources(cost);
         
         // Remove feature sprite if it exists and the building doesn't require it
         if (cell.featureSprite && !building.terrainRequirement) {

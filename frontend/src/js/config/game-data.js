@@ -26,7 +26,7 @@ export const STARTING_RESOURCES = {
     [RESOURCES.STEEL]: 200, 
     [RESOURCES.CONCRETE]: 20,
     [RESOURCES.WATER]: 0,
-    [RESOURCES.FUEL]: 100,
+    [RESOURCES.FUEL]: 0,
     [RESOURCES.DRONES]: 10,
     [RESOURCES.ENERGY]: 0,
     [RESOURCES.REPUTATION]: 0
@@ -73,10 +73,6 @@ export const BUILDINGS = {
         name: 'Drone Depo',
         shortName: 'Drone Depo',
         description: 'Produces drones immediately when built',
-        cost: {
-            [RESOURCES.CONCRETE]: 1,
-            [RESOURCES.STEEL]: 1,
-        },
         production: {
             [RESOURCES.DRONES]: 7
         },
@@ -89,12 +85,6 @@ export const BUILDINGS = {
         name: 'Iron Mine',
         shortName: 'Iron Mine',
         description: 'Extracts iron from metal deposits',
-        cost: {
-            [RESOURCES.CONCRETE]: 2,
-            [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 2,
-            [RESOURCES.ENERGY]: 1
-        },
         production: {
             [RESOURCES.IRON]: 3
         },
@@ -107,12 +97,6 @@ export const BUILDINGS = {
         name: 'Steelworks',
         shortName: 'Steelworks',
         description: 'Converts iron to steel each turn, requires iron',
-        cost: {
-            [RESOURCES.CONCRETE]: 2,
-            [RESOURCES.STEEL]: 2,
-            [RESOURCES.DRONES]: 1,
-            [RESOURCES.ENERGY]: 3
-        },
         production: {
             [RESOURCES.STEEL]: 1
         },
@@ -127,12 +111,6 @@ export const BUILDINGS = {
         name: 'Concrete Harvester',
         shortName: 'Concrete',
         description: 'Produces concrete from regolith each turn',
-        cost: {
-            [RESOURCES.CONCRETE]: 1,
-            [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 3,
-            [RESOURCES.ENERGY]: 1
-        },
         production: {
             [RESOURCES.CONCRETE]: 3
         },
@@ -145,12 +123,6 @@ export const BUILDINGS = {
         name: 'Water Pump',
         shortName: 'Water Pump',
         description: 'Extracts water from deposits each turn',
-        cost: {
-            [RESOURCES.CONCRETE]: 1,
-            [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1,
-            [RESOURCES.ENERGY]: 1
-        },
         production: {
             [RESOURCES.WATER]: 3
         },
@@ -163,12 +135,6 @@ export const BUILDINGS = {
         name: 'Fuel Refinery',
         shortName: 'Fuel',
         description: 'Converts water to rocket fuel each turn',
-        cost: {
-            [RESOURCES.CONCRETE]: 3,
-            [RESOURCES.STEEL]: 2,
-            [RESOURCES.DRONES]: 1,
-            [RESOURCES.ENERGY]: 2
-        },
         production: {
             [RESOURCES.FUEL]: 1
         },
@@ -183,10 +149,6 @@ export const BUILDINGS = {
         name: 'Wind Turbine',
         shortName: 'Wind',
         description: 'Generates energy immediately when built',
-        cost: {
-            [RESOURCES.CONCRETE]: 3,
-            [RESOURCES.STEEL]: 1
-        },
         production: {
             [RESOURCES.ENERGY]: 6
         },
@@ -199,11 +161,6 @@ export const BUILDINGS = {
         name: 'Solar Panels',
         shortName: 'Solar',
         description: 'Generates energy immediately when built',
-        cost: {
-            [RESOURCES.CONCRETE]: 1,
-            [RESOURCES.STEEL]: 1,
-            [RESOURCES.DRONES]: 1
-        },
         production: {
             [RESOURCES.ENERGY]: 3
         },
@@ -216,11 +173,6 @@ export const BUILDINGS = {
         name: 'Launch Pad',
         shortName: 'Launcher',
         description: 'Allows manual rocket launches for reputation. Rockets return after 1 turn.',
-        cost: {
-            [RESOURCES.CONCRETE]: 4,
-            [RESOURCES.STEEL]: 3,
-            [RESOURCES.DRONES]: 1
-        },
         production: {
         },
         consumption: {},
@@ -239,7 +191,6 @@ export const BUILDINGS = {
         name: 'Launch Pad Surrounding',
         shortName: 'Launch Area',
         description: 'Part of the launch pad area, cannot be built on',
-        cost: {}, // No cost as it's placed automatically
         production: {},
         consumption: {},
         terrainRequirement: null,
@@ -250,7 +201,6 @@ export const BUILDINGS = {
         name: 'Wind Turbine Surrounding',
         shortName: 'Wind Area',
         description: 'Part of the wind turbine area, cannot be built on',
-        cost: {}, // No cost as it's placed automatically
         production: {},
         consumption: {},
         terrainRequirement: null,
@@ -268,6 +218,11 @@ export const CARD_TYPES = {
         buildingId: 'droneDepo',
         cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.STEEL]: 1,
+        },
+        specialEffects: [] // For future expansion
     },
     IRON_MINE_CARD: {
         id: 'ironMineCard',
@@ -275,6 +230,13 @@ export const CARD_TYPES = {
         description: 'Build an iron mine on a metal deposit',
         buildingId: 'ironMine',
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 2,
+            [RESOURCES.STEEL]: 1,
+            [RESOURCES.DRONES]: 2,
+            [RESOURCES.ENERGY]: 1
+        },
+        specialEffects: []
     },
     STEELWORKS_CARD: {
         id: 'steelworksCard',
@@ -282,6 +244,13 @@ export const CARD_TYPES = {
         description: 'Build a steelworks to convert iron to steel',
         buildingId: 'steelworks',
         rarity: 'uncommon',
+        cost: {
+            [RESOURCES.CONCRETE]: 2,
+            [RESOURCES.STEEL]: 2,
+            [RESOURCES.DRONES]: 1,
+            [RESOURCES.ENERGY]: 3
+        },
+        specialEffects: []
     },
     CONCRETE_HARVESTER_CARD: {
         id: 'concreteMixerCard',
@@ -289,6 +258,13 @@ export const CARD_TYPES = {
         description: 'Build a concrete harvester to produce concrete',
         buildingId: 'concreteMixer',
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.STEEL]: 1,
+            [RESOURCES.DRONES]: 3,
+            [RESOURCES.ENERGY]: 1
+        },
+        specialEffects: []
     },
     WATER_PUMP_CARD: {
         id: 'waterPumpCard',
@@ -296,6 +272,13 @@ export const CARD_TYPES = {
         description: 'Build a water pump on a water deposit',
         buildingId: 'waterPump',
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.STEEL]: 1,
+            [RESOURCES.DRONES]: 1,
+            [RESOURCES.ENERGY]: 1
+        },
+        specialEffects: []
     },
     FUEL_REFINERY_CARD: {
         id: 'fuelRefineryCard',
@@ -303,6 +286,13 @@ export const CARD_TYPES = {
         description: 'Build a fuel refinery to convert water to fuel',
         buildingId: 'fuelRefinery',
         rarity: 'uncommon',
+        cost: {
+            [RESOURCES.CONCRETE]: 3,
+            [RESOURCES.STEEL]: 2,
+            [RESOURCES.DRONES]: 1,
+            [RESOURCES.ENERGY]: 2
+        },
+        specialEffects: []
     },
     WIND_TURBINE_CARD: {
         id: 'windTurbineCard',
@@ -310,6 +300,11 @@ export const CARD_TYPES = {
         description: 'Build a wind turbine to generate energy',
         buildingId: 'windTurbine',
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 3,
+            [RESOURCES.STEEL]: 1
+        },
+        specialEffects: []
     },
     SOLAR_PANEL_CARD: {
         id: 'solarPanelCard',
@@ -317,6 +312,12 @@ export const CARD_TYPES = {
         description: 'Build solar panels to generate energy',
         buildingId: 'solarPanel',
         rarity: 'common',
+        cost: {
+            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.STEEL]: 1,
+            [RESOURCES.DRONES]: 1
+        },
+        specialEffects: []
     },
     LAUNCH_PAD_CARD: {
         id: 'launchPadCard',
@@ -324,6 +325,12 @@ export const CARD_TYPES = {
         description: 'Build a launch pad to send rockets for reputation',
         buildingId: 'launchPad',
         rarity: 'rare',
+        cost: {
+            [RESOURCES.CONCRETE]: 4,
+            [RESOURCES.STEEL]: 3,
+            [RESOURCES.DRONES]: 1
+        },
+        specialEffects: []
     }
     // You can add more card types here, including special cards that don't directly map to buildings
 };
