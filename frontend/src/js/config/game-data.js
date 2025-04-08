@@ -26,7 +26,7 @@ export const STARTING_RESOURCES = {
     [RESOURCES.STEEL]: 200, 
     [RESOURCES.CONCRETE]: 20,
     [RESOURCES.WATER]: 0,
-    [RESOURCES.FUEL]: 0,
+    [RESOURCES.FUEL]: 100,
     [RESOURCES.DRONES]: 10,
     [RESOURCES.ENERGY]: 0,
     [RESOURCES.REPUTATION]: 0
@@ -355,4 +355,93 @@ export const STARTING_HAND = {
     'droneDepoCard': true,
     'windTurbineCard': true,
     'launchPadCard': true
+}; 
+
+// Rewards configuration - defines rewards that can be unlocked using reputation points
+export const REWARDS = {
+    // Starting hand card rewards - add specific card to starting hand
+    STARTING_HAND_REWARDS: {
+        STEELWORKS_CARD: {
+            id: 'steelworksStartingReward',
+            name: 'Starting Steelworks Card',
+            description: 'Start with a Steelworks card in your hand',
+            image: 'steelworks', // Using existing texture
+            applicationType: 'startingHand',
+            reputationCost: 5,
+            effect: {
+                cardId: 'steelworksCard'
+            }
+        },
+        CONCRETE_CARD: {
+            id: 'concreteStartingReward',
+            name: 'Starting Concrete Card',
+            description: 'Start with a Concrete Harvester card in your hand',
+            image: 'concreteMixer',
+            applicationType: 'startingHand',
+            reputationCost: 3,
+            effect: {
+                cardId: 'concreteMixerCard'
+            }
+        }
+    },
+    
+    // Deck cards rewards - add cards to the player's deck
+    DECK_CARDS_REWARDS: {
+        EXTRA_LAUNCH_PAD: {
+            id: 'extraLaunchPadReward',
+            name: 'Extra Launch Pad',
+            description: 'Add one Launch Pad card to your deck',
+            image: 'launchPad',
+            applicationType: 'deckCards',
+            reputationCost: 10,
+            effect: {
+                cardId: 'launchPadCard',
+                count: 1
+            }
+        },
+        EXTRA_FUEL_REFINERIES: {
+            id: 'extraFuelRefineriesReward',
+            name: 'Extra Fuel Refineries',
+            description: 'Add two Fuel Refinery cards to your deck',
+            image: 'fuelRefinery',
+            applicationType: 'deckCards',
+            reputationCost: 7,
+            effect: {
+                cardId: 'fuelRefineryCard',
+                count: 2
+            }
+        }
+    },
+    
+    // Building upgrade rewards - improve building performance
+    BUILDING_UPGRADE_REWARDS: {
+        IMPROVED_WIND_TURBINE: {
+            id: 'improvedWindTurbineReward',
+            name: 'Improved Wind Turbine',
+            description: 'Wind Turbines produce 2 more energy',
+            image: 'windTurbine',
+            applicationType: 'buildingUpgrade',
+            reputationCost: 15,
+            effect: {
+                buildingId: 'windTurbine',
+                resourceBonus: {
+                    'energy': 2
+                }
+            }
+        },
+        EFFICIENT_IRON_MINE: {
+            id: 'efficientIronMineReward',
+            name: 'Efficient Iron Mine',
+            description: 'Iron Mines produce 1 more iron each turn',
+            image: 'ironMine',
+            applicationType: 'buildingUpgrade',
+            reputationCost: 8,
+            effect: {
+                buildingId: 'ironMine',
+                resourceBonus: {
+                    'iron': 1
+                }
+            }
+        }
+    }
 }; 

@@ -21,6 +21,7 @@ export default class UIScene extends Phaser.Scene {
         // References to game managers
         this.resourceManager = null;
         this.cardManager = null;
+        this.rewardsManager = null;
         
         // UI components
         this.handContainer = null;
@@ -39,6 +40,7 @@ export default class UIScene extends Phaser.Scene {
         this.gridManager = data.gridManager;
         this.resourceManager = data.resourceManager;
         this.cardManager = data.cardManager;
+        this.rewardsManager = data.rewardsManager;
         
         // UI elements
         this.resourcesPanel = null;
