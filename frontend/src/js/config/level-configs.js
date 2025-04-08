@@ -1,4 +1,4 @@
-import { RESOURCES } from './game-data';
+import { RESOURCES, REWARDS } from './game-data';
 import { LEVEL_2_MAP, RESOURCE_RICH_MAP, SAMPLE_MAP, TUTORIAL_MAP } from './map-configs';
 
 // Level progression configuration
@@ -21,7 +21,13 @@ export const GAME_LEVELS = [
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
-      cards: ['windTurbineCard', 'ironMineCard'],
+      rewardIds: [
+        REWARDS.STARTING_HAND_REWARDS.CONCRETE_CARD.id,
+        REWARDS.BUILDING_UPGRADE_REWARDS.IMPROVED_WIND_TURBINE.id
+      ],
+      resources: {
+        // Don't add any resources for this level
+      }
     },
     nextLevelId: 'level2'
   },
@@ -43,7 +49,12 @@ export const GAME_LEVELS = [
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
-      cards: ['fuelRefineryCard'],
+      rewardIds: [
+        REWARDS.DECK_CARDS_REWARDS.EXTRA_FUEL_REFINERIES.id
+      ],
+      resources: {
+        // Don't add any resources for this level
+      }
     },
     nextLevelId: 'level3'
   },
@@ -65,7 +76,12 @@ export const GAME_LEVELS = [
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
-      cards: ['launchPadCard'],
+      rewardIds: [
+        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id
+      ],
+      resources: {
+        // Don't add any resources for this level
+      }
     },
     nextLevelId: 'level4'
   },
@@ -87,7 +103,13 @@ export const GAME_LEVELS = [
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
-      cards: ['steelworksCard', 'waterPumpCard'],
+      rewardIds: [
+        REWARDS.STARTING_HAND_REWARDS.STEELWORKS_CARD.id,
+        REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_IRON_MINE.id
+      ],
+      resources: {
+        // Don't add any resources for this level
+      }
     },
     nextLevelId: 'level5'
   },
@@ -109,7 +131,13 @@ export const GAME_LEVELS = [
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
-      cards: ['launchPadCard', 'solarPanelCard'],
+      rewardIds: [
+        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id,
+        REWARDS.DECK_CARDS_REWARDS.EXTRA_FUEL_REFINERIES.id
+      ],
+      resources: {
+        // Don't add any resources for this level
+      }
     },
     nextLevelId: null // Last level for now
   }
@@ -121,7 +149,7 @@ export const LEVEL_PROGRESS = {
   unlockedLevels: ['level1'],
   currentLevelId: 'level1',
   persistentRewards: {
-    cards: [], // Array of card IDs that player has permanently unlocked
+    rewardIds: [], // Array of reward IDs that player has permanently unlocked
     resourceBonuses: {} // Permanently increased starting resources
   }
 };
@@ -161,13 +189,22 @@ export function advanceToNextLevel() {
     
     // Add rewards to persistent rewards
     if (currentLevel.rewards) {
-      // Add card rewards
-      if (currentLevel.rewards.cards) {
-        LEVEL_PROGRESS.persistentRewards.cards.push(...currentLevel.rewards.cards);
+      // Initialize rewardIds array if it doesn't exist
+      if (!LEVEL_PROGRESS.persistentRewards.rewardIds) {
+        LEVEL_PROGRESS.persistentRewards.rewardIds = [];
+      }
+      
+      // Add reward IDs
+      if (currentLevel.rewards.rewardIds) {
+        LEVEL_PROGRESS.persistentRewards.rewardIds.push(...currentLevel.rewards.rewardIds);
       }
       
       // Add resource rewards
       if (currentLevel.rewards.resources) {
+        if (!LEVEL_PROGRESS.persistentRewards.resourceBonuses) {
+          LEVEL_PROGRESS.persistentRewards.resourceBonuses = {};
+        }
+        
         for (const [resource, amount] of Object.entries(currentLevel.rewards.resources)) {
           LEVEL_PROGRESS.persistentRewards.resourceBonuses[resource] = 
             (LEVEL_PROGRESS.persistentRewards.resourceBonuses[resource] || 0) + amount;
@@ -213,9 +250,9 @@ export function getCurrentTurnLimit() {
   return currentLevel.turnLimit;
 }
 
-// Helper function to check if a specific card is part of persistent rewards
-export function isCardPersistentlyUnlocked(cardId) {
-  return LEVEL_PROGRESS.persistentRewards.cards.includes(cardId);
+// Helper function to check if a specific reward ID is part of persistent rewards
+export function isRewardPersistentlyUnlocked(rewardId) {
+  return LEVEL_PROGRESS.persistentRewards.rewardIds.includes(rewardId);
 }
 
 // Save level progress to localStorage
