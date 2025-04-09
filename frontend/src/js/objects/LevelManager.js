@@ -42,19 +42,11 @@ class LevelManager {
   }
 
   // Helper function to advance to the next level
-  advanceToNextLevel(rewardsManager = null) {
+  advanceToNextLevel() {
     const currentLevel = this.getCurrentLevel();
     if (currentLevel && currentLevel.nextLevelId) {
       // Mark current level as completed
       this.LEVEL_PROGRESS.completedLevels[currentLevel.id] = true;
-      
-      // Add rewards to persistent rewards - now delegated to RewardsManager if available
-      if (currentLevel.rewards) {
-        if (rewardsManager) {
-          // Use RewardsManager to add and manage the rewards
-          rewardsManager.addLevelRewards(currentLevel.rewards);
-        }
-      }
       
       // Unlock and set next level as current
       this.LEVEL_PROGRESS.unlockedLevels.push(currentLevel.nextLevelId);
@@ -63,6 +55,29 @@ class LevelManager {
       return true;
     }
     return false;
+  }
+  
+  // Get the available rewards for the most recently completed level
+  getAvailableRewards() {
+    // Find the most recently completed level
+    const completedLevelIds = Object.keys(this.LEVEL_PROGRESS.completedLevels);
+    if (completedLevelIds.length === 0) {
+      return null;
+    }
+    
+    // Get the level that was completed just before the current level
+    const previousLevelId = completedLevelIds.find(levelId => {
+      const level = GAME_LEVELS.find(l => l.id === levelId);
+      return level && level.nextLevelId === this.LEVEL_PROGRESS.currentLevelId;
+    });
+    
+    if (!previousLevelId) {
+      return null;
+    }
+    
+    // Return the rewards from that level
+    const previousLevel = GAME_LEVELS.find(level => level.id === previousLevelId);
+    return previousLevel ? previousLevel.rewards : null;
   }
 
   // Helper function to get starting resources with persistent bonuses applied

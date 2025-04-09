@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES, VICTORY_GOAL } from '../config/game-data';
+import levelManager from '../objects/LevelManager';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -1118,100 +1119,97 @@ export default class UIScene extends Phaser.Scene {
         });
     }
     
-    // Show victory screen when player reaches reputation goal
+    // Show victory screen
     showVictory(reputation, goal) {
-        // Clear existing UI
-        this.handContainer.removeAll(true);
-        
-        // Create victory panel
+        // Create panel
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Use nine-slice for the victory panel background with blue tint
-        const panelWidth = 400;
-        const panelHeight = 300;
-        const panelX = width / 2;
-        const panelY = height / 2;
+        // Create panel that covers most of the screen (80% of width, 60% of height)
+        const panelWidth = 800;
+        const panelHeight = 600;
+        const panelX = (width - panelWidth) / 2;
+        const panelY = (height - panelHeight) / 2;
         
-        // Create the victory panel background with nine-slice
+        // Create victory panel with glass and screw texture
         const panel = this.add.nineslice(
-            panelX, panelY,                     // position
-            'victoryPanelBackground',           // texture key
-            null,                               // frame (null for default)
-            panelWidth, panelHeight,            // size
-            15, 15, 15, 15                      // slice sizes: left, right, top, bottom
+            panelX + panelWidth/2, panelY + panelHeight/2, // center position
+            'panelGlassScrews',                            // texture key
+            null,                                          // frame (null for default)
+            panelWidth, panelHeight,                       // size
+            30, 30, 30, 30                                 // slice sizes: left, right, top, bottom
         );
+        panel.setOrigin(0.5);
+        panel.setTint(0x3388dd); // Blue tint for victory
         
-        // Apply blue tint
-        panel.setTint(0x0055aa);
+        // Create a container to group all victory elements
+        const victoryContainer = this.add.container(0, 0);
+        victoryContainer.name = 'victoryContainer';
         
-        // Title
-        this.add.text(
+        // Title with glow effect
+        const titleText = this.add.text(
             width / 2, 
-            height / 2 - 120, 
+            panelY + 100, 
             'VICTORY!', 
-            { fontSize: '36px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+            { fontSize: '64px', fontFamily: 'Arial', color: '#ffdd00', align: 'center' }
         ).setOrigin(0.5);
         
-        // Score info
-        this.add.text(
+        // Add glow effect to the title
+        titleText.setStroke('#ff8800', 4);
+        titleText.setShadow(0, 0, '#ff8800', 20, true);
+        
+        victoryContainer.add(titleText);
+        
+        // Reputation achievement
+        victoryContainer.add(this.add.text(
             width / 2, 
-            height / 2 - 50, 
-            `You've reached the reputation goal!`, 
-            { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
+            panelY + 200, 
+            `You reached ${reputation} reputation points!`, 
+            { fontSize: '24px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
+        ).setOrigin(0.5));
         
-        this.add.text(
+        // Goal description
+        victoryContainer.add(this.add.text(
             width / 2, 
-            height / 2 - 10, 
-            `Reputation: ${reputation}/${goal}`, 
-            { fontSize: '24px', fontFamily: 'Arial', color: '#ffff00', align: 'center' }
-        ).setOrigin(0.5);
+            panelY + 240, 
+            `(required: ${goal})`, 
+            { fontSize: '18px', fontFamily: 'Arial', color: '#aaddff', align: 'center' }
+        ).setOrigin(0.5));
         
-        this.add.text(
+        // Victory description
+        const victoryText = "Your Mars colony is thriving! Your leadership skills have " +
+                           "impressed the United Earth Government, and more resources " +
+                           "will be provided for your next mission.";
+        
+        victoryContainer.add(this.add.text(
             width / 2, 
-            height / 2 + 40, 
-            'Your Mars colony is thriving!', 
-            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
+            panelY + 300, 
+            victoryText, 
+            { 
+                fontSize: '18px', 
+                fontFamily: 'Arial', 
+                color: '#ffffff', 
+                align: 'center',
+                wordWrap: { width: panelWidth - 100 }
+            }
+        ).setOrigin(0.5));
         
-        // Rewards button
-        const rewardsButton = this.add.container(width / 2, height / 2 + 100);
-        
-        // Use nine-slice for the button with blueGlossSquareButton texture
-        const buttonWidth = 150;
-        const buttonHeight = 40;
-        const buttonBg = this.add.nineslice(
-            0,0,
-            'blueGlossSquareButton',              // texture key
-            null,                                 // frame (null for default)
-            buttonWidth, buttonHeight,            // size
-            10, 10, 10, 10                        // slice sizes: left, right, top, bottom
+        // Show button to see available rewards
+        const rewardsButton = this.createActionButton(
+            'VIEW REWARDS',
+            () => {
+                // Hide victory screen and show rewards
+                victoryContainer.setVisible(false);
+                panel.setVisible(false);
+                this.showRewards();
+            },
+            0x228833, // Green color for positive action
+            200, // Wider button
+            40  // Taller button
         );
         
-        const buttonText = this.add.text(
-            0, 
-            0, 
-            'REWARDS', 
-            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
-        
-        rewardsButton.add(buttonBg);
-        rewardsButton.add(buttonText);
-        
-        rewardsButton.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
-        
-        rewardsButton.on('pointerdown', () => {
-            this.showRewards();
-        });
-        
-        rewardsButton.on('pointerover', () => {
-            buttonBg.setTint(0xaaccff); // Light blue tint for hover
-        });
-        
-        rewardsButton.on('pointerout', () => {
-            buttonBg.clearTint(); // Clear tint on pointer out
-        });
+        rewardsButton.setPosition(width / 2, panelY + 380);
+        victoryContainer.add(rewardsButton);
     }
     
     // Show rewards panel with selectable rewards
@@ -1269,12 +1267,12 @@ export default class UIScene extends Phaser.Scene {
         // Calculate starting X position to center all slots
         const startX = (width - totalSlotsWidth) / 2;
         
-        // Get the reward IDs from the current level configuration
-        const gameScene = this.scene.get('GameScene');
+        // Get the reward IDs from the level manager's available rewards
+        const availableRewards = levelManager.getAvailableRewards();
         let rewardIds = [];
         
-        if (gameScene && gameScene.currentLevel && gameScene.currentLevel.rewards) {
-            rewardIds = gameScene.currentLevel.rewards.rewardIds || [];
+        if (availableRewards && availableRewards.rewardIds) {
+            rewardIds = availableRewards.rewardIds || [];
         }
         
         // Get the requested rewards from the RewardsManager
