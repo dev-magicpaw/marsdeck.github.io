@@ -571,28 +571,21 @@ export default class UIScene extends Phaser.Scene {
         
         // Card background using NineSlice for better UI scaling
         let cardBg;
-        const textureKey = card.type === 'building' ? 'cardBackground' : 'cardTemplate';
+        let textureKey = card.cardType.cardType === 'prefab' ? 'cardPrefabBackground' : 'cardBackground';
         
-        if (card.type === 'building') {
-            // Use NineSlice for building cards with adjusted slice sizes
-            // Top slice is larger (35px) to account for the header area
-            // Bottom slice is 15px for the rounded corner
-            // Left and right are 10px for the rounded corners
-            cardBg = this.add.nineslice(
-                0, 0,               // position
-                textureKey,         // texture key
-                null,               // frame (null for default)
-                this.cardWidth, this.cardHeight, // size
-                10, 10, 35, 15      // slice sizes: left, right, top, bottom
-            );
-            cardBg.setOrigin(0, 0);
-        } else {
-            // Use regular sprite for other card types
-            cardBg = this.add.sprite(0, 0, textureKey);
-            cardBg.setDisplaySize(this.cardWidth, this.cardHeight);
-            cardBg.setOrigin(0, 0);
-        }
-        
+        // Use NineSlice for building cards with adjusted slice sizes
+        // Top slice is larger (35px) to account for the header area
+        // Bottom slice is 15px for the rounded corner
+        // Left and right are 10px for the rounded corners
+        cardBg = this.add.nineslice(
+            0, 0,               // position
+            textureKey,         // texture key
+            null,               // frame (null for default)
+            this.cardWidth, this.cardHeight, // size
+            10, 10, 35, 15      // slice sizes: left, right, top, bottom
+        );
+        cardBg.setOrigin(0, 0);
+
         // Add highlight for selected card
         if (index === this.selectedCardIndex) {
             const highlight = this.add.rectangle(0, 0, this.cardWidth, this.cardHeight, 0xffff00, 0.3);
@@ -1605,10 +1598,10 @@ export default class UIScene extends Phaser.Scene {
             // Card background using NineSlice for better UI scaling
             let cardBg;
             
-            // Use NineSlice for better scaling with adjusted slice sizes
+            let textureKey = card.cardType && card.cardType.cardType === 'prefab' ? 'cardPrefabBackground' : 'cardBackground';
             cardBg = this.add.nineslice(
                 0, 0,                // position
-                'cardBackground',    // texture key
+                textureKey,          // texture key
                 null,                // frame (null for default)
                 this.cardWidth, this.cardHeight, // size
                 10, 10, 35, 15       // slice sizes: left, right, top, bottom
