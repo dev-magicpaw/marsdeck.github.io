@@ -1194,7 +1194,10 @@ export default class UIScene extends Phaser.Scene {
             }
         ).setOrigin(0.5));
         
-        // Show button to see available rewards
+        const rewardButtonWidth = 200;
+        const rewardButtonHeight = 40;
+        const rewardButtonX = width / 2 - rewardButtonWidth / 2;
+        const rewardButtonY = panelY + 380;
         const rewardsButton = this.createActionButton(
             'VIEW REWARDS',
             () => {
@@ -1204,11 +1207,11 @@ export default class UIScene extends Phaser.Scene {
                 this.showRewards();
             },
             0x228833, // Green color for positive action
-            200, // Wider button
-            40  // Taller button
+            rewardButtonWidth,
+            rewardButtonHeight
         );
         
-        rewardsButton.setPosition(width / 2, panelY + 380);
+        rewardsButton.setPosition(rewardButtonX, rewardButtonY);
         victoryContainer.add(rewardsButton);
     }
     
