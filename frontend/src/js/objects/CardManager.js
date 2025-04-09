@@ -1,5 +1,4 @@
 import { BUILDINGS, CARD_TYPES, DECK_COMPOSITION, MAX_CARD_SLOTS, REWARDS, STARTING_HAND } from '../config/game-data';
-import levelManager from './LevelManager';
 
 export default class CardManager {
     constructor(scene) {
@@ -30,36 +29,11 @@ export default class CardManager {
             });
         }
         
-        // Process persistent rewards from level progression
-        this.processLevelProgressionRewards();
-        
         // If the deck is empty (e.g., if DECK_COMPOSITION is invalid),
         // fall back to the default deck creation logic
         if (this.deck.length === 0) {
             console.warn('Deck composition is empty or invalid. Using default deck.');
             this.createDefaultDeck();
-        }
-    }
-    
-    // Process rewards from level progression
-    processLevelProgressionRewards() {
-        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds && levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.length > 0) {
-            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
-                // Find the reward in all reward categories
-                let reward = this.findRewardById(rewardId);
-                
-                if (!reward) {
-                    console.warn(`Reward ${rewardId} not found in REWARDS configuration.`);
-                    return;
-                }
-                
-                if (reward.applicationType == 'deckCards') {
-                    if (reward.effect && reward.effect.cardId) {
-                        const count = reward.effect.count || 1;
-                        this.addCardToDeck(reward.effect.cardId, count);
-                    }
-                }
-            });
         }
     }
     
@@ -183,23 +157,12 @@ export default class CardManager {
             });
         }
         
-        // 3. Process persistent rewards from level progression for starting hand
-        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds) {
-            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
-                const reward = this.findRewardById(rewardId);
-                
-                if (reward && reward.applicationType === 'startingHand' && reward.effect && reward.effect.cardId) {
-                    this.addCardToStartingCards(reward.effect.cardId, startingCards);
-                }
-            });
-        }
-        
         // Add the starting cards to hand
         startingCards.forEach(card => {
             this.hand.push(card);
         });
         
-        // 4. Draw remaining random cards to complete starting hand
+        // 3. Draw remaining random cards to complete starting hand
         this.drawCards(startingHandSize - startingCards.length);
     }
     

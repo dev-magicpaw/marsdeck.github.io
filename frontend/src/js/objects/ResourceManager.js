@@ -5,7 +5,7 @@ export default class ResourceManager {
     constructor(scene) {
         this.scene = scene;
         // Get level-specific starting resources or fall back to default
-        const levelResources = levelManager.getStartingResourcesForCurrentLevel();
+        const levelResources = levelManager.getStartingResourcesForCurrentLevel(scene.rewardsManager);
         this.resources = levelResources || { ...STARTING_RESOURCES };
         
         // Resources that don't accumulate between turns (e.g., energy)

@@ -23,28 +23,88 @@ export default class RewardsManager {
             
             // Categorize each reward into the appropriate list based on its application type
             persistentRewardIds.forEach(rewardId => {
-                const reward = this.findRewardById(rewardId);
-                if (reward && reward.applicationType) {
-                    switch (reward.applicationType) {
-                        case 'startingHand':
-                            if (!this.unlockedRewards.startingHand.includes(rewardId)) {
-                                this.unlockedRewards.startingHand.push(rewardId);
-                            }
-                            break;
-                        case 'deckCards':
-                            if (!this.unlockedRewards.deckCards.includes(rewardId)) {
-                                this.unlockedRewards.deckCards.push(rewardId);
-                            }
-                            break;
-                        case 'buildingUpgrade':
-                            if (!this.unlockedRewards.buildingUpgrade.includes(rewardId)) {
-                                this.unlockedRewards.buildingUpgrade.push(rewardId);
-                            }
-                            break;
-                    }
-                }
+                this.addRewardById(rewardId);
+            });
+            
+            // Load resource bonuses
+            if (levelManager.LEVEL_PROGRESS.persistentRewards.resourceBonuses) {
+                this.resourceBonuses = { ...levelManager.LEVEL_PROGRESS.persistentRewards.resourceBonuses };
+            }
+        }
+    }
+    
+    // Add a reward by its ID - categorize it and add to the appropriate list
+    addRewardById(rewardId) {
+        const reward = this.findRewardById(rewardId);
+        if (!reward) {
+            console.warn(`Reward ${rewardId} not found in rewards configuration`);
+            return false;
+        }
+        
+        // Check if already unlocked
+        if (this.isRewardUnlocked(rewardId)) {
+            console.log(`Reward ${rewardId} is already unlocked`);
+            return false;
+        }
+        
+        // Add to appropriate unlocked rewards list based on application type
+        if (reward.applicationType) {
+            switch (reward.applicationType) {
+                case 'startingHand':
+                    this.unlockedRewards.startingHand.push(rewardId);
+                    break;
+                case 'deckCards':
+                    this.unlockedRewards.deckCards.push(rewardId);
+                    break;
+                case 'buildingUpgrade':
+                    this.unlockedRewards.buildingUpgrade.push(rewardId);
+                    break;
+                default:
+                    console.error(`Unknown application type: ${reward.applicationType}`);
+                    return false;
+            }
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Save all rewards to the level manager's persistent rewards
+    saveRewardsToLevelManager() {
+        if (!levelManager.LEVEL_PROGRESS.persistentRewards) {
+            levelManager.LEVEL_PROGRESS.persistentRewards = {
+                rewardIds: [],
+                resourceBonuses: {}
+            };
+        }
+        
+        // Create a flat list of all reward IDs
+        const allRewardIds = [
+            ...this.unlockedRewards.startingHand,
+            ...this.unlockedRewards.deckCards,
+            ...this.unlockedRewards.buildingUpgrade
+        ];
+        
+        // Update the level manager's persistent rewards
+        levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds = [...allRewardIds];
+        
+        // Save the level progress to persist the changes
+        levelManager.saveLevelProgress();
+    }
+    
+    // Add rewards from level completion
+    addLevelRewards(levelRewards) {
+        if (!levelRewards) return;
+        
+        // Add reward IDs
+        if (levelRewards.rewardIds && levelRewards.rewardIds.length > 0) {
+            levelRewards.rewardIds.forEach(rewardId => {
+                this.addRewardById(rewardId);
             });
         }
+        
+        // Save the updated rewards to level manager
+        this.saveRewardsToLevelManager();
     }
     
     // Get all available rewards grouped by type
@@ -110,26 +170,17 @@ export default class RewardsManager {
         // Spend reputation points
         this.scene.resourceManager.spendResource(RESOURCES.REPUTATION, reward.reputationCost);
         
-        // TODO: add all unlocked rewards to a single list.
-        //   When needed, use reward application type to understand what to do with the reward.
         // Add to appropriate unlocked rewards list
-        switch (reward.applicationType) {
-            case 'startingHand':
-                this.unlockedRewards.startingHand.push(rewardId);
-                break;
-            case 'deckCards':
-                this.unlockedRewards.deckCards.push(rewardId);
-                break;
-            case 'buildingUpgrade':
-                this.unlockedRewards.buildingUpgrade.push(rewardId);
-                break;
-            default:
-                console.error(`Unknown application type: ${reward.applicationType}`);
-                return false;
+        const added = this.addRewardById(rewardId);
+        
+        if (added) {
+            // Save to level manager's persistent rewards
+            this.saveRewardsToLevelManager();
+            console.log(`Unlocked reward: ${reward.name}`);
+            return true;
         }
         
-        console.log(`Unlocked reward: ${reward.name}`);
-        return true;
+        return false;
     }
     
     // Get additional starting hand cards from unlocked rewards
