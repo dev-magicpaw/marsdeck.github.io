@@ -856,33 +856,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Apply building upgrades from level progression rewards
     applyBuildingUpgrades(buildingId, productionValues) {
-        // First, apply upgrades from the rewards manager if it exists
+        // Apply upgrades from the rewards manager if it exists
         if (this.rewardsManager) {
             productionValues = this.rewardsManager.applyBuildingUpgrades(buildingId, productionValues);
-        }
-        
-        // Then apply upgrades from level progression rewards
-        if (levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds) {
-            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.forEach(rewardId => {
-                // Find the reward in the CardManager
-                const reward = this.cardManager.findRewardById(rewardId);
-                
-                if (reward && 
-                    reward.applicationType === 'buildingUpgrade' && 
-                    reward.effect && 
-                    reward.effect.buildingId === buildingId && 
-                    reward.effect.resourceBonus) {
-                    
-                    // Apply resource bonuses to production
-                    for (const [resourceType, bonus] of Object.entries(reward.effect.resourceBonus)) {
-                        if (productionValues[resourceType]) {
-                            productionValues[resourceType] += bonus;
-                        } else {
-                            productionValues[resourceType] = bonus;
-                        }
-                    }
-                }
-            });
         }
         
         return productionValues;
@@ -920,7 +896,7 @@ export default class GameScene extends Phaser.Scene {
         const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
         
         // Advance to next level and save progress
-        levelManager.advanceToNextLevel();
+        levelManager.advanceToNextLevel(this.rewardsManager);
         levelManager.saveLevelProgress();
         
         // Stop game input

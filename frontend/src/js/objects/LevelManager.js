@@ -42,34 +42,17 @@ class LevelManager {
   }
 
   // Helper function to advance to the next level
-  advanceToNextLevel() {
+  advanceToNextLevel(rewardsManager = null) {
     const currentLevel = this.getCurrentLevel();
     if (currentLevel && currentLevel.nextLevelId) {
       // Mark current level as completed
       this.LEVEL_PROGRESS.completedLevels[currentLevel.id] = true;
       
-      // Add rewards to persistent rewards
+      // Add rewards to persistent rewards - now delegated to RewardsManager if available
       if (currentLevel.rewards) {
-        // Initialize rewardIds array if it doesn't exist
-        if (!this.LEVEL_PROGRESS.persistentRewards.rewardIds) {
-          this.LEVEL_PROGRESS.persistentRewards.rewardIds = [];
-        }
-        
-        // Add reward IDs
-        if (currentLevel.rewards.rewardIds) {
-          this.LEVEL_PROGRESS.persistentRewards.rewardIds.push(...currentLevel.rewards.rewardIds);
-        }
-        
-        // Add resource rewards
-        if (currentLevel.rewards.resources) {
-          if (!this.LEVEL_PROGRESS.persistentRewards.resourceBonuses) {
-            this.LEVEL_PROGRESS.persistentRewards.resourceBonuses = {};
-          }
-          
-          for (const [resource, amount] of Object.entries(currentLevel.rewards.resources)) {
-            this.LEVEL_PROGRESS.persistentRewards.resourceBonuses[resource] = 
-              (this.LEVEL_PROGRESS.persistentRewards.resourceBonuses[resource] || 0) + amount;
-          }
+        if (rewardsManager) {
+          // Use RewardsManager to add and manage the rewards
+          rewardsManager.addLevelRewards(currentLevel.rewards);
         }
       }
       
@@ -88,14 +71,6 @@ class LevelManager {
     if (!currentLevel) return null;
     
     const startingResources = {...currentLevel.startingResources};
-    
-    // Apply persistent resource bonuses
-    for (const [resource, bonus] of Object.entries(this.LEVEL_PROGRESS.persistentRewards.resourceBonuses)) {
-      if (startingResources[resource] !== undefined) {
-        startingResources[resource] += bonus;
-      }
-    }
-    
     return startingResources;
   }
 
