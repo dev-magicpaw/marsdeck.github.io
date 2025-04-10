@@ -340,6 +340,22 @@ export const CARD_TYPES = {
         },
         specialEffects: []
     },
+    // Event cards
+    SCRAP_DRONES_EVENT: {
+        id: 'scrapDronesEvent',
+        name: 'Scrap Drones',
+        description: 'Convert scrap metal into 5 drones',
+        cardType: 'event',
+        cardTexture: null, // Optional texture
+        cost: {
+            [RESOURCES.IRON]: 1
+        },
+        effect: {
+            type: 'addResource',
+            resource: RESOURCES.DRONES,
+            amount: 5
+        }
+    }
 };
 
 // Deck composition - defines how many copies of each card type will be in the deck
@@ -353,7 +369,9 @@ export const DECK_COMPOSITION = {
     'fuelRefineryCard': 3,
     'windTurbineCard': 4,
     'solarPanelCard': 4,
-    'launchPadCard': 1
+    'launchPadCard': 1,
+    // Event cards
+    'scrapDronesEvent': 5
 };
 
 // Starting hand configuration - specific cards to always include in starting hand
