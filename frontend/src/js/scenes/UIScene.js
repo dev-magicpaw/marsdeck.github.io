@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CARD_TYPES, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES, VICTORY_GOAL } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
 import levelManager from '../objects/LevelManager';
 
 export default class UIScene extends Phaser.Scene {
@@ -419,11 +419,14 @@ export default class UIScene extends Phaser.Scene {
         const margin = 20;
         const panelX = width - panelWidth;
         
+        // Get the current level's reputation goal
+        const reputationGoal = levelManager.getCurrentVictoryGoal();
+        
         // Create reputation display with goal
         const reputationText = this.add.text(
             panelX + margin, 
             height - panelHeight/2, 
-            `Reputation: 0/${VICTORY_GOAL}`, 
+            `Reputation: 0/${reputationGoal}`, 
             { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff' }
         );
         reputationText.setOrigin(0, 0.5);
@@ -526,7 +529,9 @@ export default class UIScene extends Phaser.Scene {
             
             // Special formatting for reputation to show the goal
             if (resourceType === RESOURCES.REPUTATION) {
-                this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}/${VICTORY_GOAL}`);
+                // Get current level's reputation goal
+                const reputationGoal = levelManager.getCurrentVictoryGoal();
+                this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}/${reputationGoal}`);
             } else {
                 this.resourceTexts[resourceType].setText(`${label}: ${resources[resourceType]}`);
             }

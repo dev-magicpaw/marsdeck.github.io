@@ -865,7 +865,7 @@ export default class GameScene extends Phaser.Scene {
     }
     
     gameOver() {
-        const reputation = resources[RESOURCES.REPUTATION];
+        const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
                 
         // Show game over screen in UI
         if (this.uiScene) {
