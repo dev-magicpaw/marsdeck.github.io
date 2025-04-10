@@ -635,26 +635,6 @@ export default class UIScene extends Phaser.Scene {
             icon.setDisplaySize(40, 40);
             icon.setOrigin(0.5);
             cardContainer.add(icon);
-        } else if (card.type === 'event') {
-            // For event cards, display a description text
-            const descriptionText = this.add.text(
-                this.cardWidth / 2,
-                45,
-                card.cardType.description,
-                { fontSize: '10px', fontFamily: 'Arial', color: '#000000', align: 'center', wordWrap: { width: this.cardWidth - 20 } }
-            );
-            descriptionText.setOrigin(0.5, 0.5);
-            cardContainer.add(descriptionText);
-            
-            // Add an "EVENT" label
-            const eventLabel = this.add.text(
-                this.cardWidth / 2,
-                70,
-                "EVENT",
-                { fontSize: '11px', fontFamily: 'Arial', color: '#005500', align: 'center', fontStyle: 'bold' }
-            );
-            eventLabel.setOrigin(0.5, 0.5);
-            cardContainer.add(eventLabel);
         }
         
         // Show costs from card type if available
@@ -849,14 +829,8 @@ export default class UIScene extends Phaser.Scene {
                         const hasEnough = available >= required;
                         
                         // Format resource names with proper capitalization
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        
-                        // Add color coding for resources we don't have enough of
-                        if (hasEnough) {
-                            content += `${resourceName}: ${required}\n`;
-                        } else {
-                            content += `${resourceName}: ${required} (have ${available})\n`;
-                        }
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);                        
+                        content += `${resourceName}: ${required}\n`;
                     }
                 }
                 
