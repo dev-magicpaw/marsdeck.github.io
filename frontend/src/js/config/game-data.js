@@ -346,7 +346,7 @@ export const CARD_TYPES = {
         name: 'Scrap Drones',
         description: 'Convert scrap metal into 5 drones',
         cardType: 'event',
-        cardTexture: null, // Optional texture
+        cardTexture: 'droneIcon',
         cost: {
             [RESOURCES.IRON]: 1
         },
