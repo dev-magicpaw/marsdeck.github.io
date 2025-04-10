@@ -22,7 +22,7 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.IRON_MINE_PREFAB_STARTING_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id,
+        REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id,
         REWARDS.BUILDING_UPGRADE_REWARDS.IMPROVED_WIND_TURBINE.id
       ],
       resources: {
@@ -77,7 +77,7 @@ export const GAME_LEVELS = [
     },
     rewards: {
       rewardIds: [
-        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id
+        REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id
       ],
       resources: {
         // Don't add any resources for this level
@@ -132,7 +132,7 @@ export const GAME_LEVELS = [
     },
     rewards: {
       rewardIds: [
-        REWARDS.DECK_CARDS_REWARDS.EXTRA_LAUNCH_PAD.id,
+        REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id,
         REWARDS.DECK_CARDS_REWARDS.EXTRA_FUEL_REFINERIES.id
       ],
       resources: {
