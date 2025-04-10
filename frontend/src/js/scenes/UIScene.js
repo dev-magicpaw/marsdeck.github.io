@@ -861,8 +861,8 @@ export default class UIScene extends Phaser.Scene {
                 }
                 
                 // Add building-specific info
-                let additionalText = "\nBuilding info:\n";
-                additionalText += building.description + "\n\n";
+                let additionalText = "\n";
+                // additionalText += building.description + "\n\n";
                 
                 // Special info for Launch Pad
                 if (building.id === 'launchPad') {
@@ -905,10 +905,6 @@ export default class UIScene extends Phaser.Scene {
                     const hasProductionResources = Object.keys(building.production).some(
                         resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
                     );
-                    
-                    if (hasProductionResources) {
-                        additionalText += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
-                    }
                 }
                 
                 // Consumption
