@@ -336,7 +336,6 @@ export const CARD_TYPES = {
         buildingId: 'ironMine',
         cardType: 'prefab',
         cost: {
-            [RESOURCES.DRONES]: 2,
             [RESOURCES.ENERGY]: 1
         },
         specialEffects: []
