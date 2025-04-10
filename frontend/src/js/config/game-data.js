@@ -244,7 +244,7 @@ export const CARD_TYPES = {
         buildingId: 'steelworks',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 2,
+            [RESOURCES.CONCRETE]: 3,
             [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 3
@@ -323,8 +323,8 @@ export const CARD_TYPES = {
         buildingId: 'launchPad',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 4,
-            [RESOURCES.STEEL]: 3,
+            [RESOURCES.CONCRETE]: 5,
+            [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1
         },
         specialEffects: []
