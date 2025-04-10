@@ -370,8 +370,6 @@ export const DECK_COMPOSITION = {
     'windTurbineCard': 4,
     'solarPanelCard': 4,
     'launchPadCard': 1,
-    // Event cards
-    'scrapDronesEvent': 5
 };
 
 // Starting hand configuration - specific cards to always include in starting hand
@@ -412,16 +410,16 @@ export const REWARDS = {
     
     // Deck cards rewards - add cards to the player's deck
     DECK_CARDS_REWARDS: {
-        EXTRA_LAUNCH_PAD: {
-            id: 'extraLaunchPadReward',
-            name: 'Extra Launch Pad',
-            description: 'Add one Launch Pad card to your deck',
-            image: 'launchPad',
+        DRONE_EVENT_DECK_REWARD: {
+            id: 'droneEventDeckReward',
+            name: 'Drone Event',
+            description: 'Add two Drone Event cards to your deck',
+            image: 'droneIcon',
             applicationType: 'deckCards',
             reputationCost: 10,
             effect: {
-                cardId: 'launchPadCard',
-                count: 1
+                cardId: 'scrapDronesEvent',
+                count: 2
             }
         },
         EXTRA_FUEL_REFINERIES: {
