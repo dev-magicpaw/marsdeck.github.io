@@ -1266,9 +1266,11 @@ export default class UIScene extends Phaser.Scene {
             if (rewardCardId) {
                 // Find the card type directly from CARD_TYPES
                 const rewardCard = Object.values(CARD_TYPES).find(ct => ct.id === rewardCardId);
-                // Check if it's a prefab
-                if (rewardCard.cardType === 'prefab') {
+                // Check if it's a prefab or event
+                if (rewardCard && rewardCard.cardType === 'prefab') {
                     textureKey = 'cardPrefabBackground';
+                } else if (rewardCard && rewardCard.cardType === 'event') {
+                    textureKey = 'cardEventBackground';
                 }
             }
             
