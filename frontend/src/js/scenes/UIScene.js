@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES, VICTORY_GOAL } from '../config/game-data';
+import { BUILDINGS, CARD_TYPES, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES, VICTORY_GOAL } from '../config/game-data';
 import levelManager from '../objects/LevelManager';
 
 export default class UIScene extends Phaser.Scene {
@@ -1316,17 +1316,14 @@ export default class UIScene extends Phaser.Scene {
             // Determine background texture based on card type
             let textureKey = 'cardBackground';
             
-            console.log("HI");
-            console.log(reward);
-            console.log(reward.effect);
-            console.log(reward.effect());
-            // Get the card ID from the reward if available
-            if (reward.effect && reward.effect.cardId) {
+            // Get the card ID from the original reward object obtained from RewardsManager
+            const originalReward = this.rewardsManager.findRewardById(reward.id);
+            const rewardCardId = originalReward.effect.cardId;
+            if (rewardCardId) {
                 // Find the card type directly from CARD_TYPES
-                const rewardCard = Object.values(CARD_TYPES).find(ct => ct.id === reward.effect.cardId);
-                console.log(rewardCard);
+                const rewardCard = Object.values(CARD_TYPES).find(ct => ct.id === rewardCardId);
                 // Check if it's a prefab
-                if (rewardCard && rewardCard.cardType.cardType === 'prefab') {
+                if (rewardCard.cardType === 'prefab') {
                     textureKey = 'cardPrefabBackground';
                 }
             }
