@@ -219,7 +219,7 @@ export const CARD_TYPES = {
         cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 1,
         },
         specialEffects: [] // For future expansion
@@ -232,7 +232,6 @@ export const CARD_TYPES = {
         cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 2,
-            [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 2,
             [RESOURCES.ENERGY]: 1
         },
@@ -259,7 +258,6 @@ export const CARD_TYPES = {
         buildingId: 'concreteMixer',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 1,
             [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 3,
             [RESOURCES.ENERGY]: 1
@@ -273,7 +271,7 @@ export const CARD_TYPES = {
         buildingId: 'waterPump',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 1,
+            [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 1
@@ -288,7 +286,6 @@ export const CARD_TYPES = {
         cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 3,
-            [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 2
         },
