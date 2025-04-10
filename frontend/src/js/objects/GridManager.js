@@ -154,6 +154,12 @@ export default class GridManager {
         return adjacentCells;
     }
     
+    // Check if a cell is adjacent to a specific building type
+    isAdjacentToBuildingType(x, y, buildingType) {
+        const adjacentCells = this.getAdjacentCells(x, y);
+        return adjacentCells.some(cell => cell.building === buildingType);
+    }
+    
     // Place a building on a cell
     placeBuilding(x, y, building) {
         if (!this.canPlaceBuilding(x, y, building)) {

@@ -738,7 +738,7 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Production - apply building upgrades
                 if (Object.keys(building.production).length > 0) {
-                    const upgradedProduction = gameScene.applyBuildingUpgrades(building.id, {...building.production});
+                    const upgradedProduction = gameScene.applyBuildingUpgrades(building.id, {...building.production}, cell.x, cell.y);
                     
                     content += "Production:\n";
                     for (const resource in upgradedProduction) {
@@ -749,7 +749,24 @@ export default class UIScene extends Phaser.Scene {
                         // Show upgraded value with base value in parentheses if different
                         const valueDiff = upgradedValue - baseValue;
                         if (valueDiff > 0) {
-                            content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                            // Check specifically for drone depo bonus
+                            const isDroneDepoBonus = gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'droneDepo') && 
+                                                     resource !== RESOURCES.ENERGY && 
+                                                     resource !== RESOURCES.DRONES;
+                            
+                            if (isDroneDepoBonus) {
+                                // Show combined bonus (upgrades + drone depo)
+                                content += `${resourceName}: +${upgradedValue} (`;
+                                // If there are other upgrades besides drone depo
+                                if (valueDiff > 1) {
+                                    content += `upgrade: +${valueDiff-1}, drone depo: +1`;
+                                } else {
+                                    content += `drone depo: +1`;
+                                }
+                                content += `)\n`;
+                            } else {
+                                content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                            }
                         } else {
                             content += `${resourceName}: +${baseValue}\n`;
                         }
@@ -887,6 +904,8 @@ export default class UIScene extends Phaser.Scene {
                         // Only try to get upgraded values if gameScene is available
                         if (this.scene.manager.getScene('GameScene')) {
                             const gameScene = this.scene.manager.getScene('GameScene');
+                            // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
+                            // But we can still apply other upgrades
                             upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
                         }
                         
@@ -903,6 +922,15 @@ export default class UIScene extends Phaser.Scene {
                             } else {
                                 additionalText += `${resourceName}: +${baseValue}\n`;
                             }
+                        }
+                        
+                        // Add note about drone depo bonus if this is a production building
+                        const hasProductionResources = Object.keys(card.building.production).some(
+                            resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
+                        );
+                        
+                        if (hasProductionResources) {
+                            additionalText += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
                         }
                     }
                     
@@ -948,6 +976,8 @@ export default class UIScene extends Phaser.Scene {
                         // Only try to get upgraded values if gameScene is available
                         if (this.scene.manager.getScene('GameScene')) {
                             const gameScene = this.scene.manager.getScene('GameScene');
+                            // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
+                            // But we can still apply other upgrades
                             upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
                         }
                         
@@ -964,6 +994,15 @@ export default class UIScene extends Phaser.Scene {
                             } else {
                                 content += `${resourceName}: +${baseValue}\n`;
                             }
+                        }
+                        
+                        // Add note about drone depo bonus if this is a production building
+                        const hasProductionResources = Object.keys(card.building.production).some(
+                            resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
+                        );
+                        
+                        if (hasProductionResources) {
+                            content += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
                         }
                     }
                     
