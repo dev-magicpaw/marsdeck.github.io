@@ -1313,15 +1313,33 @@ export default class UIScene extends Phaser.Scene {
         rewards.forEach((reward, index) => {
             const slotX = startX + (index * (slotWidth + slotSpacing));
             
+            // Determine background texture based on card type
+            let textureKey = 'cardBackground';
+            
+            console.log("HI");
+            console.log(reward);
+            console.log(reward.effect);
+            console.log(reward.effect());
+            // Get the card ID from the reward if available
+            if (reward.effect && reward.effect.cardId) {
+                // Find the card type directly from CARD_TYPES
+                const rewardCard = Object.values(CARD_TYPES).find(ct => ct.id === reward.effect.cardId);
+                console.log(rewardCard);
+                // Check if it's a prefab
+                if (rewardCard && rewardCard.cardType.cardType === 'prefab') {
+                    textureKey = 'cardPrefabBackground';
+                }
+            }
+            
             // Slot background
             const slotBg = this.add.nineslice(
                 slotX + slotWidth/2, slotsY + slotHeight/2,
-                'cardBackground',
+                textureKey,
                 null,
                 slotWidth, slotHeight,
                 15, 15, 35, 15
             );
-            slotBg.setTint(0x3366aa);
+            // slotBg.setTint(0x3366aa);
             rewardsContainer.add(slotBg);
             
             // Reward name
