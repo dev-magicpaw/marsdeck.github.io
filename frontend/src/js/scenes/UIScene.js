@@ -624,18 +624,20 @@ export default class UIScene extends Phaser.Scene {
         nameText.setOrigin(0.5, 0);
         cardContainer.add(nameText);
         
+        let iconTexture = 'placeholderTexture';
         // Handle specific card type content
         if (card.type === 'building') {
             // Building icon - use cardTexture if available, otherwise use building texture
-            const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
-                                card.cardType.cardTexture : 
-                                (card.building ? card.building.texture : 'placeholderTexture');
-            
-            const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
-            icon.setDisplaySize(40, 40);
-            icon.setOrigin(0.5);
-            cardContainer.add(icon);
+            iconTexture = (card.cardType && card.cardType.cardTexture) ? card.cardType.cardTexture :  card.building.texture;
+        } else if (card.type === 'event') {
+            iconTexture = card.cardType.cardTexture;
         }
+            
+        const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
+        icon.setDisplaySize(40, 40);
+        icon.setOrigin(0.5);
+        cardContainer.add(icon);
+       
         
         // Show costs from card type if available
         if (card.cardType && card.cardType.cost) {
@@ -936,8 +938,8 @@ export default class UIScene extends Phaser.Scene {
             
             this.infoContent.setText(content);
             
-            // Use generic event icon or specific card texture if available
-            const texture = card.cardType.cardTexture || 'cardEventBackground';
+            // Use proper card texture if available
+            const texture = card.cardType.cardTexture || 'placeholderTexture';
             this.infoSprite.setTexture(texture);
             this.infoSprite.setVisible(true);
         }
@@ -1555,7 +1557,14 @@ export default class UIScene extends Phaser.Scene {
             // Card background using NineSlice for better UI scaling
             let cardBg;
             
-            let textureKey = card.cardType && card.cardType.cardType === 'prefab' ? 'cardPrefabBackground' : 'cardBackground';
+            // Determine background texture based on card type
+            let textureKey = 'cardBackground';
+            if (card.cardType.cardType === 'prefab') {
+                textureKey = 'cardPrefabBackground';
+            } else if (card.cardType.cardType === 'event') {
+                textureKey = 'cardEventBackground';
+            }
+            
             cardBg = this.add.nineslice(
                 0, 0,                // position
                 textureKey,          // texture key
@@ -1573,20 +1582,19 @@ export default class UIScene extends Phaser.Scene {
                 this.onCardChoiceClick(index);
             });
             
-            // Card content (if it's a building card)
+            // Add card name
+            const cardName = card.cardType ? card.cardType.name : card.building.shortName;
+            const nameText = this.add.text(
+                this.cardWidth / 2, 
+                10, 
+                cardName, 
+                { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
+            );
+            nameText.setOrigin(0.5, 0);
+            cardContainer.add(nameText);
+            
+            // Handle specific card type content
             if (card.type === 'building') {
-                // Card name - use name from card type if available, otherwise use building name
-                const cardName = card.cardType ? card.cardType.name : card.building.shortName;
-                
-                const nameText = this.add.text(
-                    this.cardWidth / 2, 
-                    10, 
-                    cardName, 
-                    { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
-                );
-                nameText.setOrigin(0.5, 0);
-                cardContainer.add(nameText);
-                
                 // Building icon - use cardTexture if available, otherwise use building texture
                 const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
                                    card.cardType.cardTexture : 
@@ -1635,6 +1643,42 @@ export default class UIScene extends Phaser.Scene {
                         { fontSize: '10px', fontFamily: 'Arial', color: '#0000ff' }
                     );
                     cardContainer.add(effectsText);
+                }
+            } else if (card.type === 'event') {
+                // For event cards, display card texture if available
+                const iconTexture = card.cardType.cardTexture || 'placeholderTexture';
+                
+                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
+                icon.setDisplaySize(40, 40);
+                icon.setOrigin(0.5);
+                cardContainer.add(icon);
+                
+                // Show costs from card type if available
+                if (card.cardType && card.cardType.cost) {
+                    // Cost text
+                    let costY = 75;
+                    for (const resource in card.cardType.cost) {
+                        if (card.cardType.cost[resource] > 0) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            
+                            // Check if player has enough of this resource
+                            const requiredAmount = card.cardType.cost[resource];
+                            const playerAmount = this.resourceManager.getResource(resource);
+                            const hasEnough = playerAmount >= requiredAmount;
+                            
+                            // Set color based on resource availability
+                            const textColor = hasEnough ? '#000000' : '#ff0000';
+                            
+                            const costText = this.add.text(
+                                5, 
+                                costY, 
+                                `${resourceName}: ${card.cardType.cost[resource]}`, 
+                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                            );
+                            cardContainer.add(costText);
+                            costY += 12;
+                        }
+                    }
                 }
             }
             
