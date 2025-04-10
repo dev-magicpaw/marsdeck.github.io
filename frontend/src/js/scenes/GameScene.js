@@ -350,7 +350,7 @@ export default class GameScene extends Phaser.Scene {
         // Handle immediate production for buildings that produce ENERGY or DRONES
         if (building.production) {
             // Apply building upgrades to the production values
-            let upgradedProduction = this.applyBuildingUpgrades(building.id, {...building.production});
+            let upgradedProduction = this.applyBuildingUpgrades(building.id, {...building.production}, x, y);
             
             // Extract only ENERGY and DRONES for immediate production
             const immediateResources = {
@@ -782,7 +782,7 @@ export default class GameScene extends Phaser.Scene {
             let produced = false;
             if (building.production) {
                 // Get production values with any building upgrades applied
-                let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
+                let productionValues = this.applyBuildingUpgrades(building.id, {...building.production}, x, y);
                 
                 // Filter out ENERGY and DRONES which should only be produced on construction
                 const filteredProduction = {};
@@ -835,7 +835,7 @@ export default class GameScene extends Phaser.Scene {
                 // Apply production
                 if (building.production) {
                     // Get production values with any building upgrades applied
-                    let productionValues = this.applyBuildingUpgrades(building.id, {...building.production});
+                    let productionValues = this.applyBuildingUpgrades(building.id, {...building.production}, x, y);
                     
                     // Filter out ENERGY and DRONES which should only be produced on construction
                     const filteredProduction = {};
@@ -855,10 +855,24 @@ export default class GameScene extends Phaser.Scene {
     }
     
     // Apply building upgrades from level progression rewards
-    applyBuildingUpgrades(buildingId, productionValues) {
+    applyBuildingUpgrades(buildingId, productionValues, x, y) {
         // Apply upgrades from the rewards manager if it exists
         if (this.rewardsManager) {
             productionValues = this.rewardsManager.applyBuildingUpgrades(buildingId, productionValues);
+        }
+        
+        // Apply drone depo adjacency bonus if coordinates are provided
+        // and this isn't a building that produces on construction
+        if (x !== undefined && y !== undefined) {
+            // Check if the building is adjacent to a drone depo
+            if (this.gridManager.isAdjacentToBuildingType(x, y, 'droneDepo')) {
+                // Add +1 to each production resource
+                Object.keys(productionValues).forEach(resource => {
+                    if (resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES) {
+                        productionValues[resource] += 1;
+                    }
+                });
+            }
         }
         
         return productionValues;

@@ -72,7 +72,7 @@ export const BUILDINGS = {
         id: 'droneDepo',
         name: 'Drone Depo',
         shortName: 'Drone Depo',
-        description: 'Produces drones immediately when built',
+        description: 'Produces drones immediately when built. Adjacent buildings get +1 to each production resource.',
         production: {
             [RESOURCES.DRONES]: 7
         },
@@ -214,7 +214,7 @@ export const CARD_TYPES = {
     DRONE_DEPO_CARD: {
         id: 'droneDepoCard',
         name: 'Drone Depo',
-        description: 'Build a drone depo to produce drones',
+        description: 'Build a drone depo to produce drones and provide +1 production bonus to adjacent buildings',
         buildingId: 'droneDepo',
         cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
         cardType: 'building',
