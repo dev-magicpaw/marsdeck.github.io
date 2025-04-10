@@ -1031,7 +1031,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Show game over screen
-    showGameOver(finalScore, victoryPoints, bonusPoints) {
+    showGameOver(victoryPoints) {
         // Clear existing UI
         this.handContainer.removeAll(true);
         
@@ -1057,20 +1057,6 @@ export default class UIScene extends Phaser.Scene {
             height / 2 - 50, 
             `Reputation: ${victoryPoints}`, 
             { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
-        
-        this.add.text(
-            width / 2, 
-            height / 2 - 20, 
-            `Resource Bonus: ${bonusPoints}`, 
-            { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center' }
-        ).setOrigin(0.5);
-        
-        this.add.text(
-            width / 2, 
-            height / 2 + 20, 
-            `FINAL SCORE: ${finalScore}`, 
-            { fontSize: '24px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' }
         ).setOrigin(0.5);
         
         // Restart button
