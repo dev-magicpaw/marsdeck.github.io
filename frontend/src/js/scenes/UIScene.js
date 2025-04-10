@@ -576,9 +576,16 @@ export default class UIScene extends Phaser.Scene {
         
         // Card background using NineSlice for better UI scaling
         let cardBg;
-        let textureKey = card.cardType.cardType === 'prefab' ? 'cardPrefabBackground' : 'cardBackground';
+        let textureKey = 'cardBackground';
         
-        // Use NineSlice for building cards with adjusted slice sizes
+        // Determine background texture based on card type
+        if (card.cardType.cardType === 'prefab') {
+            textureKey = 'cardPrefabBackground';
+        } else if (card.cardType.cardType === 'event') {
+            textureKey = 'cardEventBackground';
+        }
+        
+        // Use NineSlice for cards with adjusted slice sizes
         // Top slice is larger (35px) to account for the header area
         // Bottom slice is 15px for the rounded corner
         // Left and right are 10px for the rounded corners
@@ -606,20 +613,19 @@ export default class UIScene extends Phaser.Scene {
         
         cardContainer.add(cardBg);
         
-        // Card content (if it's a building card)
+        // Add card name
+        const cardName = card.cardType.name;
+        const nameText = this.add.text(
+            this.cardWidth / 2, 
+            10, 
+            cardName, 
+            { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
+        );
+        nameText.setOrigin(0.5, 0);
+        cardContainer.add(nameText);
+        
+        // Handle specific card type content
         if (card.type === 'building') {
-            // Card name - use name from card type if available, otherwise use building name
-            const cardName = card.cardType ? card.cardType.name : card.building.shortName;
-            
-            const nameText = this.add.text(
-                this.cardWidth / 2, 
-                10, 
-                cardName, 
-                { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
-            );
-            nameText.setOrigin(0.5, 0);
-            cardContainer.add(nameText);
-            
             // Building icon - use cardTexture if available, otherwise use building texture
             const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
                                 card.cardType.cardTexture : 
@@ -629,32 +635,52 @@ export default class UIScene extends Phaser.Scene {
             icon.setDisplaySize(40, 40);
             icon.setOrigin(0.5);
             cardContainer.add(icon);
+        } else if (card.type === 'event') {
+            // For event cards, display a description text
+            const descriptionText = this.add.text(
+                this.cardWidth / 2,
+                45,
+                card.cardType.description,
+                { fontSize: '10px', fontFamily: 'Arial', color: '#000000', align: 'center', wordWrap: { width: this.cardWidth - 20 } }
+            );
+            descriptionText.setOrigin(0.5, 0.5);
+            cardContainer.add(descriptionText);
             
-            // Show costs from card type if available
-            if (card.cardType && card.cardType.cost) {
-                // Cost text
-                let costY = 75;
-                for (const resource in card.cardType.cost) {
-                    if (card.cardType.cost[resource] > 0) {
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                        
-                        // Check if player has enough of this resource
-                        const requiredAmount = card.cardType.cost[resource];
-                        const playerAmount = this.resourceManager.getResource(resource);
-                        const hasEnough = playerAmount >= requiredAmount;
-                        
-                        // Set color based on resource availability
-                        const textColor = hasEnough ? '#000000' : '#ff0000';
-                        
-                        const costText = this.add.text(
-                            5, 
-                            costY, 
-                            `${resourceName}: ${card.cardType.cost[resource]}`, 
-                            { fontSize: '10px', fontFamily: 'Arial', color: textColor }
-                        );
-                        cardContainer.add(costText);
-                        costY += 12;
-                    }
+            // Add an "EVENT" label
+            const eventLabel = this.add.text(
+                this.cardWidth / 2,
+                70,
+                "EVENT",
+                { fontSize: '11px', fontFamily: 'Arial', color: '#005500', align: 'center', fontStyle: 'bold' }
+            );
+            eventLabel.setOrigin(0.5, 0.5);
+            cardContainer.add(eventLabel);
+        }
+        
+        // Show costs from card type if available
+        if (card.cardType && card.cardType.cost) {
+            // Cost text
+            let costY = 75;
+            for (const resource in card.cardType.cost) {
+                if (card.cardType.cost[resource] > 0) {
+                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    
+                    // Check if player has enough of this resource
+                    const requiredAmount = card.cardType.cost[resource];
+                    const playerAmount = this.resourceManager.getResource(resource);
+                    const hasEnough = playerAmount >= requiredAmount;
+                    
+                    // Set color based on resource availability
+                    const textColor = hasEnough ? '#000000' : '#ff0000';
+                    
+                    const costText = this.add.text(
+                        5, 
+                        costY, 
+                        `${resourceName}: ${card.cardType.cost[resource]}`, 
+                        { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                    );
+                    cardContainer.add(costText);
+                    costY += 12;
                 }
             }
         }
@@ -802,232 +828,148 @@ export default class UIScene extends Phaser.Scene {
         // Clear current info
         this.clearInfoPanel();
         
+        // Set up title based on card type
+        this.infoTitle.setText(card.cardType.name);
+        
+        // Show card info based on type
         if (card.type === 'building') {
-            // Get card name from card type if available, otherwise use building name
-            const cardName = card.cardType ? card.cardType.name : card.building.name;
-            this.infoTitle.setText(`${cardName} (Card)`);
+            const building = card.building;
             
-            // Get card description from card type if available, otherwise use building description
-            const cardDescription = card.cardType ? card.cardType.description : card.building.description;
-            
-            // Building description
-            let content = cardDescription + "\n\n";
-            
-            // Get costs from card type
-            const cost = card.cardType && card.cardType.cost ? card.cardType.cost : {};
-            
-            // Construction Cost
-            if (Object.keys(cost).length > 0) {
-                content += "Construction Cost:\n";
+            if (building) {
+                // Set the content to the building description with construction cost
+                let content = card.cardType.description + '\n\n';
+                content += "Construction cost:\n";
                 
-                // Create a container for the colored cost text elements
-                this.costTexts = this.costTexts || [];
+                // Show cost from card type
+                for (const resource in card.cardType.cost) {
+                    if (card.cardType.cost[resource] > 0) {
+                        // Check if we have enough resources
+                        const required = card.cardType.cost[resource];
+                        const available = this.resourceManager.getResource(resource);
+                        const hasEnough = available >= required;
+                        
+                        // Format resource names with proper capitalization
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        
+                        // Add color coding for resources we don't have enough of
+                        if (hasEnough) {
+                            content += `${resourceName}: ${required}\n`;
+                        } else {
+                            content += `${resourceName}: ${required} (have ${available})\n`;
+                        }
+                    }
+                }
                 
-                // Clear any existing cost texts
-                this.costTexts.forEach(text => text.destroy());
-                this.costTexts = [];
+                // Add building-specific info
+                let additionalText = "\nBuilding info:\n";
+                additionalText += building.description + "\n\n";
                 
-                // Add all other information to the main content text
-                this.infoContent.setText(cardDescription + "\n\nConstruction Cost:");
+                // Special info for Launch Pad
+                if (building.id === 'launchPad') {
+                    additionalText += "Launch cost:\n";
+                    for (const resource in building.launchCost) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        additionalText += `${resourceName}: ${building.launchCost[resource]}\n`;
+                    }
+                    additionalText += `Reputation reward: +${building.launchReward}\n\n`;
+                }
                 
-                // Position for cost texts - now relative to the info panel container
-                let yOffset = this.infoContent.y + this.infoContent.height + 5;
-                let xOffset = this.infoContent.x;
-                
-                // Add each resource cost with appropriate color
-                for (const resource in cost) {
-                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                    const requiredAmount = cost[resource];
-                    const playerAmount = this.resourceManager.getResource(resource);
-                    const hasEnough = playerAmount >= requiredAmount;
+                // Production - apply building upgrades
+                if (Object.keys(building.production).length > 0) {
+                    let upgradedProduction = {...building.production};
                     
-                    // Set color based on resource availability
-                    const textColor = hasEnough ? '#ffffff' : '#ff0000';
+                    // Only try to get upgraded values if gameScene is available
+                    if (this.scene.manager.getScene('GameScene')) {
+                        const gameScene = this.scene.manager.getScene('GameScene');
+                        // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
+                        // But we can still apply other upgrades
+                        upgradedProduction = gameScene.applyBuildingUpgrades(building.id, upgradedProduction);
+                    }
                     
-                    const costText = this.add.text(
-                        xOffset,
-                        yOffset, 
-                        `${resourceName}: ${cost[resource]}`, 
-                        { fontSize: '14px', fontFamily: 'Arial', color: textColor }
+                    additionalText += "Production:\n";
+                    for (const resource in upgradedProduction) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        const baseValue = building.production[resource];
+                        const upgradedValue = upgradedProduction[resource];
+                        
+                        // Show upgraded value with base value in parentheses if different
+                        const valueDiff = upgradedValue - baseValue;
+                        if (valueDiff > 0) {
+                            additionalText += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
+                        } else {
+                            additionalText += `${resourceName}: +${baseValue}\n`;
+                        }
+                    }
+                    
+                    // Add note about drone depo bonus if this is a production building
+                    const hasProductionResources = Object.keys(building.production).some(
+                        resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
                     );
                     
-                    // Add to the info panel container
-                    this.infoPanelContainer.add(costText);
-                    
-                    // Store text for later cleanup
-                    this.costTexts.push(costText);
-                    
-                    yOffset += costText.height;
-                }
-                
-                // Position for the additional content after the costs
-                this.additionalContent = this.add.text(
-                    xOffset,
-                    yOffset + 10, // Add 10px spacing after costs
-                    "",
-                    { fontSize: '14px', fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: 410 } }
-                );
-                
-                // Add to the info panel container
-                this.infoPanelContainer.add(this.additionalContent);
-                
-                // Add to cost texts for cleanup
-                this.costTexts.push(this.additionalContent);
-                
-                // Continue with the rest of the information
-                let additionalText = "";
-                
-                // Special effects from card type
-                if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
-                    additionalText += "Special Effects:\n";
-                    card.cardType.specialEffects.forEach(effect => {
-                        additionalText += `- ${effect}\n`;
-                    });
-                    additionalText += "\n";
-                }
-                
-                // Only show building info if the card has a building
-                if (card.building) {
-                    // Terrain requirement
-                    if (card.building.terrainRequirement) {
-                        const featureId = card.building.terrainRequirement;
-                        const feature = Object.values(TERRAIN_FEATURES).find(f => f.id === featureId);
-                        if (feature) {
-                            additionalText += `Requires: ${feature.name}\n\n`;
-                        }
-                    }
-                    
-                    // Production - apply building upgrades
-                    if (Object.keys(card.building.production).length > 0) {
-                        let upgradedProduction = {...card.building.production};
-                        
-                        // Only try to get upgraded values if gameScene is available
-                        if (this.scene.manager.getScene('GameScene')) {
-                            const gameScene = this.scene.manager.getScene('GameScene');
-                            // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
-                            // But we can still apply other upgrades
-                            upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
-                        }
-                        
-                        additionalText += "Production:\n";
-                        for (const resource in upgradedProduction) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            const baseValue = card.building.production[resource];
-                            const upgradedValue = upgradedProduction[resource];
-                            
-                            // Show upgraded value with base value in parentheses if different
-                            const valueDiff = upgradedValue - baseValue;
-                            if (valueDiff > 0) {
-                                additionalText += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
-                            } else {
-                                additionalText += `${resourceName}: +${baseValue}\n`;
-                            }
-                        }
-                        
-                        // Add note about drone depo bonus if this is a production building
-                        const hasProductionResources = Object.keys(card.building.production).some(
-                            resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
-                        );
-                        
-                        if (hasProductionResources) {
-                            additionalText += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
-                        }
-                    }
-                    
-                    // Consumption
-                    if (Object.keys(card.building.consumption).length > 0) {
-                        additionalText += "\nConsumption:\n";
-                        for (const resource in card.building.consumption) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            additionalText += `${resourceName}: -${card.building.consumption[resource]}\n`;
-                        }
+                    if (hasProductionResources) {
+                        additionalText += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
                     }
                 }
                 
-                // Set the additional content text
-                this.additionalContent.setText(additionalText);
-            } else {
-                // If no costs, just display regular content
-                
-                // Special effects from card type
-                if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
-                    content += "Special Effects:\n";
-                    card.cardType.specialEffects.forEach(effect => {
-                        content += `- ${effect}\n`;
-                    });
-                    content += "\n";
-                }
-                
-                // Only show building info if the card has a building
-                if (card.building) {
-                    // Terrain requirement
-                    if (card.building.terrainRequirement) {
-                        const featureId = card.building.terrainRequirement;
-                        const feature = Object.values(TERRAIN_FEATURES).find(f => f.id === featureId);
-                        if (feature) {
-                            content += `Requires: ${feature.name}\n\n`;
-                        }
-                    }
-                    
-                    // Production - apply building upgrades
-                    if (Object.keys(card.building.production).length > 0) {
-                        let upgradedProduction = {...card.building.production};
-                        
-                        // Only try to get upgraded values if gameScene is available
-                        if (this.scene.manager.getScene('GameScene')) {
-                            const gameScene = this.scene.manager.getScene('GameScene');
-                            // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
-                            // But we can still apply other upgrades
-                            upgradedProduction = gameScene.applyBuildingUpgrades(card.building.id, upgradedProduction);
-                        }
-                        
-                        content += "Production:\n";
-                        for (const resource in upgradedProduction) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            const baseValue = card.building.production[resource];
-                            const upgradedValue = upgradedProduction[resource];
-                            
-                            // Show upgraded value with base value in parentheses if different
-                            const valueDiff = upgradedValue - baseValue;
-                            if (valueDiff > 0) {
-                                content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
-                            } else {
-                                content += `${resourceName}: +${baseValue}\n`;
-                            }
-                        }
-                        
-                        // Add note about drone depo bonus if this is a production building
-                        const hasProductionResources = Object.keys(card.building.production).some(
-                            resource => resource !== RESOURCES.ENERGY && resource !== RESOURCES.DRONES
-                        );
-                        
-                        if (hasProductionResources) {
-                            content += "\nNote: Gets +1 to each resource when adjacent to a Drone Depo.\n";
-                        }
-                    }
-                    
-                    // Consumption
-                    if (Object.keys(card.building.consumption).length > 0) {
-                        content += "\nConsumption:\n";
-                        for (const resource in card.building.consumption) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            content += `${resourceName}: -${card.building.consumption[resource]}\n`;
-                        }
+                // Consumption
+                if (Object.keys(building.consumption).length > 0) {
+                    additionalText += "\nConsumption:\n";
+                    for (const resource in building.consumption) {
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        additionalText += `${resourceName}: -${building.consumption[resource]}\n`;
                     }
                 }
+                
+                // Combine all text
+                content += additionalText;
                 
                 this.infoContent.setText(content);
+                
+                // Show building sprite
+                this.infoSprite.setTexture(building.texture);
+                this.infoSprite.setVisible(true);
+            } else {
+                this.infoContent.setText('Unknown building card');
+            }
+        } else if (card.type === 'event') {
+            // Handle event card info display
+            let content = card.cardType.description + '\n\n';
+            content += "Cost:\n";
+            
+            // Show cost from card type
+            for (const resource in card.cardType.cost) {
+                if (card.cardType.cost[resource] > 0) {
+                    // Check if we have enough resources
+                    const required = card.cardType.cost[resource];
+                    const available = this.resourceManager.getResource(resource);
+                    const hasEnough = available >= required;
+                    
+                    // Format resource names with proper capitalization
+                    const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                    
+                    // Add color coding for resources we don't have enough of
+                    if (hasEnough) {
+                        content += `${resourceName}: ${required}\n`;
+                    } else {
+                        content += `${resourceName}: ${required} (have ${available})\n`;
+                    }
+                }
             }
             
-            // Show building sprite or custom card texture if available
-            const spriteTexture = (card.cardType && card.cardType.cardTexture) ? 
-                                card.cardType.cardTexture : 
-                                (card.building ? card.building.texture : 'placeholderTexture');
-            this.infoSprite.setTexture(spriteTexture);
-            this.infoSprite.setVisible(true);
+            // Add effect description
+            content += "\nEffect:\n";
+            if (card.cardType.effect.type === 'addResource') {
+                const resourceName = card.cardType.effect.resource.charAt(0).toUpperCase() + 
+                                      card.cardType.effect.resource.slice(1);
+                content += `Add ${card.cardType.effect.amount} ${resourceName}\n`;
+            }
             
-            // Update actions panel
-            this.updateActionsPanel();
+            this.infoContent.setText(content);
+            
+            // Use generic event icon or specific card texture if available
+            const texture = card.cardType.cardTexture || 'cardEventBackground';
+            this.infoSprite.setTexture(texture);
+            this.infoSprite.setVisible(true);
         }
     }
     
@@ -1749,11 +1691,44 @@ export default class UIScene extends Phaser.Scene {
         let buttonY = 0; // Track vertical position for multiple buttons
         const buttonSpacing = 10; // Spacing between buttons
         
-        // If we have a selected card, show discard action
+        // If we have a selected card, show actions based on card type
         if (this.selectedCardIndex !== null) {
             hasActions = true;
             
-            // Create discard button using texture
+            const selectedCard = this.gameScene.selectedCard;
+            
+            // For event cards, show Apply button
+            if (selectedCard && selectedCard.type === 'event') {
+                // Check if player has enough resources
+                const hasSufficientResources = this.resourceManager.hasSufficientResources(selectedCard.cardType.cost);
+                
+                if (hasSufficientResources) {
+                    // Create apply button
+                    const applyButton = this.createActionButton('Apply Event', () => {
+                        // Apply the event card
+                        this.gameScene.applyEvent(this.selectedCardIndex);
+                    }, 0x008800, 100, 30, 'blueGlossSquareButton'); // Green color for apply
+                    
+                    // Position the button
+                    applyButton.y = buttonY;
+                    this.actionsContainer.add(applyButton);
+                    
+                    // Update vertical position for next button
+                    buttonY += this.buttonHeight + buttonSpacing;
+                } else {
+                    // Disabled apply button
+                    const applyButton = this.createDisabledButton('Apply Event', 'Not enough resources', 100, this.buttonHeight);
+                    
+                    // Position the button
+                    applyButton.y = buttonY;
+                    this.actionsContainer.add(applyButton);
+                    
+                    // Update vertical position for next button
+                    buttonY += this.buttonHeight + buttonSpacing;
+                }
+            }
+            
+            // Always show discard button for any card
             const discardButton = this.createActionButton('Discard', () => {
                 // Discard the selected card
                 this.cardManager.discardCard(this.selectedCardIndex);
@@ -1896,7 +1871,7 @@ export default class UIScene extends Phaser.Scene {
         // Add click handler
         button.on('pointerdown', callback);
         
-        return button;
+        return button; // Return the button container
     }
     
     // Helper to create disabled action buttons

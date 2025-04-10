@@ -68,15 +68,23 @@ export default class CardManager {
             return;
         }
         
+        // Determine the card type (building or event)
+        const cardTypeString = cardType.cardType === 'event' ? 'event' : 'building';
+        
         // Add the specified number of copies to the deck
         for (let i = 0; i < count; i++) {
-            this.deck.push({
-                type: 'building',
-                cardType: cardType,
-                building: cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
-                    BUILDINGS[key].id === cardType.buildingId
-                )] : null
-            });
+            // Create a card object
+            const card = {
+                type: cardTypeString,
+                cardType: cardType
+            };
+            
+            // Add building reference only for building cards
+            if (cardTypeString === 'building' && cardType.buildingId) {
+                card.building = Object.values(BUILDINGS).find(b => b.id === cardType.buildingId);
+            }
+            
+            this.deck.push(card);
         }
     }
     
@@ -84,15 +92,21 @@ export default class CardManager {
     createDefaultDeck() {
         // Add one of each card type defined in CARD_TYPES
         Object.values(CARD_TYPES).forEach(cardType => {
-            const building = cardType.buildingId ? BUILDINGS[Object.keys(BUILDINGS).find(key => 
-                BUILDINGS[key].id === cardType.buildingId
-            )] : null;
+            // Determine the card type (building or event)
+            const cardTypeString = cardType.cardType === 'event' ? 'event' : 'building';
             
-            this.deck.push({
-                type: 'building',
-                cardType: cardType,
-                building: building
-            });
+            // Create the card object
+            const card = {
+                type: cardTypeString,
+                cardType: cardType
+            };
+            
+            // Add building reference only for building cards
+            if (cardTypeString === 'building' && cardType.buildingId) {
+                card.building = Object.values(BUILDINGS).find(b => b.id === cardType.buildingId);
+            }
+            
+            this.deck.push(card);
         });
     }
     
@@ -171,16 +185,21 @@ export default class CardManager {
         // Find the card definition by ID
         const cardType = Object.values(CARD_TYPES).find(c => c.id === cardId);
         if (cardType) {
-            // Find the building if the card has a buildingId
-            const building = cardType.buildingId ? 
-                Object.values(BUILDINGS).find(b => b.id === cardType.buildingId) : null;
+            // Determine the card type (building or event)
+            const cardTypeString = cardType.cardType === 'event' ? 'event' : 'building';
             
             // Create the card object
-            startingCards.push({
-                type: 'building',
-                cardType: cardType,
-                building: building
-            });
+            const card = {
+                type: cardTypeString,
+                cardType: cardType
+            };
+            
+            // Add building reference only for building cards
+            if (cardTypeString === 'building' && cardType.buildingId) {
+                card.building = Object.values(BUILDINGS).find(b => b.id === cardType.buildingId);
+            }
+            
+            startingCards.push(card);
         }
     }
     

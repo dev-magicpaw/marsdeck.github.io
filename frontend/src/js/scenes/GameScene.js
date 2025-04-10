@@ -419,7 +419,51 @@ export default class GameScene extends Phaser.Scene {
             if (card.type === 'building') {
                 this.showIllegalTiles(card.building);
             }
+            // If it's an event card - don't show illegal tiles, just select it
+            // Event cards are handled by the "Apply" button in UIScene
         }
+    }
+    
+    // Apply an event card from the hand
+    applyEvent(cardIndex) {
+        const card = this.cardManager.getCardFromHand(cardIndex);
+        
+        if (!card || card.type !== 'event') {
+            return false;
+        }
+        
+        // Check if player has enough resources
+        if (!this.resourceManager.hasSufficientResources(card.cardType.cost)) {
+            this.uiScene.showMessage('Not enough resources');
+            return false;
+        }
+        
+        // Apply the cost
+        for (const resource in card.cardType.cost) {
+            this.resourceManager.spendResource(resource, card.cardType.cost[resource]);
+        }
+        
+        // Apply the effect based on its type
+        const effect = card.cardType.effect;
+        if (effect.type === 'addResource') {
+            this.resourceManager.modifyResource(effect.resource, effect.amount);
+            const resourceName = effect.resource.charAt(0).toUpperCase() + effect.resource.slice(1);
+            this.uiScene.showMessage(`Added ${effect.amount} ${resourceName}`);
+        }
+        
+        // Discard the card from hand
+        this.cardManager.playCard(cardIndex);
+        
+        // Clear selection and update UI
+        this.selectedCard = null;
+        this.selectedCardIndex = undefined;
+        
+        if (this.uiScene) {
+            this.uiScene.clearInfoPanel();
+            this.uiScene.refreshUI();
+        }
+        
+        return true;
     }
     
     // End the current turn
