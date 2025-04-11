@@ -21,6 +21,9 @@ export default class GameScene extends Phaser.Scene {
         this.rewardsManager = new RewardsManager(this);
         this.cardManager = new CardManager(this);
         
+        // Ensure victory checking is enabled for new levels
+        this.resourceManager.setVictoryCheckEnabled(true);
+        
         // Get current level information
         this.currentLevel = levelManager.getCurrentLevel();
         

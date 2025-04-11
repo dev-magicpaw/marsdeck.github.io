@@ -1164,6 +1164,9 @@ export default class UIScene extends Phaser.Scene {
     
     // Show rewards panel with selectable rewards
     showRewards() {
+        // Disable victory checking while in rewards screen
+        this.resourceManager.setVictoryCheckEnabled(false);
+        
         // Create rewards panel
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -1400,7 +1403,13 @@ export default class UIScene extends Phaser.Scene {
                 rewardsContainer.destroy();
                 nextMissionButton.destroy();
                 
-                // Start a new game 
+                // Reset player's reputation for the next level
+                this.resourceManager.resources[RESOURCES.REPUTATION] = 0;
+                
+                // Re-enable victory checking for the next level
+                this.resourceManager.setVictoryCheckEnabled(true);
+                
+                // Start a new game
                 this.scene.stop('UIScene');
                 this.scene.stop('GameScene');
                 this.scene.start('GameScene');
@@ -1412,8 +1421,6 @@ export default class UIScene extends Phaser.Scene {
         );
         nextMissionButton.x = width / 2 - 100; // Center horizontally
         nextMissionButton.y = height - panelY - 60; // Position at bottom of panel
-
-        // Do NOT add any close button!
     }
     
     // Handle reward selection - replacing the old selectReward method with these new helper methods
