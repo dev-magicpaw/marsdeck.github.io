@@ -377,6 +377,11 @@ export default class GameScene extends Phaser.Scene {
         if (this.uiScene) {
             this.uiScene.clearInfoPanel();
             this.uiScene.refreshUI();
+            
+            // If card choices are currently shown, update them to reflect new resource availability
+            if (this.cardChoices.length > 0 && this.uiScene.choicePanelContainer.visible) {
+                this.uiScene.updateCardChoices(this.cardChoices);
+            }
         }
     }
     
@@ -466,6 +471,11 @@ export default class GameScene extends Phaser.Scene {
         if (this.uiScene) {
             this.uiScene.clearInfoPanel();
             this.uiScene.refreshUI();
+            
+            // If card choices are currently shown, update them to reflect new resource availability
+            if (this.cardChoices.length > 0 && this.uiScene.choicePanelContainer.visible) {
+                this.uiScene.updateCardChoices(this.cardChoices);
+            }
         }
         
         return true;
