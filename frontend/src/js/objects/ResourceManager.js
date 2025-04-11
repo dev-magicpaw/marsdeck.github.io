@@ -13,6 +13,9 @@ export default class ResourceManager {
         
         // For UI updates
         this.onResourceChange = null;
+        
+        // Flag to disable victory checking during rewards screen
+        this.victoryCheckEnabled = true;
     }
     
     // Get current resource amount
@@ -40,8 +43,8 @@ export default class ResourceManager {
             this.onResourceChange(resourceType, this.resources[resourceType]);
         }
         
-        // Check for victory condition when reputation increases
-        if (resourceType === RESOURCES.REPUTATION) {
+        // Check for victory condition when reputation increases - only if enabled
+        if (resourceType === RESOURCES.REPUTATION && this.victoryCheckEnabled) {
             this.checkVictoryCondition();
         }
         
@@ -70,6 +73,9 @@ export default class ResourceManager {
     
     // Check if the player has reached the victory goal
     checkVictoryCondition() {
+        // Skip if victory checking is disabled
+        if (!this.victoryCheckEnabled) return;
+        
         // Get current level's victory goal
         const victoryGoal = levelManager.getCurrentVictoryGoal();
         
@@ -118,5 +124,10 @@ export default class ResourceManager {
     // Get all current resource values
     getAllResources() {
         return { ...this.resources };
+    }
+    
+    // Enable or disable victory checking
+    setVictoryCheckEnabled(enabled) {
+        this.victoryCheckEnabled = enabled;
     }
 } 
