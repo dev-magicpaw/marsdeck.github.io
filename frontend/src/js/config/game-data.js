@@ -355,6 +355,20 @@ export const CARD_TYPES = {
             resource: RESOURCES.DRONES,
             amount: 5
         }
+    },
+    RESOURCE_SUPPLY_EVENT: {
+        id: 'resourceSupplyEvent',
+        name: 'Resource Supply',
+        description: 'Increase the supply of a steel and concrete by 5',
+        cardType: 'event',
+        cardTexture: 'resourceSupplyIcon',
+        cost: {
+        },
+        effect: {
+            type: 'addResource',
+            resource: RESOURCES.STEEL,
+            amount: 5
+        }
     }
 };
 
