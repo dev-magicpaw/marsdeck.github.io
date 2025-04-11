@@ -930,10 +930,20 @@ export default class UIScene extends Phaser.Scene {
             
             // Add effect description
             content += "\nEffect:\n";
-            if (card.cardType.effect.type === 'addResource') {
-                const resourceName = card.cardType.effect.resource.charAt(0).toUpperCase() + 
-                                      card.cardType.effect.resource.slice(1);
-                content += `Add ${card.cardType.effect.amount} ${resourceName}\n`;
+            
+            // Support backward compatibility for old cards with a single effect
+            const effects = card.cardType.effects || (card.cardType.effect ? [card.cardType.effect] : []);
+            
+            if (effects.length === 0) {
+                content += "No effects\n";
+            } else {
+                for (const effect of effects) {
+                    if (effect.type === 'addResource') {
+                        const resourceName = effect.resource.charAt(0).toUpperCase() + effect.resource.slice(1);
+                        content += `• Add ${effect.amount} ${resourceName}\n`;
+                    }
+                    // Future effect types can be added here
+                }
             }
             
             this.infoContent.setText(content);
