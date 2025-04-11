@@ -1003,6 +1003,9 @@ export default class GameScene extends Phaser.Scene {
             
             // Always add to hand, even if over the limit
             this.cardManager.hand.push(selectedCard);
+
+            // Update the hand display to show the new card immediately
+            this.uiScene.updateHandDisplay();
             
             // Get card name from cardType if available, otherwise fallback to building name
             const cardName = selectedCard.cardType ? 
