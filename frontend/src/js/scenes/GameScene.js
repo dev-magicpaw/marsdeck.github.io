@@ -12,6 +12,8 @@ export default class GameScene extends Phaser.Scene {
         this.selectedCard = null;
         this.currentTurn = 1;
         this.illegalTileSprites = []; // Store references to illegal tile shading sprites
+        this.developerMode = false; // Flag for developer mode
+        this.coordinateTexts = []; // Store references to coordinate text objects
     }
 
     init() {
@@ -171,8 +173,30 @@ export default class GameScene extends Phaser.Scene {
                     this.gridContainer.add(buildingSprite);
                     cell.buildingSprite = buildingSprite;
                 }
+                
+                // Create coordinate text (initially hidden)
+                const coordText = this.add.text(
+                    xPos + CELL_SIZE / 2, 
+                    yPos + CELL_SIZE / 2, 
+                    `${x},${y}`, 
+                    { 
+                        fontSize: '14px', 
+                        fontFamily: 'Arial', 
+                        color: '#FFFFFF',
+                        stroke: '#000000',
+                        strokeThickness: 3,
+                        fontWeight: 'bold'
+                    }
+                );
+                coordText.setOrigin(0.5, 0.5);
+                coordText.setVisible(false);
+                this.gridContainer.add(coordText);
+                this.coordinateTexts.push(coordText);
             }
         }
+        
+        // Initialize developer mode visibility
+        this.updateCoordinateDisplay();
     }
     
     // Set up input handling for game interactions
@@ -201,6 +225,11 @@ export default class GameScene extends Phaser.Scene {
                 // Clear any existing selection
                 this.clearSelection();
             }
+        });
+        
+        // Set up keyboard input for developer mode
+        this.input.keyboard.on('keydown-D', () => {
+            this.toggleDeveloperMode();
         });
     }
     
@@ -1129,5 +1158,22 @@ export default class GameScene extends Phaser.Scene {
             });
             this.illegalTileSprites = [];
         }
+    }
+    
+    // Toggle developer mode
+    toggleDeveloperMode() {
+        this.developerMode = !this.developerMode;
+        this.updateCoordinateDisplay();
+        
+        // Show message about developer mode status
+        const message = this.developerMode ? 'Developer Mode: ON' : 'Developer Mode: OFF';
+        this.uiScene.showMessage(message);
+    }
+    
+    // Update coordinate display based on developer mode
+    updateCoordinateDisplay() {
+        this.coordinateTexts.forEach(text => {
+            text.setVisible(this.developerMode);
+        });
     }
 } 
