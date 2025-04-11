@@ -453,12 +453,25 @@ export default class GameScene extends Phaser.Scene {
             this.resourceManager.spendResource(resource, card.cardType.cost[resource]);
         }
         
-        // Apply the effect based on its type
-        const effect = card.cardType.effect;
-        if (effect.type === 'addResource') {
-            this.resourceManager.modifyResource(effect.resource, effect.amount);
-            const resourceName = effect.resource.charAt(0).toUpperCase() + effect.resource.slice(1);
-            this.uiScene.showMessage(`Added ${effect.amount} ${resourceName}`);
+        // Support backward compatibility for old cards with a single effect
+        const effects = card.cardType.effects || (card.cardType.effect ? [card.cardType.effect] : []);
+        
+        // Initialize message about resources added
+        let resourceMessages = [];
+        
+        // Apply all effects
+        for (const effect of effects) {
+            if (effect.type === 'addResource') {
+                this.resourceManager.modifyResource(effect.resource, effect.amount);
+                const resourceName = effect.resource.charAt(0).toUpperCase() + effect.resource.slice(1);
+                resourceMessages.push(`${effect.amount} ${resourceName}`);
+            }
+            // In the future, more effect types can be handled here
+        }
+        
+        // Show message about all resources added
+        if (resourceMessages.length > 0) {
+            this.uiScene.showMessage(`Added ${resourceMessages.join(', ')}`);
         }
         
         // Discard the card from hand

@@ -40,17 +40,17 @@ export const GAME_LEVELS = [
     reputationGoal: 20,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 10,
+      [RESOURCES.STEEL]: 30, // 10
       [RESOURCES.CONCRETE]: 15,
       [RESOURCES.WATER]: 0,
-      [RESOURCES.FUEL]: 0,
-      [RESOURCES.DRONES]: 0,
+      [RESOURCES.FUEL]: 50, // 0
+      [RESOURCES.DRONES]: 1, // 0
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
       rewardIds: [
-        REWARDS.DECK_CARDS_REWARDS.EXTRA_FUEL_REFINERIES.id
+        REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id
       ],
       resources: {
         // Don't add any resources for this level
@@ -133,7 +133,6 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.EXTRA_FUEL_REFINERIES.id
       ],
       resources: {
         // Don't add any resources for this level

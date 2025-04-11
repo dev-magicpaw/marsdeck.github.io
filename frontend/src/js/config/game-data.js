@@ -350,25 +350,34 @@ export const CARD_TYPES = {
         cost: {
             [RESOURCES.IRON]: 1
         },
-        effect: {
-            type: 'addResource',
-            resource: RESOURCES.DRONES,
-            amount: 5
-        }
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.DRONES,
+                amount: 5
+            }
+        ]
     },
     RESOURCE_SUPPLY_EVENT: {
         id: 'resourceSupplyEvent',
-        name: 'Resource Supply',
-        description: 'Increase the supply of a steel and concrete by 5',
+        name: 'Resources',
+        description: 'Increase the supply of steel and concrete by 5 each',
         cardType: 'event',
         cardTexture: 'resourceSupplyIcon',
         cost: {
         },
-        effect: {
-            type: 'addResource',
-            resource: RESOURCES.STEEL,
-            amount: 5
-        }
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.STEEL,
+                amount: 5
+            },
+            {
+                type: 'addResource',
+                resource: RESOURCES.CONCRETE,
+                amount: 5
+            }
+        ]
     }
 };
 
@@ -436,15 +445,15 @@ export const REWARDS = {
                 count: 2
             }
         },
-        EXTRA_FUEL_REFINERIES: {
-            id: 'extraFuelRefineriesReward',
-            name: 'Extra Fuel Refineries',
-            description: 'Add two Fuel Refinery cards to your deck',
-            image: 'fuelRefinery',
+        RESOURCE_SUPPLY_EVENT_DECK_REWARD: {
+            id: 'resourceSupplyEventDeckReward',
+            name: 'Resource Supply Event',
+            description: 'Add two Resource Supply Event cards to your deck',
+            image: 'resourceSupplyIcon',
             applicationType: 'deckCards',
             reputationCost: 5,
             effect: {
-                cardId: 'fuelRefineryCard',
+                cardId: 'resourceSupplyEvent',
                 count: 2
             }
         }
