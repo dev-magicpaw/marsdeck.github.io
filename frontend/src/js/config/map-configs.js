@@ -58,6 +58,36 @@ export const LEVEL_2_MAP = {
     ]
 };
 
+export const LEVEL_3_MAP = {
+    gridSize: 8, // Size of the map grid (8x8)
+    cells: [
+        // Metal deposits in specific locations
+        { x: 0, y: 5, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 1, y: 5, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 1, y: 6, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 2, y: 6, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 6, y: 0, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 7, y: 0, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 6, y: 4, feature: TERRAIN_FEATURES.METAL.id },
+        
+        // Water deposits
+        { x: 0, y: 0, feature: TERRAIN_FEATURES.WATER.id },
+        { x: 5, y: 7, feature: TERRAIN_FEATURES.WATER.id },
+        
+        // Mountain range across the middle
+        { x: 2, y: 0, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 3, y: 1, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 4, y: 1, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 1, y: 2, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 5, y: 2, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 4, y: 4, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 0, y: 6, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 1, y: 7, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 7, y: 7, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 7, y: 6, feature: TERRAIN_FEATURES.MOUNTAIN.id }
+    ]
+};
+
 // A map with lots of resources
 export const RESOURCE_RICH_MAP = {
     gridSize: 8,

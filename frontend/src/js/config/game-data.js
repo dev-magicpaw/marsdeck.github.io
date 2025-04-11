@@ -340,6 +340,17 @@ export const CARD_TYPES = {
         },
         specialEffects: []
     },
+    STEELWORKS_PREFAB_CARD: {
+        id: 'steelworksPrefabCard',
+        name: '*Steelworks*',
+        description: 'Build a steelworks to convert iron to steel. Being a prefab this card requires way less resources to build.',
+        buildingId: 'steelworks',
+        cardType: 'prefab',
+        cost: {
+            [RESOURCES.ENERGY]: 3
+        },
+        specialEffects: []
+    },
     // Event cards
     SCRAP_DRONES_EVENT: {
         id: 'scrapDronesEvent',
@@ -418,17 +429,17 @@ export const REWARDS = {
                 cardId: 'ironMinePrefabCard'
             }
         },
-        CONCRETE_CARD: {
-            id: 'concreteStartingReward',
-            name: 'Starting Concrete Card',
-            description: 'Start with a Concrete Harvester card in your hand',
-            image: 'concreteMixer',
+        STEELWORKS_PREFAB_STARTING_REWARD: {
+            id: 'steelworksPrefabStartingReward',
+            name: 'Steelworks Prefab',
+            description: 'Start with an additional Steelworks Prefab card in your hand',
+            image: 'steelworks',
             applicationType: 'startingHand',
-            reputationCost: 3,
+            reputationCost: 20,
             effect: {
-                cardId: 'concreteMixerCard'
+                cardId: 'steelworksPrefabCard'
             }
-        }
+        },
     },
     
     // Deck cards rewards - add cards to the player's deck
