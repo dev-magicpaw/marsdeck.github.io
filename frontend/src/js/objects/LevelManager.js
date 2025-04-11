@@ -1,5 +1,5 @@
 import { GAME_LEVELS } from '../config/level-configs';
-import { LEVEL_2_MAP, RESOURCE_RICH_MAP, SAMPLE_MAP, TUTORIAL_MAP } from '../config/map-configs';
+import * as MapConfigs from '../config/map-configs';
 
 class LevelManager {
   constructor() {
@@ -13,6 +13,19 @@ class LevelManager {
         resourceBonuses: {} // Permanently increased starting resources
       }
     };
+    
+    // Store all available maps from the imported MapConfigs
+    this.availableMaps = {};
+    
+    // Extract all exported maps from MapConfigs
+    for (const key in MapConfigs) {
+      if (key !== '__esModule') {  // Skip the __esModule flag
+        // Convert export name to expected mapId format
+        // For example: SAMPLE_MAP export becomes 'SAMPLE_MAP' mapId
+        const mapId = key;
+        this.availableMaps[mapId] = MapConfigs[key];
+      }
+    }
   }
 
   // Helper function to get current level configuration
@@ -26,19 +39,18 @@ class LevelManager {
     const currentLevel = this.getCurrentLevel();
     if (!currentLevel) return null;
     
-    // Return the actual map configuration based on the mapId
-    switch (currentLevel.mapId) {
-      case 'SAMPLE_MAP':
-        return SAMPLE_MAP;
-      case 'LEVEL_2_MAP':
-        return LEVEL_2_MAP;
-      case 'RESOURCE_RICH_MAP':
-        return RESOURCE_RICH_MAP;
-      case 'TUTORIAL_MAP':
-        return TUTORIAL_MAP;
-      default:
-        return SAMPLE_MAP;
+    const mapId = currentLevel.mapId;
+    
+    // Look up the map by ID directly in our dynamic collection
+    const map = this.availableMaps[mapId];
+    
+    // If the map doesn't exist, log a warning and return a default map
+    if (!map) {
+      console.warn(`Map with ID "${mapId}" not found. Using default map.`);
+      return this.availableMaps['SAMPLE_MAP']; // Return default map
     }
+    
+    return map;
   }
 
   // Helper function to advance to the next level
