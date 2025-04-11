@@ -50,6 +50,7 @@ export const GAME_LEVELS = [
     },
     rewards: {
       rewardIds: [
+        REWARDS.STARTING_HAND_REWARDS.STEELWORKS_PREFAB_STARTING_REWARD.id,
         REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id
       ],
       resources: {
