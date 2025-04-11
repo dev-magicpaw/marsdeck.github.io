@@ -525,6 +525,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Reset event card mechanics tracking for the new turn
         this.extraCardAddedThisTurn = false;
+        console.log('extraCardAddedThisTurn reset to false');
         this.eventCardSelectedThisTurn = false;
         this.pendingSecondChoice = false;
         
@@ -978,9 +979,7 @@ export default class GameScene extends Phaser.Scene {
                     break; // No more cards
                 }
                 // Reshuffle discard pile into deck
-                this.cardManager.deck = [...this.cardManager.discardPile];
-                this.cardManager.discardPile = [];
-                this.cardManager.shuffleDeck();
+                this.cardManager.shuffleDiscardIntoDeck();
             }
             
             if (this.cardManager.deck.length > 0) {
@@ -992,9 +991,15 @@ export default class GameScene extends Phaser.Scene {
         
         // Check if any of the cards is an event card
         const hasEventCard = tempCards.some(card => card.type === 'event');
+        console.log('hasEventCard:', hasEventCard);
+        console.log('extraCardAddedThisTurn:', this.extraCardAddedThisTurn);
+        console.log('cardManager.deck.length:', this.cardManager.deck.length);
         
         // If there's an event card and we haven't added an extra card this turn, add one more
         if (hasEventCard && !this.extraCardAddedThisTurn && this.cardManager.deck.length > 0) {
+            if (this.cardManager.deck.length === 0) {
+                this.cardManager.shuffleDiscardIntoDeck();
+            }
             const extraCard = this.cardManager.deck.pop();
             tempCards.push(extraCard);
             this.extraCardAddedThisTurn = true;

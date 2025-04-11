@@ -117,6 +117,12 @@ export default class CardManager {
             [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
         }
     }
+
+    shuffleDiscardIntoDeck() {
+        this.deck = [...this.discardPile];
+        this.discardPile = [];
+        this.shuffleDeck();
+    }
     
     // Draw a specified number of cards from the deck to hand
     drawCards(count = 1) {
