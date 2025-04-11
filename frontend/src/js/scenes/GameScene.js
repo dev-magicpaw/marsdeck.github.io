@@ -45,6 +45,11 @@ export default class GameScene extends Phaser.Scene {
         // Card choice options
         this.cardChoices = [];
         
+        // Event card mechanics tracking
+        this.extraCardAddedThisTurn = false;
+        this.eventCardSelectedThisTurn = false;
+        this.pendingSecondChoice = false;
+        
         // Store launch cost for easier access
         this.launchCost = BUILDINGS.LAUNCH_PAD.launchCost;
         this.launchReward = BUILDINGS.LAUNCH_PAD.launchReward;
@@ -518,6 +523,11 @@ export default class GameScene extends Phaser.Scene {
         // Increment turn counter
         this.currentTurn++;
         
+        // Reset event card mechanics tracking for the new turn
+        this.extraCardAddedThisTurn = false;
+        this.eventCardSelectedThisTurn = false;
+        this.pendingSecondChoice = false;
+        
         // Update rocket states since resources may have changed
         this.updateRocketStates();
         
@@ -954,9 +964,12 @@ export default class GameScene extends Phaser.Scene {
 
     // Show card choices to the player
     showCardChoices() {
-        // Draw 3 cards as choices
+        // Draw 3 cards as choices (default)
         this.cardChoices = [];
-        const numChoices = 3;
+        let numChoices = 3;
+        
+        // Check if we need to pull the cards first to check for events
+        let tempCards = [];
         
         // Get cards from the deck
         for (let i = 0; i < numChoices; i++) {
@@ -973,9 +986,22 @@ export default class GameScene extends Phaser.Scene {
             if (this.cardManager.deck.length > 0) {
                 // Draw from the end of the deck to avoid shifting indices
                 const card = this.cardManager.deck.pop();
-                this.cardChoices.push(card);
+                tempCards.push(card);
             }
         }
+        
+        // Check if any of the cards is an event card
+        const hasEventCard = tempCards.some(card => card.type === 'event');
+        
+        // If there's an event card and we haven't added an extra card this turn, add one more
+        if (hasEventCard && !this.extraCardAddedThisTurn && this.cardManager.deck.length > 0) {
+            const extraCard = this.cardManager.deck.pop();
+            tempCards.push(extraCard);
+            this.extraCardAddedThisTurn = true;
+        }
+        
+        // Add all the cards to the choices
+        this.cardChoices = tempCards;
         
         // Show choices in UI
         if (this.uiScene && this.cardChoices.length > 0) {
@@ -986,7 +1012,7 @@ export default class GameScene extends Phaser.Scene {
     // Handle card choice selection
     selectCardChoice(choiceIndex) {
         if (choiceIndex >= 0 && choiceIndex < this.cardChoices.length) {
-            // Add the selected card to hand
+            // Get the selected card
             const selectedCard = this.cardChoices[choiceIndex];
             
             // Always add to hand, even if over the limit
@@ -999,15 +1025,45 @@ export default class GameScene extends Phaser.Scene {
                 
             this.uiScene.showMessage(`Added ${cardName} to your hand`);
             
-            // Discard the other choices
-            for (let i = 0; i < this.cardChoices.length; i++) {
-                if (i !== choiceIndex) {
-                    this.cardManager.discardPile.push(this.cardChoices[i]);
+            // Check if this is an event card and we haven't selected an event card yet this turn
+            const isEventCard = selectedCard.type === 'event';
+            
+            if (isEventCard && !this.eventCardSelectedThisTurn && !this.pendingSecondChoice) {
+                // First event card selected this turn - allow a second choice
+                this.eventCardSelectedThisTurn = true;
+                this.pendingSecondChoice = true;
+                
+                // Remove the selected card from choices
+                this.cardChoices.splice(choiceIndex, 1);
+                
+                // If there are still cards to choose from
+                if (this.cardChoices.length > 0) {
+                    // Show a message that player can choose again
+                    this.uiScene.showMessage('You can choose one more card');
+                    
+                    // Update the card choice display
+                    this.uiScene.updateCardChoices(this.cardChoices);
+                    
+                    // No need to hide panel - player will make another choice
+                    return;
                 }
             }
             
-            // Clear choices
+            // For non-event cards or second choices, discard the other choices
+            const remainingCards = [...this.cardChoices];
+            remainingCards.splice(choiceIndex, 1);
+            
+            // Add remaining cards to discard pile
+            for (const card of remainingCards) {
+                this.cardManager.discardPile.push(card);
+            }
+            
+            // Clear choices and reset pending second choice flag
             this.cardChoices = [];
+            this.pendingSecondChoice = false;
+            
+            // Hide the choice panel in UI
+            this.uiScene.hideCardChoices();
             
             // Update UI
             this.uiScene.refreshUI();
