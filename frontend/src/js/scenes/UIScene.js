@@ -1688,16 +1688,27 @@ export default class UIScene extends Phaser.Scene {
         });
     }
     
+    // Update card choices after removing a card
+    updateCardChoices(cards) {
+        // Clear existing choices
+        this.choiceContainer.removeAll(true);
+        
+        // Show remaining cards
+        this.showCardChoices(cards);
+    }
+    
+    // Hide card choices panel
+    hideCardChoices() {
+        this.choicePanelContainer.setVisible(false);
+        this.choicePanelBg.visible = false;
+    }
+    
     // Handle card choice click
     onCardChoiceClick(choiceIndex) {
         // Tell the game scene which card was chosen
         this.gameScene.selectCardChoice(choiceIndex);
-        
-        // Hide the choice panel
-        this.choicePanelContainer.setVisible(false);
-        this.choicePanelBg.visible = false;
     }
-
+    
     // Update the actions panel based on selected entity
     updateActionsPanel() {
         // Clear existing buttons
