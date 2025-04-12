@@ -1927,6 +1927,10 @@ export default class UIScene extends Phaser.Scene {
     
     // Helper to create disabled action buttons
     createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30, textureName = null) {
+        const button = this.add.container(0, 0);
+        
+        // Button background
+        let bg;
         if (textureName) {
             // Use nine-slice for texture-based buttons for better UI scaling
             bg = this.add.nineslice(
