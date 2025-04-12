@@ -448,9 +448,11 @@ export const REWARDS = {
             image: 'ironMine', // Using existing texture
             applicationType: 'startingHand',
             reputationCost: 10,
-            effect: {
-                cardId: 'ironMinePrefabCard'
-            }
+            effects: [
+                {
+                    cardId: 'ironMinePrefabCard'
+                }
+            ]
         },
         STEELWORKS_PREFAB_STARTING_REWARD: {
             id: 'steelworksPrefabStartingReward',
@@ -459,9 +461,11 @@ export const REWARDS = {
             image: 'steelworks',
             applicationType: 'startingHand',
             reputationCost: 20,
-            effect: {
-                cardId: 'steelworksPrefabCard'
-            }
+            effects: [
+                {
+                    cardId: 'steelworksPrefabCard'
+                }
+            ]
         },
     },
     
@@ -474,10 +478,12 @@ export const REWARDS = {
             image: 'droneIcon',
             applicationType: 'deckCards',
             reputationCost: 10,
-            effect: {
-                cardId: 'scrapDronesEvent',
-                count: 2
-            }
+            effects: [
+                {
+                    cardId: 'scrapDronesEvent',
+                    count: 2
+                }
+            ]
         },
         RESOURCE_SUPPLY_EVENT_DECK_REWARD: {
             id: 'resourceSupplyEventDeckReward',
@@ -486,10 +492,12 @@ export const REWARDS = {
             image: 'resourceSupplyIcon',
             applicationType: 'deckCards',
             reputationCost: 10,
-            effect: {
-                cardId: 'resourceSupplyEvent',
-                count: 2
-            }
+            effects: [
+                {
+                    cardId: 'resourceSupplyEvent',
+                    count: 2
+                }
+            ]
         },
         BARTER_EVENT_DECK_REWARD: {
             id: 'barterEventDeckReward',
@@ -498,10 +506,12 @@ export const REWARDS = {
             image: 'barterIcon',
             applicationType: 'deckCards',
             reputationCost: 20,
-            effect: {
-                cardId: 'barterEvent',
-                count: 3
-            }
+            effects: [
+                {
+                    cardId: 'barterEvent',
+                    count: 3
+                }
+            ]
         }
     },
     
@@ -514,12 +524,14 @@ export const REWARDS = {
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
             reputationCost: 5,
-            effect: {
-                buildingId: 'windTurbine',
-                resourceBonus: {
-                    'energy': 2
+            effects: [
+                {
+                    buildingId: 'windTurbine',
+                    resourceBonus: {
+                        'energy': 2
+                    }
                 }
-            }
+            ]
         },
         EFFICIENT_IRON_MINE: {
             id: 'efficientIronMineReward',
@@ -528,12 +540,14 @@ export const REWARDS = {
             image: 'ironMine',
             applicationType: 'buildingUpgrade',
             reputationCost: 8,
-            effect: {
-                buildingId: 'ironMine',
-                resourceBonus: {
-                    'iron': 1
+            effects: [
+                {
+                    buildingId: 'ironMine',
+                    resourceBonus: {
+                        'iron': 1
+                    }
                 }
-            }
-        }
+            ]
+        },
     }
 }; 

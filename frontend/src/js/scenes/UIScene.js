@@ -1282,7 +1282,18 @@ export default class UIScene extends Phaser.Scene {
             
             // Get the card ID from the original reward object obtained from RewardsManager
             const originalReward = this.rewardsManager.findRewardById(reward.id);
-            const rewardCardId = originalReward.effect.cardId;
+            // Check if reward has effects and use the first one that has a cardId
+            let rewardCardId = null;
+            if (originalReward && originalReward.effects) {
+                // Look for the first effect with a cardId
+                for (const effect of originalReward.effects) {
+                    if (effect.cardId) {
+                        rewardCardId = effect.cardId;
+                        break;
+                    }
+                }
+            }
+            
             if (rewardCardId) {
                 // Find the card type directly from CARD_TYPES
                 const rewardCard = Object.values(CARD_TYPES).find(ct => ct.id === rewardCardId);
