@@ -260,7 +260,7 @@ export default class RewardsManager {
     }
     
     // Apply building upgrades to a building's production values
-    applyBuildingUpgrades(buildingId, productionValues) {
+    applyBuildingUpgrades(buildingId, productionValues, x, y) {
         const upgradedValues = { ...productionValues };
         
         // Find all unlocked building upgrade rewards that affect this building
@@ -270,6 +270,7 @@ export default class RewardsManager {
             if (reward && reward.effects) {
                 // Loop through all effects
                 for (const effect of reward.effects) {
+                    // Apply direct resource bonuses to this building
                     if (effect.buildingId === buildingId && effect.resourceBonus) {
                         // Apply the resource bonuses
                         for (const resourceType in effect.resourceBonus) {
@@ -279,6 +280,23 @@ export default class RewardsManager {
                                 upgradedValues[resourceType] += bonus;
                             } else {
                                 upgradedValues[resourceType] = bonus;
+                            }
+                        }
+                    }
+                    
+                    // Apply adjacency bonuses if coordinates are provided
+                    if (effect.buildingId === buildingId && effect.adjacencyBonus && x !== undefined && y !== undefined) {
+                        // Check if this building is adjacent to the required building type
+                        if (this.scene.gridManager.isAdjacentToBuildingType(x, y, effect.adjacentBuildingId)) {
+                            // Apply the adjacency bonuses
+                            for (const resourceType in effect.adjacencyBonus) {
+                                const bonus = effect.adjacencyBonus[resourceType];
+                                
+                                if (upgradedValues[resourceType]) {
+                                    upgradedValues[resourceType] += bonus;
+                                } else {
+                                    upgradedValues[resourceType] = bonus;
+                                }
                             }
                         }
                     }

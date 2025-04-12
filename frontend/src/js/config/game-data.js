@@ -536,19 +536,21 @@ export const REWARDS = {
             id: 'efficientSupplyChainReward',
             name: 'Efficient Supply Chain',
             description: 'Steelworks produce 1 more steel if adjacent to an Iron Mine. Fuel Refineries produce 1 more fuel if adjacent to a Water Pump.',
-            image: 'ironMine',
+            image: 'supplyChainIcon',
             applicationType: 'buildingUpgrade',
             reputationCost: 8,
             effects: [
                 {
                     buildingId: 'steelworks',
-                    resourceBonus: {
+                    adjacentBuildingId: 'ironMine',
+                    adjacencyBonus: {
                         'steel': 1
                     }
                 },
                 {
                     buildingId: 'fuelRefinery',
-                    resourceBonus: {
+                    adjacentBuildingId: 'waterPump',
+                    adjacencyBonus: {
                         'fuel': 1
                     }
                 }
