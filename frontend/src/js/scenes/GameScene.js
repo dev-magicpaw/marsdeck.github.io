@@ -426,9 +426,17 @@ export default class GameScene extends Phaser.Scene {
         
         if (!cell) return;
         
+        // Clear any previously selected card
+        this.selectedCard = null;
+        this.selectedCardIndex = undefined;
+        
+        // Clear illegal tile shading if any
+        this.clearIllegalTileShading();
+        
         // Show cell info in UI
         if (this.uiScene) {
             this.uiScene.showCellInfo(cell, this);
+            this.uiScene.selectedCardIndex = null; // Clear selected card in UI too
         }
     }
     
