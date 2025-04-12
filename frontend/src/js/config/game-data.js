@@ -426,7 +426,6 @@ export const DECK_COMPOSITION = {
     'fuelRefineryCard': 3,
     'windTurbineCard': 4,
     'solarPanelCard': 4,
-    'launchPadCard': 1,
 };
 
 // Starting hand configuration - specific cards to always include in starting hand
