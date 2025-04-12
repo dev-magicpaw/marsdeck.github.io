@@ -14,6 +14,8 @@ export default class UIScene extends Phaser.Scene {
         this.cardHeight = 140;
         this.cardSpacing = 5;
         
+        // UI constants
+        this.INFO_SPRITE_SIZE = 80;
         this.buttonHeight = 30;
         
         // Selected card tracking
@@ -235,6 +237,7 @@ export default class UIScene extends Phaser.Scene {
         
         // Create a sprite placeholder for selected entity - centered horizontally
         this.infoSprite = this.add.sprite(rightPanelWidth / 2, 190, 'gridTile');
+        this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE); // Use constant for standard size
         this.infoSprite.setVisible(false);
         
         // Add all to container
@@ -717,6 +720,7 @@ export default class UIScene extends Phaser.Scene {
         // Show terrain/feature sprite
         if (texture) {
             this.infoSprite.setTexture(texture);
+            this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE);
             this.infoSprite.setVisible(true);
         }
         
@@ -794,6 +798,7 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
+                this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE);
                 this.infoSprite.setVisible(true);
                 
                 // Store selected cell for actions
@@ -899,6 +904,7 @@ export default class UIScene extends Phaser.Scene {
                 
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
+                this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE);
                 this.infoSprite.setVisible(true);
             } else {
                 this.infoContent.setText('Unknown building card');
@@ -951,6 +957,7 @@ export default class UIScene extends Phaser.Scene {
             // Use proper card texture if available
             const texture = card.cardType.cardTexture || 'placeholderTexture';
             this.infoSprite.setTexture(texture);
+            this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE);
             this.infoSprite.setVisible(true);
         }
     }
@@ -1920,10 +1927,6 @@ export default class UIScene extends Phaser.Scene {
     
     // Helper to create disabled action buttons
     createDisabledButton(text, tooltipText, buttonWidth = 100, buttonHeight = 30, textureName = null) {
-        const button = this.add.container(0, 0);
-        
-        // Button background - either use texture or graphics
-        let bg;
         if (textureName) {
             // Use nine-slice for texture-based buttons for better UI scaling
             bg = this.add.nineslice(
