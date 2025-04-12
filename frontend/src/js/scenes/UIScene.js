@@ -781,8 +781,8 @@ export default class UIScene extends Phaser.Scene {
                             
                             let bonuses = [];
                             if (otherUpgrades > 0) bonuses.push(`upgrade: +${otherUpgrades}`);
-                            if (droneDepoBonus > 0) bonuses.push(`drone depo: +1`);
-                            if (supplyChainBonus > 0) bonuses.push(`supply chain: +1`);
+                            if (droneDepoBonus > 0) bonuses.push(`drone depo: +${droneDepoBonus}`);
+                            if (supplyChainBonus > 0) bonuses.push(`supply chain: +${supplyChainBonus}`);
                             
                             content += bonuses.join(', ');
                             content += `)\n`;
