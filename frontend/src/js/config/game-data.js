@@ -500,7 +500,7 @@ export const REWARDS = {
             reputationCost: 20,
             effect: {
                 cardId: 'barterEvent',
-                count: 2
+                count: 3
             }
         }
     },
