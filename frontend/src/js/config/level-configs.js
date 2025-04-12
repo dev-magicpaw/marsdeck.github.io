@@ -51,7 +51,8 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.STEELWORKS_PREFAB_STARTING_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.BARTER_EVENT_DECK_REWARD.id
+        REWARDS.DECK_CARDS_REWARDS.BARTER_EVENT_DECK_REWARD.id,
+        REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_SUPPLY_CHAIN.id
       ],
       resources: {
         // Don't add any resources for this level
@@ -106,7 +107,8 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.IRON_MINE_PREFAB_STARTING_REWARD.id,
-        REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_IRON_MINE.id
+        REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id,
+        REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_SUPPLY_CHAIN.id
       ],
       resources: {
         // Don't add any resources for this level

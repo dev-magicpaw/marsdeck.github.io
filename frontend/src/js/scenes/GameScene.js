@@ -979,7 +979,7 @@ export default class GameScene extends Phaser.Scene {
     applyBuildingUpgrades(buildingId, productionValues, x, y) {
         // Apply upgrades from the rewards manager if it exists
         if (this.rewardsManager) {
-            productionValues = this.rewardsManager.applyBuildingUpgrades(buildingId, productionValues);
+            productionValues = this.rewardsManager.applyBuildingUpgrades(buildingId, productionValues, x, y);
         }
         
         // Apply drone depo adjacency bonus if coordinates are provided

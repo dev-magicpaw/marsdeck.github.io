@@ -761,24 +761,31 @@ export default class UIScene extends Phaser.Scene {
                         // Show upgraded value with base value in parentheses if different
                         const valueDiff = upgradedValue - baseValue;
                         if (valueDiff > 0) {
-                            // Check specifically for drone depo bonus
+                            // Check for different types of bonuses
                             const isDroneDepoBonus = gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'droneDepo') && 
                                                      resource !== RESOURCES.ENERGY && 
                                                      resource !== RESOURCES.DRONES;
                             
-                            if (isDroneDepoBonus) {
-                                // Show combined bonus (upgrades + drone depo)
-                                content += `${resourceName}: +${upgradedValue} (`;
-                                // If there are other upgrades besides drone depo
-                                if (valueDiff > 1) {
-                                    content += `upgrade: +${valueDiff-1}, drone depo: +1`;
-                                } else {
-                                    content += `drone depo: +1`;
-                                }
-                                content += `)\n`;
-                            } else {
-                                content += `${resourceName}: +${upgradedValue} (upgrade: +${valueDiff})\n`;
-                            }
+                            // Check for efficient supply chain bonus
+                            const isSupplyChainSteelBonus = building.id === 'steelworks' && resource === RESOURCES.STEEL && 
+                                                           gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'ironMine');
+                            const isSupplyChainFuelBonus = building.id === 'fuelRefinery' && resource === RESOURCES.FUEL && 
+                                                          gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'waterPump');
+                            
+                            // Calculate different types of bonuses
+                            let droneDepoBonus = isDroneDepoBonus ? 1 : 0;
+                            let supplyChainBonus = (isSupplyChainSteelBonus || isSupplyChainFuelBonus) ? 1 : 0;
+                            let otherUpgrades = valueDiff - droneDepoBonus - supplyChainBonus;
+                            
+                            content += `${resourceName}: +${upgradedValue} (`;
+                            
+                            let bonuses = [];
+                            if (otherUpgrades > 0) bonuses.push(`upgrade: +${otherUpgrades}`);
+                            if (droneDepoBonus > 0) bonuses.push(`drone depo: +1`);
+                            if (supplyChainBonus > 0) bonuses.push(`supply chain: +1`);
+                            
+                            content += bonuses.join(', ');
+                            content += `)\n`;
                         } else {
                             content += `${resourceName}: +${baseValue}\n`;
                         }
@@ -862,9 +869,9 @@ export default class UIScene extends Phaser.Scene {
                     // Only try to get upgraded values if gameScene is available
                     if (this.scene.manager.getScene('GameScene')) {
                         const gameScene = this.scene.manager.getScene('GameScene');
-                        // When showing a card, we don't have coordinates, so we can't apply drone depo bonus here
-                        // But we can still apply other upgrades
-                        upgradedProduction = gameScene.applyBuildingUpgrades(building.id, upgradedProduction);
+                        // When showing a card, we don't have coordinates, so we pass undefined
+                        // to indicate we can't apply position-based bonuses
+                        upgradedProduction = gameScene.applyBuildingUpgrades(building.id, upgradedProduction, undefined, undefined);
                     }
                     
                     additionalText += "Production:\n";
