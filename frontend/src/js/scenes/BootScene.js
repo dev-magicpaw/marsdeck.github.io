@@ -46,6 +46,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('droneIcon', require('../../assets/images/rts_sci_fi/Unit/scifiUnit_29.png'));
         this.load.image('resourceSupplyIcon', require('../../assets/images/rts_sci_fi/Unit/scifiUnit_30.png'));
 
+        // Load icons
+        this.load.image('barterIcon', require('../../assets/images/game_icons/trade.svg'));
 
         // Load illegal tile shading sprite
         this.load.image('illegalTileShade', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_large_square.png'));
