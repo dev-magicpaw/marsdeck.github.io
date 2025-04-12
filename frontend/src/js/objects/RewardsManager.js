@@ -47,26 +47,54 @@ export default class RewardsManager {
             return false;
         }
         
-        // Add to appropriate unlocked rewards list based on application type
+        // Add to appropriate unlocked rewards lists based on application type and effects
+        let added = false;
+        
+        // Add to the list based on the main application type
         if (reward.applicationType) {
             switch (reward.applicationType) {
                 case 'startingHand':
                     this.unlockedRewards.startingHand.push(rewardId);
+                    added = true;
                     break;
                 case 'deckCards':
                     this.unlockedRewards.deckCards.push(rewardId);
+                    added = true;
                     break;
                 case 'buildingUpgrade':
                     this.unlockedRewards.buildingUpgrade.push(rewardId);
+                    added = true;
                     break;
                 default:
                     console.error(`Unknown application type: ${reward.applicationType}`);
-                    return false;
+                    break;
             }
-            return true;
         }
         
-        return false;
+        // Check for secondary effects that might need additional categorization
+        if (reward.effects) {
+            for (const effect of reward.effects) {
+                // If there's a cardId but no count, it's likely a starting hand card
+                if (effect.cardId && !effect.count && !this.unlockedRewards.startingHand.includes(rewardId)) {
+                    this.unlockedRewards.startingHand.push(rewardId);
+                    added = true;
+                }
+                
+                // If there's a cardId with a count, it's likely a deck card
+                if (effect.cardId && effect.count && !this.unlockedRewards.deckCards.includes(rewardId)) {
+                    this.unlockedRewards.deckCards.push(rewardId);
+                    added = true;
+                }
+                
+                // If there's a buildingId and resourceBonus, it's a building upgrade
+                if (effect.buildingId && effect.resourceBonus && !this.unlockedRewards.buildingUpgrade.includes(rewardId)) {
+                    this.unlockedRewards.buildingUpgrade.push(rewardId);
+                    added = true;
+                }
+            }
+        }
+        
+        return added;
     }
     
     // Save all rewards to the level manager's persistent rewards
@@ -190,8 +218,13 @@ export default class RewardsManager {
         // Find all unlocked starting hand rewards
         for (const rewardId of this.unlockedRewards.startingHand) {
             const reward = this.findRewardById(rewardId);
-            if (reward && reward.effect && reward.effect.cardId) {
-                rewardCards.push(reward.effect.cardId);
+            if (reward && reward.effects) {
+                // Loop through all effects
+                for (const effect of reward.effects) {
+                    if (effect.cardId) {
+                        rewardCards.push(effect.cardId);
+                    }
+                }
             }
         }
         
@@ -205,15 +238,20 @@ export default class RewardsManager {
         // Find all unlocked deck cards rewards
         for (const rewardId of this.unlockedRewards.deckCards) {
             const reward = this.findRewardById(rewardId);
-            if (reward && reward.effect && reward.effect.cardId) {
-                const cardId = reward.effect.cardId;
-                const count = reward.effect.count || 1;
-                
-                // Add the card to the rewardCards object
-                if (rewardCards[cardId]) {
-                    rewardCards[cardId] += count;
-                } else {
-                    rewardCards[cardId] = count;
+            if (reward && reward.effects) {
+                // Loop through all effects
+                for (const effect of reward.effects) {
+                    if (effect.cardId) {
+                        const cardId = effect.cardId;
+                        const count = effect.count || 1;
+                        
+                        // Add the card to the rewardCards object
+                        if (rewardCards[cardId]) {
+                            rewardCards[cardId] += count;
+                        } else {
+                            rewardCards[cardId] = count;
+                        }
+                    }
                 }
             }
         }
@@ -229,19 +267,20 @@ export default class RewardsManager {
         for (const rewardId of this.unlockedRewards.buildingUpgrade) {
             const reward = this.findRewardById(rewardId);
             
-            if (reward && 
-                reward.effect && 
-                reward.effect.buildingId === buildingId && 
-                reward.effect.resourceBonus) {
-                
-                // Apply the resource bonuses
-                for (const resourceType in reward.effect.resourceBonus) {
-                    const bonus = reward.effect.resourceBonus[resourceType];
-                    
-                    if (upgradedValues[resourceType]) {
-                        upgradedValues[resourceType] += bonus;
-                    } else {
-                        upgradedValues[resourceType] = bonus;
+            if (reward && reward.effects) {
+                // Loop through all effects
+                for (const effect of reward.effects) {
+                    if (effect.buildingId === buildingId && effect.resourceBonus) {
+                        // Apply the resource bonuses
+                        for (const resourceType in effect.resourceBonus) {
+                            const bonus = effect.resourceBonus[resourceType];
+                            
+                            if (upgradedValues[resourceType]) {
+                                upgradedValues[resourceType] += bonus;
+                            } else {
+                                upgradedValues[resourceType] = bonus;
+                            }
+                        }
                     }
                 }
             }
