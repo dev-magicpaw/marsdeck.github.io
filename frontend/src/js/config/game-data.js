@@ -532,9 +532,9 @@ export const REWARDS = {
                 }
             ]
         },
-        EFFICIENT_IRON_MINE: {
-            id: 'supplyChainReward',
-            name: 'Efficient Supply Chains',
+        EFFICIENT_SUPPLY_CHAIN: {
+            id: 'efficientSupplyChainReward',
+            name: 'Efficient Supply Chain',
             description: 'Steelworks produce 1 more steel if adjacent to an Iron Mine. Fuel Refineries produce 1 more fuel if adjacent to a Water Pump.',
             image: 'ironMine',
             applicationType: 'buildingUpgrade',
