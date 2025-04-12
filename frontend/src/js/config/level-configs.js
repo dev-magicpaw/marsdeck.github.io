@@ -69,17 +69,17 @@ export const GAME_LEVELS = [
     reputationGoal: 30,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 10,
+      [RESOURCES.STEEL]: 40, //10
       [RESOURCES.CONCRETE]: 15,
       [RESOURCES.WATER]: 0,
-      [RESOURCES.FUEL]: 0,
+      [RESOURCES.FUEL]: 30, //0
       [RESOURCES.DRONES]: 0,
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
       rewardIds: [
-        REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id
+        REWARDS.STARTING_HAND_REWARDS.TESLA_COIL_STARTING_REWARD.id
       ],
       resources: {
         // Don't add any resources for this level

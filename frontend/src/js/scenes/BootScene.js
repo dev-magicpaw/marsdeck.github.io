@@ -39,6 +39,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('solarPanel', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_12.png'));
         this.load.image('steelworks', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_08.png'));
         this.load.image('waterPump', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_11.png'));
+        this.load.image('teslaCoil', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_16.png'));
         this.load.image('windTurbine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_01.png'));
         this.load.image('windTurbineSurrounding', require('../../assets/images/ui_pack_space/Extra/Double/panel_square_screws_upside_down.png'));
         

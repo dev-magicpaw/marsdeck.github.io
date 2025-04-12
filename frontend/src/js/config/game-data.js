@@ -205,6 +205,18 @@ export const BUILDINGS = {
         consumption: {},
         terrainRequirement: null,
         texture: 'windTurbineSurrounding'
+    },
+    TESLA_COIL: {
+        id: 'teslaCoil',
+        name: 'Tesla Coil',
+        shortName: 'Tesla',
+        description: 'Generates a lot of energy immediately when built. Must be placed on water deposits.',
+        production: {
+            [RESOURCES.ENERGY]: 15
+        },
+        consumption: {},
+        terrainRequirement: TERRAIN_FEATURES.WATER.id,
+        texture: 'teslaCoil'
     }
 };
 
@@ -329,6 +341,20 @@ export const CARD_TYPES = {
         },
         specialEffects: []
     },
+    TESLA_COIL_CARD: {
+        id: 'teslaCoilCard',
+        name: 'Tesla Coil',
+        description: 'Build a tesla coil to generate a lot of energy',
+        buildingId: 'teslaCoil',
+        cardType: 'building',
+        cost: {
+            [RESOURCES.CONCRETE]: 4,
+            [RESOURCES.STEEL]: 2,
+            [RESOURCES.DRONES]: 1
+        },
+        specialEffects: []
+    },
+    // Prefab cards
     IRON_MINE_PREFAB_CARD: {
         id: 'ironMinePrefabCard',
         name: '*Iron Mine*',
@@ -466,6 +492,19 @@ export const REWARDS = {
                 }
             ]
         },
+        TESLA_COIL_STARTING_REWARD: {
+            id: 'teslaCoilStartingReward',
+            name: 'Tesla Coil',
+            description: 'Start with an Tesla Coil card in your hand',
+            image: 'teslaCoil',
+            applicationType: 'startingHand',
+            reputationCost: 30,
+            effects: [
+                {
+                    cardId: 'teslaCoilCard'
+                }
+            ]
+        }
     },
     
     // Deck cards rewards - add cards to the player's deck
