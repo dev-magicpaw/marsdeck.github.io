@@ -533,17 +533,23 @@ export const REWARDS = {
             ]
         },
         EFFICIENT_IRON_MINE: {
-            id: 'efficientIronMineReward',
-            name: 'Efficient Iron Mine',
-            description: 'Iron Mines produce 1 more iron each turn',
+            id: 'supplyChainReward',
+            name: 'Efficient Supply Chains',
+            description: 'Steelworks produce 1 more steel if adjacent to an Iron Mine. Fuel Refineries produce 1 more fuel if adjacent to a Water Pump.',
             image: 'ironMine',
             applicationType: 'buildingUpgrade',
             reputationCost: 8,
             effects: [
                 {
-                    buildingId: 'ironMine',
+                    buildingId: 'steelworks',
                     resourceBonus: {
-                        'iron': 1
+                        'steel': 1
+                    }
+                },
+                {
+                    buildingId: 'fuelRefinery',
+                    resourceBonus: {
+                        'fuel': 1
                     }
                 }
             ]
