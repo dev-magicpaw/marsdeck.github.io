@@ -2016,4 +2016,16 @@ export default class UIScene extends Phaser.Scene {
             this.tooltip = null;
         }
     }
+    
+    // Update the launch button if a launch pad is selected
+    updateLaunchButtonState() {
+        // Only proceed if a launch pad with a rocket is selected
+        if (this.selectedCell && 
+            this.selectedCell.building === 'launchPad' && 
+            this.selectedCell.hasRocket) {
+            
+            // Update the actions panel to refresh the launch button
+            this.updateActionsPanel();
+        }
+    }
 } 

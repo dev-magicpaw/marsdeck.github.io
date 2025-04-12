@@ -14,8 +14,28 @@ export default class ResourceManager {
         // For UI updates
         this.onResourceChange = null;
         
+        // For specific resource monitoring (e.g., launch resources)
+        this.resourceChangeListeners = {};
+        
         // Flag to disable victory checking during rewards screen
         this.victoryCheckEnabled = true;
+    }
+    
+    // Add a listener for changes to a specific resource
+    addResourceChangeListener(resourceType, callback) {
+        if (!this.resourceChangeListeners[resourceType]) {
+            this.resourceChangeListeners[resourceType] = [];
+        }
+        this.resourceChangeListeners[resourceType].push(callback);
+    }
+    
+    // Remove a listener
+    removeResourceChangeListener(resourceType, callback) {
+        if (!this.resourceChangeListeners[resourceType]) return;
+        const index = this.resourceChangeListeners[resourceType].indexOf(callback);
+        if (index !== -1) {
+            this.resourceChangeListeners[resourceType].splice(index, 1);
+        }
     }
     
     // Get current resource amount
@@ -36,11 +56,20 @@ export default class ResourceManager {
             return false;
         }
         
+        const oldAmount = this.resources[resourceType];
         this.resources[resourceType] += amount;
+        const newAmount = this.resources[resourceType];
         
         // Notify UI for updates
         if (this.onResourceChange) {
-            this.onResourceChange(resourceType, this.resources[resourceType]);
+            this.onResourceChange(resourceType, newAmount);
+        }
+        
+        // Notify any specific listeners for this resource
+        if (this.resourceChangeListeners[resourceType] && this.resourceChangeListeners[resourceType].length > 0) {
+            this.resourceChangeListeners[resourceType].forEach(callback => {
+                callback(resourceType, oldAmount, newAmount);
+            });
         }
         
         // Check for victory condition when reputation increases - only if enabled

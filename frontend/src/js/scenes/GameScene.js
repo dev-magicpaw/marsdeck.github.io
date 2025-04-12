@@ -98,6 +98,9 @@ export default class GameScene extends Phaser.Scene {
         // Set up input handling
         this.setupInput();
         
+        // Register resource listeners for rocket fueling
+        this.setupResourceListeners();
+        
         // Present initial card choice for first turn
         this.time.delayedCall(500, () => {
             this.showCardChoices();
@@ -1193,6 +1196,24 @@ export default class GameScene extends Phaser.Scene {
     updateCoordinateDisplay() {
         this.coordinateTexts.forEach(text => {
             text.setVisible(this.developerMode);
+        });
+    }
+
+    setupResourceListeners() {
+        // Get the resources needed for launching
+        const launchResources = Object.keys(this.launchCost);
+        
+        // Create a handler that updates rocket states when launch resources change
+        const updateRocketsOnResourceChange = (resourceType, oldValue, newValue) => {    
+            this.updateRocketStates();
+            if (this.uiScene) {
+                this.uiScene.updateLaunchButtonState();
+            }
+        };
+        
+        // Register listeners for each launch resource
+        launchResources.forEach(resourceType => {
+            this.resourceManager.addResourceChangeListener(resourceType, updateRocketsOnResourceChange);
         });
     }
 } 
