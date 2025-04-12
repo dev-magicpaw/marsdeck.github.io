@@ -11,18 +11,18 @@ export const GAME_LEVELS = [
     reputationGoal: 10,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 100,
-      [RESOURCES.CONCRETE]: 10,
+      [RESOURCES.STEEL]: 100, //30
+      [RESOURCES.CONCRETE]: 30,
       [RESOURCES.WATER]: 0,
-      [RESOURCES.FUEL]: 50,
-      [RESOURCES.DRONES]: 5,
+      [RESOURCES.FUEL]: 50, //0
+      [RESOURCES.DRONES]: 5, //0
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.IRON_MINE_PREFAB_STARTING_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.DRONE_EVENT_DECK_REWARD.id,
+        REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id,
         REWARDS.BUILDING_UPGRADE_REWARDS.IMPROVED_WIND_TURBINE.id
       ],
       resources: {
@@ -51,7 +51,7 @@ export const GAME_LEVELS = [
     rewards: {
       rewardIds: [
         REWARDS.STARTING_HAND_REWARDS.STEELWORKS_PREFAB_STARTING_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id
+        REWARDS.DECK_CARDS_REWARDS.BARTER_EVENT_DECK_REWARD.id
       ],
       resources: {
         // Don't add any resources for this level

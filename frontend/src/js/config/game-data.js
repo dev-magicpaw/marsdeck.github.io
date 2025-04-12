@@ -389,7 +389,30 @@ export const CARD_TYPES = {
                 amount: 5
             }
         ]
+    },
+    BARTER_EVENT: {
+        id: 'barterEvent',
+        name: 'Barter',
+        description: 'Trade 10 concrete for 3 steel and 3 fuel',
+        cardType: 'event',
+        cardTexture: 'barterIcon',
+        cost: {
+            [RESOURCES.CONCRETE]: 10
+        },
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.STEEL,
+                amount: 3
+            },
+            {
+                type: 'addResource',
+                resource: RESOURCES.FUEL,
+                amount: 3
+            }
+        ]
     }
+
 };
 
 // Deck composition - defines how many copies of each card type will be in the deck
@@ -462,9 +485,21 @@ export const REWARDS = {
             description: 'Add two Resource Supply Event cards to your deck',
             image: 'resourceSupplyIcon',
             applicationType: 'deckCards',
-            reputationCost: 5,
+            reputationCost: 10,
             effect: {
                 cardId: 'resourceSupplyEvent',
+                count: 2
+            }
+        },
+        BARTER_EVENT_DECK_REWARD: {
+            id: 'barterEventDeckReward',
+            name: 'Barter Event',
+            description: 'Add two Barter Event cards to your deck',
+            image: 'barterIcon',
+            applicationType: 'deckCards',
+            reputationCost: 20,
+            effect: {
+                cardId: 'barterEvent',
                 count: 2
             }
         }
