@@ -292,7 +292,25 @@ export default class GameScene extends Phaser.Scene {
         
         // Get the cost from the selected card's cardType
         const cost = this.selectedCard && this.selectedCard.cardType && this.selectedCard.cardType.cost ? 
-                     this.selectedCard.cardType.cost : {};
+                     { ...this.selectedCard.cardType.cost } : {};
+        
+        // Apply cost adjustments from rewards if available
+        if (this.rewardsManager && building) {
+            const costAdjustments = this.rewardsManager.getCardCostAdjustments(building.id);
+            
+            // Apply the adjustments to the base cost
+            for (const resource in costAdjustments) {
+                if (cost[resource]) {
+                    cost[resource] += costAdjustments[resource];
+                    // Ensure cost doesn't go below zero
+                    if (cost[resource] < 0) {
+                        cost[resource] = 0;
+                    }
+                } else {
+                    cost[resource] = costAdjustments[resource];
+                }
+            }
+        }
         
         // Check resource requirements
         if (!this.resourceManager.hasSufficientResources(cost)) {

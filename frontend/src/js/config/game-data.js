@@ -707,7 +707,7 @@ export const REWARDS = {
             id: 'fuelCompressorReward',
             name: 'Fuel Compressor',
             description: 'Fuel Refineries produce 1 more fuel but require 2 more energy',
-            image: 'fuelRefinery',
+            image: 'fuelPumpIcon',
             applicationType: 'buildingUpgrade',
             reputationCost: 10,
             effects: [
