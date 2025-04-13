@@ -444,6 +444,40 @@ export const CARD_TYPES = {
                 amount: 3
             }
         ]
+    },
+    EXPORT_WATER_EVENT: {
+        id: 'exportWaterEvent',
+        name: 'Export Water',
+        description: 'Export 10 water for 5 fuel',
+        cardType: 'event',
+        cardTexture: 'barterIcon',
+        cost: {
+            [RESOURCES.WATER]: 10
+        },
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.FUEL,
+                amount: 5
+            }
+        ]
+    },
+    EXPORT_IRON_EVENT: {
+        id: 'exportIronEvent',
+        name: 'Export Iron',
+        description: 'Export 15 iron for 5 fuel',
+        cardType: 'event',
+        cardTexture: 'barterIcon',
+        cost: {
+            [RESOURCES.IRON]: 15
+        },
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.FUEL,
+                amount: 5
+            }
+        ]
     }
 
 };
@@ -555,6 +589,24 @@ export const REWARDS = {
                 {
                     cardId: 'barterEvent',
                     count: 3
+                }
+            ]
+        },
+        RAW_EXPORT_EVENT_DECK_REWARD: {
+            id: 'rawExportEventDeckReward',
+            name: 'Raw Export Event',
+            description: 'Add two Raw Export Event cards to your deck',
+            image: 'rawExportIcon',
+            applicationType: 'deckCards',
+            reputationCost: 20,
+            effects: [
+                {
+                    cardId: 'exportWaterEvent',
+                    count: 2
+                },
+                {
+                    cardId: 'exportIronEvent',
+                    count: 2
                 }
             ]
         }
