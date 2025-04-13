@@ -331,6 +331,25 @@ export const CARD_TYPES = {
             [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1
         },
+        effects: [
+            {
+                type: 'action',
+                action: 'launchRocket',
+                name: 'Launch',
+                cost: {
+                    [RESOURCES.FUEL]: 10,
+                    [RESOURCES.STEEL]: 10
+                },
+                cooldown: 2,
+                effects: [
+                    {
+                        type: 'addResource',
+                        resource: RESOURCES.REPUTATION,
+                        amount: 10
+                    }
+                ]
+            }
+        ]
     },
     TESLA_COIL_CARD: {
         id: 'teslaCoilCard',
