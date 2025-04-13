@@ -1338,7 +1338,29 @@ export default class UIScene extends Phaser.Scene {
                 slotsY + 120,
                 reward.image
             );
-            rewardImage.setDisplaySize(120, 120);
+
+            // Set fixed height of 120px and calculate width based on aspect ratio
+            const imageTexture = this.textures.get(reward.image);
+            if (imageTexture && imageTexture.get()) {
+                const sourceWidth = imageTexture.get().width;
+                const sourceHeight = imageTexture.get().height;
+                
+                if (sourceWidth && sourceHeight) {
+                    const aspectRatio = sourceWidth / sourceHeight;
+                    const displayHeight = 120;
+                    const displayWidth = displayHeight * aspectRatio;
+                    
+                    // Apply the calculated dimensions
+                    rewardImage.setDisplaySize(displayWidth, displayHeight);
+                } else {
+                    // Fallback to square if dimensions can't be determined
+                    rewardImage.setDisplaySize(120, 120);
+                }
+            } else {
+                // Fallback to square if texture can't be found
+                rewardImage.setDisplaySize(120, 120);
+            }
+
             rewardsContainer.add(rewardImage);
             
             // Reward description
