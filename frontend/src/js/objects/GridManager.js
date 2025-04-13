@@ -312,7 +312,7 @@ export default class GridManager {
     }
     
     // Generate a random map with various terrain features
-    generateRandomMap(metalPercentage = 10, waterPercentage = 10, mountainPercentage = 5) {
+    generateRandomMap(metalPercentage = 15, waterPercentage = 5, mountainPercentage = 10) {
         this.initializeGrid(); // Start with a clean grid
         
         const totalCells = this.gridSize * this.gridSize;
