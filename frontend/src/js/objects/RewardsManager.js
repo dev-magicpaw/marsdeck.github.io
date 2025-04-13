@@ -43,7 +43,6 @@ export default class RewardsManager {
         
         // Check if already unlocked
         if (this.isRewardUnlocked(rewardId)) {
-            console.log(`Reward ${rewardId} is already unlocked`);
             return false;
         }
         
@@ -184,14 +183,12 @@ export default class RewardsManager {
         
         // Check if already unlocked
         if (this.isRewardUnlocked(rewardId)) {
-            console.log(`Reward ${rewardId} is already unlocked`);
             return false;
         }
         
         // Check if player has enough reputation
         const currentReputation = this.scene.resourceManager.getResource(RESOURCES.REPUTATION);
         if (currentReputation < reward.reputationCost) {
-            console.log(`Not enough reputation to unlock reward ${rewardId}`);
             return false;
         }
         
@@ -204,7 +201,6 @@ export default class RewardsManager {
         if (added) {
             // Save to level manager's persistent rewards
             this.saveRewardsToLevelManager();
-            console.log(`Unlocked reward: ${reward.name}`);
             return true;
         }
         
@@ -305,5 +301,37 @@ export default class RewardsManager {
         }
         
         return upgradedValues;
+    }
+    
+    // Get additional actions for a building from upgrades
+    getBuildingActions(buildingId) {
+        const actions = [];
+        
+        // Find all unlocked building upgrade rewards that affect this building
+        for (const rewardId of this.unlockedRewards.buildingUpgrade) {
+            const reward = this.findRewardById(rewardId);
+            
+            if (reward && reward.effects) {
+                // Loop through all effects
+                for (const effect of reward.effects) {
+                    // Check if this effect adds a new action to this building
+                    if (effect.buildingId === buildingId && effect.newAction) {
+                        // Create the action object with required properties
+                        const action = {
+                            type: 'action',
+                            action: `${effect.newAction.name.replace(/\s+/g, '')}`, // Convert name to ID by removing spaces
+                            name: effect.newAction.name,
+                            cost: effect.newAction.cost,
+                            cooldown: effect.newAction.cooldown,
+                            effects: effect.newAction.effects
+                        };
+                        
+                        actions.push(action);
+                    }
+                }
+            }
+        }
+        
+        return actions;
     }
 } 

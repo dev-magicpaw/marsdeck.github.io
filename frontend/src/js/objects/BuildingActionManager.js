@@ -3,7 +3,7 @@ import { BUILDINGS, CARD_TYPES } from '../config/game-data';
 export default class BuildingActionManager {
     constructor(scene) {
         this.scene = scene;
-        this.actionCooldowns = {}; // Format: {cellId: {actionId: turnsRemaining}}
+        this.rocketInFlight = {}; // Format: {cellId: true/false}
     }
     
     // Get building actions from the building configuration
@@ -11,23 +11,56 @@ export default class BuildingActionManager {
         const building = Object.values(BUILDINGS).find(b => b.id === buildingId);
         if (!building) return [];
         
-        // Look for actions in the card definition instead (since that's where they're defined)
-        const card = Object.values(CARD_TYPES).find(c => c.buildingId === buildingId);
-        if (!card || !card.effects) return [];
+        let actions = [];
         
-        return card.effects.filter(effect => effect.type === 'action');
+        // Look for actions in the card definition (since that's where they're defined)
+        const card = Object.values(CARD_TYPES).find(c => c.buildingId === buildingId);
+        if (card && card.effects) {
+            actions = [...actions, ...card.effects.filter(effect => effect.type === 'action')];
+        }
+        
+        // Also get additional actions from reward upgrades
+        if (this.scene.rewardsManager) {
+            const upgradeActions = this.scene.rewardsManager.getBuildingActions(buildingId);
+            if (upgradeActions.length > 0) {
+                actions = [...actions, ...upgradeActions];
+            }
+        }
+        
+        return actions;
     }
     
-    // Check if an action is on cooldown
+    // Check if an action is on cooldown - for launch actions, this just checks if the rocket is in flight
     isActionOnCooldown(x, y, actionId) {
         const cellId = `${x},${y}`;
-        return this.actionCooldowns[cellId]?.[actionId] > 0;
+        
+        // If this is a launch action and there's a rocket in flight from this pad
+        if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
+            return this.rocketInFlight[cellId] === true;
+        }
+        
+        return false;
     }
     
-    // Get remaining cooldown turns
+    // Get remaining cooldown turns - for launch actions, this is handled by GridManager
     getActionCooldown(x, y, actionId) {
-        const cellId = `${x},${y}`;
-        return this.actionCooldowns[cellId]?.[actionId] || 0;
+        // For launch actions, we don't directly track cooldown here
+        // Instead we check if there's a rocket in flight
+        if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
+            const cellId = `${x},${y}`;
+            if (this.rocketInFlight[cellId]) {
+                // Check the GridManager to see when the rocket will return
+                const rocketsInFlight = this.scene.gridManager.rocketsInFlight;
+                for (const rocket of rocketsInFlight) {
+                    if (rocket.x === x && rocket.y === y) {
+                        return rocket.returnsAtTurn - this.scene.currentTurn;
+                    }
+                }
+                return 1; // Default if we can't find the rocket
+            }
+        }
+        
+        return 0;
     }
     
     // Perform an action
@@ -35,9 +68,14 @@ export default class BuildingActionManager {
         // Check if valid action
         if (!action || action.type !== 'action') return false;
         
-        // Check if on cooldown
+        // Check if on cooldown (rocket in flight for launch actions)
         if (this.isActionOnCooldown(x, y, action.action)) {
-            this.scene.uiScene.showMessage(`Action is on cooldown for ${this.getActionCooldown(x, y, action.action)} more turns`);
+            const cooldownTurns = this.getActionCooldown(x, y, action.action);
+            const message = action.action === 'FastLaunch' || action.action === 'launchRocket' 
+                ? `Rocket in flight. Returns in ${cooldownTurns} turn${cooldownTurns > 1 ? 's' : ''}.`
+                : `Action is on cooldown for ${cooldownTurns} more turns`;
+            
+            this.scene.uiScene.showMessage(message);
             return false;
         }
         
@@ -47,11 +85,10 @@ export default class BuildingActionManager {
             return false;
         }
         
-        // Apply action cooldown
-        if (action.cooldown) {
+        // Mark rocket as in flight for launch actions
+        if (action.action === 'launchRocket' || action.action === 'FastLaunch') {
             const cellId = `${x},${y}`;
-            if (!this.actionCooldowns[cellId]) this.actionCooldowns[cellId] = {};
-            this.actionCooldowns[cellId][action.action] = action.cooldown;
+            this.rocketInFlight[cellId] = true;
         }
         
         // Consume resources
@@ -68,11 +105,9 @@ export default class BuildingActionManager {
         }
         
         // Trigger specific action handling (like animations)
-        if (action.action === 'launchRocket') {
-            this.scene.gridManager.launchRocket(x, y);
-            // We'll trigger the rocket animation
-            this.scene.animateRocketLaunch(x, y);
-        }
+        this.scene.gridManager.launchRocket(x, y, action.cooldown);
+        const launchType = action.action === 'FastLaunch' ? 'fast' : 'regular';
+        this.scene.animateRocketLaunch(x, y, launchType);
         
         // Show message about the action
         this.scene.uiScene.showMessage(`${action.name} action executed!`);
@@ -83,20 +118,9 @@ export default class BuildingActionManager {
         return true;
     }
     
-    // Process end of turn for cooldowns
-    processTurnEnd() {
-        // Reduce all cooldowns by 1
-        for (const cellId in this.actionCooldowns) {
-            for (const actionId in this.actionCooldowns[cellId]) {
-                this.actionCooldowns[cellId][actionId]--;
-                if (this.actionCooldowns[cellId][actionId] <= 0) {
-                    delete this.actionCooldowns[cellId][actionId];
-                }
-            }
-            // Clean up empty entries
-            if (Object.keys(this.actionCooldowns[cellId]).length === 0) {
-                delete this.actionCooldowns[cellId];
-            }
-        }
+    // Track when a rocket has returned to the pad
+    clearRocketInFlight(x, y) {
+        const cellId = `${x},${y}`;
+        delete this.rocketInFlight[cellId];
     }
 } 

@@ -1877,10 +1877,16 @@ export default class UIScene extends Phaser.Scene {
                         // Determine disabled reason
                         let disabledReason = 'Action unavailable';
                         if (isOnCooldown) {
-                            const cooldown = this.gameScene.buildingActionManager.getActionCooldown(
+                            const cooldownTurns = this.gameScene.buildingActionManager.getActionCooldown(
                                 this.selectedCell.x, this.selectedCell.y, action.action
                             );
-                            disabledReason = `On cooldown (${cooldown} turns)`;
+                            
+                            // For launch actions, provide more context
+                            if (isLaunchAction) {
+                                disabledReason = `Rocket in flight. Returns in ${cooldownTurns} turn${cooldownTurns > 1 ? 's' : ''}.`;
+                            } else {
+                                disabledReason = `On cooldown (${cooldownTurns} turns)`;
+                            }
                         } else if (!hasSufficientResources) {
                             disabledReason = 'Not enough resources';
                         } else if (isLaunchAction && !canLaunch) {

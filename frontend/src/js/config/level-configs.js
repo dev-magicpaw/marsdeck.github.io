@@ -79,7 +79,8 @@ export const GAME_LEVELS = [
     },
     rewards: {
       rewardIds: [
-        REWARDS.STARTING_HAND_REWARDS.TESLA_COIL_STARTING_REWARD.id
+        REWARDS.STARTING_HAND_REWARDS.TESLA_COIL_STARTING_REWARD.id,
+        REWARDS.BUILDING_UPGRADE_REWARDS.IMPROVED_LAUNCH_PAD.id
       ],
       resources: {
         // Don't add any resources for this level
@@ -92,8 +93,8 @@ export const GAME_LEVELS = [
     name: 'Advanced Colony',
     description: 'Develop advanced infrastructure and technology',
     mapId: 'RESOURCE_RICH_MAP',
-    turnLimit: 35,
-    reputationGoal: 15,
+    turnLimit: 20,
+    reputationGoal: 40,
     startingResources: {
       [RESOURCES.IRON]: 0,
       [RESOURCES.STEEL]: 250,

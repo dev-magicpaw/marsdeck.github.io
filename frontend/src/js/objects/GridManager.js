@@ -199,17 +199,20 @@ export default class GridManager {
     }
     
     // Launch a rocket from a launch pad
-    launchRocket(x, y) {
+    launchRocket(x, y, returnInTurns = 2) {
         const cell = this.getCell(x, y);
         if (!cell || cell.building !== 'launchPad' || !cell.hasRocket || cell.rocketState !== 'fueled') {
             return false;
         }
         
+        // Reduce by one to account for the current turn
+        let returnDelay = returnInTurns - 1;
+        
         // Add to rockets in flight with return timer
         this.rocketsInFlight.push({
             x: x,
             y: y,
-            returnsAtTurn: this.scene.currentTurn + 1 // Returns after next full turn
+            returnsAtTurn: this.scene.currentTurn + returnDelay, // Return after specified delay
         });
         
         // Update cell state
@@ -239,6 +242,11 @@ export default class GridManager {
                 cell.hasRocket = true;
                 cell.justLanded = true; // Mark that this rocket just landed for animation
                 this.updateRocketState(rocket.x, rocket.y);
+                
+                // Clear the rocket in flight status in BuildingActionManager
+                if (this.scene.buildingActionManager) {
+                    this.scene.buildingActionManager.clearRocketInFlight(rocket.x, rocket.y);
+                }
             }
         }
         
