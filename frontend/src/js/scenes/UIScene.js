@@ -664,7 +664,7 @@ export default class UIScene extends Phaser.Scene {
             let costY = 75;
             
             // Get base cost from card type with adjustments
-            let displayCost = this.calculateCardCost(card);
+            let displayCost = this.gameScene.calculateCardCost(card);
             
             for (const resource in displayCost) {
                 if (displayCost[resource] > 0) {
@@ -855,7 +855,7 @@ export default class UIScene extends Phaser.Scene {
                 content += "Construction cost:\n";
                 
                 // Get base cost from card type with adjustments
-                let displayCost = this.calculateCardCost(card);
+                let displayCost = this.gameScene.calculateCardCost(card);
                 
                 // Show adjusted cost
                 for (const resource in displayCost) {
@@ -945,7 +945,7 @@ export default class UIScene extends Phaser.Scene {
             content += "Cost:\n";
 
             // Get costs with adjustments
-            let displayCost = this.calculateCardCost(card);
+            let displayCost = this.gameScene.calculateCardCost(card);
             
             // Show cost
             for (const resource in displayCost) {
@@ -1018,32 +1018,6 @@ export default class UIScene extends Phaser.Scene {
         
         // Only hide action buttons, not the title
         this.actionsContainer.setVisible(false);
-    }
-    
-    // Calculate card cost with adjustments from rewards
-    calculateCardCost(card) {
-        // Get base cost from card type
-        let displayCost = {...card.cardType.cost};
-        
-        // Apply cost adjustments from rewards if gameScene is available and it's a building card
-        if (this.gameScene && this.gameScene.rewardsManager && card.type === 'building' && card.building) {
-            const costAdjustments = this.gameScene.rewardsManager.getCardCostAdjustments(card.building.id);
-            
-            // Apply adjustments
-            for (const resource in costAdjustments) {
-                if (displayCost[resource]) {
-                    displayCost[resource] += costAdjustments[resource];
-                    // Ensure cost doesn't go below zero
-                    if (displayCost[resource] < 0) {
-                        displayCost[resource] = 0;
-                    }
-                } else {
-                    displayCost[resource] = costAdjustments[resource];
-                }
-            }
-        }
-        
-        return displayCost;
     }
     
     // Show message to the player
@@ -1729,7 +1703,7 @@ export default class UIScene extends Phaser.Scene {
                     let costY = 75;
                     
                     // Get base cost from card type with adjustments
-                    let displayCost = this.calculateCardCost(card);
+                    let displayCost = this.gameScene.calculateCardCost(card);
                     
                     for (const resource in displayCost) {
                         if (displayCost[resource] > 0) {
@@ -1769,7 +1743,7 @@ export default class UIScene extends Phaser.Scene {
                     let costY = 75;
                     
                     // Get base cost from card type with adjustments
-                    let displayCost = this.calculateCardCost(card);
+                    let displayCost = this.gameScene.calculateCardCost(card);
                     
                     for (const resource in displayCost) {
                         if (displayCost[resource] > 0) {
@@ -1839,7 +1813,7 @@ export default class UIScene extends Phaser.Scene {
             // For event cards, show Apply button
             if (selectedCard && selectedCard.type === 'event') {
                 // Calculate cost with adjustments
-                const cardCost = this.calculateCardCost(selectedCard);
+                const cardCost = this.gameScene.calculateCardCost(selectedCard);
                 // Check if player has enough resources
                 const hasSufficientResources = this.resourceManager.hasSufficientResources(cardCost);
                 
