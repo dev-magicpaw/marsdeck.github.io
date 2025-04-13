@@ -123,15 +123,15 @@ export const GAME_LEVELS = [
     name: 'Metropolis',
     description: 'Build a massive, self-sustaining Mars metropolis',
     mapId: 'SAMPLE_MAP',  // You might want to create a new map for this level
-    turnLimit: 40,
-    reputationGoal: 20,
+    turnLimit:25,
+    reputationGoal: 90,
     startingResources: {
-      [RESOURCES.IRON]: 20,
-      [RESOURCES.STEEL]: 300,
-      [RESOURCES.CONCRETE]: 50,
-      [RESOURCES.WATER]: 30,
-      [RESOURCES.FUEL]: 150,
-      [RESOURCES.DRONES]: 20,
+      [RESOURCES.IRON]: 0,
+      [RESOURCES.STEEL]: 5,
+      [RESOURCES.CONCRETE]: 5,
+      [RESOURCES.WATER]: 0,
+      [RESOURCES.FUEL]: 0,
+      [RESOURCES.DRONES]: 0,
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
