@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import BuildingActionManager from '../objects/BuildingActionManager';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
 import levelManager from '../objects/LevelManager';
@@ -22,6 +23,7 @@ export default class GameScene extends Phaser.Scene {
         this.resourceManager = new ResourceManager(this);
         this.rewardsManager = new RewardsManager(this);
         this.cardManager = new CardManager(this);
+        this.buildingActionManager = new BuildingActionManager(this);
         
         // Ensure victory checking is enabled for new levels
         this.resourceManager.setVictoryCheckEnabled(true);
@@ -55,7 +57,7 @@ export default class GameScene extends Phaser.Scene {
         this.eventCardSelectedThisTurn = false;
         this.pendingSecondChoice = false;
         
-        // Store launch cost for easier access
+        // Store launch cost for easier access - will be deprecated after refactoring
         this.launchCost = BUILDINGS.LAUNCH_PAD.launchCost;
         this.launchReward = BUILDINGS.LAUNCH_PAD.launchReward;
     }
@@ -561,6 +563,9 @@ export default class GameScene extends Phaser.Scene {
         // Process building production first
         this.processProduction();
         
+        // Process building action cooldowns
+        this.buildingActionManager.processTurnEnd();
+        
         // Reset resources (if needed)
         
         // Process end game condition
@@ -651,110 +656,8 @@ export default class GameScene extends Phaser.Scene {
     
     // Launch a rocket from a launch pad
     launchRocket(x, y) {
-        const cell = this.gridManager.getCell(x, y);
-        
-        // Check if valid
-        if (!cell || cell.building !== 'launchPad' || !cell.hasRocket || cell.rocketState !== 'fueled') {
-            return false;
-        }
-        
-        // Check if player has enough resources
-        if (!this.resourceManager.hasSufficientResources(this.launchCost)) {
-            this.uiScene.showMessage("Not enough resources to launch rocket");
-            return false;
-        }
-        
-        // Deduct resources
-        for (const resource in this.launchCost) {
-            this.resourceManager.modifyResource(resource, -this.launchCost[resource]);
-        }
-        
-        // Award reputation
-        this.resourceManager.modifyResource(RESOURCES.REPUTATION, this.launchReward);
-        
-        // Update the rocket state immediately to prevent duplicate launches
-        // This happens before the animation so the UI will update correctly
-        this.gridManager.launchRocket(x, y);
-        
-        // Create flickering effect
-        // Reference for later use
-        const rocketSprite = cell.rocketSprite;
-        const xPos = rocketSprite.x;
-        const yPos = rocketSprite.y;
-        const rocketScale = rocketSprite.scaleX;
-        
-        // Hide the original sprite
-        rocketSprite.setVisible(false);
-        
-        // Create a new sprite for the pre-launch flickering
-        const flickerSprite = this.add.sprite(xPos, yPos, 'rocketFueled');
-        flickerSprite.setOrigin(0.5, 1.0);
-        flickerSprite.setScale(rocketScale);
-        this.gridContainer.add(flickerSprite);
-        
-        // Define the flickering sequence
-        const flickerSequence = [
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 }
-        ];
-        
-        // Initialize sequence counter
-        let sequenceIndex = 0;
-        
-        // Create a timer for flickering effect
-        // TODO: Put it into a separate function
-        const flickerTimer = this.time.addEvent({
-            delay: 200,
-            callback: () => {
-                sequenceIndex++;
-                if (sequenceIndex < flickerSequence.length) {
-                    // Update texture for next flicker
-                    flickerSprite.setTexture(flickerSequence[sequenceIndex].key);
-                } else {
-                    // Flickering complete, start the launch
-                    flickerTimer.remove();
-                    
-                    // Create the launch animation sprite
-                    const launchSprite = this.add.sprite(xPos, yPos, 'rocketInFlight');
-                    launchSprite.setOrigin(0.5, 1.0);
-                    launchSprite.setScale(rocketScale);
-                    this.gridContainer.add(launchSprite);
-                    
-                    // Remove the flicker sprite
-                    flickerSprite.destroy();
-                    
-                    // Calculate the distance to fly off the screen
-                    const mapHeight = this.gridManager.gridSize * CELL_SIZE;
-                    const distanceToTop = yPos;
-                    const extraDistance = 100; // Go a bit beyond the edge
-                    
-                    // Launch the rocket animation - fly straight up at constant size
-                    this.tweens.add({
-                        targets: launchSprite,
-                        y: -extraDistance, // Go beyond the top edge
-                        duration: 2000,
-                        ease: 'Quad.easeIn',
-                        onComplete: () => {
-                            launchSprite.destroy();
-                        }
-                    });
-                }
-            },
-            repeat: flickerSequence.length - 1
-        });
-        
-        // Show message
-        this.uiScene.showMessage(`Rocket launched! +${this.launchReward} Reputation`);
-        
-        // Update UI
-            this.uiScene.refreshUI();
-        
-        return true;
+        // Use the action-based approach instead
+        return this.executeAction(x, y, 'launchRocket');
     }
     
     // Animate rocket landing on a launch pad
@@ -1222,6 +1125,96 @@ export default class GameScene extends Phaser.Scene {
         // Register listeners for each launch resource
         launchResources.forEach(resourceType => {
             this.resourceManager.addResourceChangeListener(resourceType, updateRocketsOnResourceChange);
+        });
+    }
+
+    // Execute a building action
+    executeAction(x, y, actionId) {
+        const cell = this.gridManager.getCell(x, y);
+        if (!cell || !cell.building) return false;
+        
+        // Find the action configuration
+        const actions = this.buildingActionManager.getBuildingActions(cell.building);
+        const action = actions.find(a => a.action === actionId);
+        
+        // Perform the action
+        return this.buildingActionManager.performAction(x, y, action);
+    }
+
+    // Animate rocket launching from a launch pad
+    animateRocketLaunch(x, y) {
+        const cell = this.gridManager.getCell(x, y);
+        
+        // Reference for later use
+        const rocketSprite = cell.rocketSprite;
+        if (!rocketSprite) return;
+        
+        const xPos = rocketSprite.x;
+        const yPos = rocketSprite.y;
+        const rocketScale = rocketSprite.scaleX;
+        
+        // Hide the original sprite
+        rocketSprite.setVisible(false);
+        
+        // Create a new sprite for the pre-launch flickering
+        const flickerSprite = this.add.sprite(xPos, yPos, 'rocketFueled');
+        flickerSprite.setOrigin(0.5, 1.0);
+        flickerSprite.setScale(rocketScale);
+        this.gridContainer.add(flickerSprite);
+        
+        // Define the flickering sequence
+        const flickerSequence = [
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 },
+            { key: 'rocketFueled', duration: 200 },
+            { key: 'rocketInFlight', duration: 200 }
+        ];
+        
+        // Initialize sequence counter
+        let sequenceIndex = 0;
+        
+        // Create a timer for flickering effect
+        const flickerTimer = this.time.addEvent({
+            delay: 200,
+            callback: () => {
+                sequenceIndex++;
+                if (sequenceIndex < flickerSequence.length) {
+                    // Update texture for next flicker
+                    flickerSprite.setTexture(flickerSequence[sequenceIndex].key);
+                } else {
+                    // Flickering complete, start the launch
+                    flickerTimer.remove();
+                    
+                    // Create the launch animation sprite
+                    const launchSprite = this.add.sprite(xPos, yPos, 'rocketInFlight');
+                    launchSprite.setOrigin(0.5, 1.0);
+                    launchSprite.setScale(rocketScale);
+                    this.gridContainer.add(launchSprite);
+                    
+                    // Remove the flicker sprite
+                    flickerSprite.destroy();
+                    
+                    // Calculate the distance to fly off the screen
+                    const mapHeight = this.gridManager.gridSize * CELL_SIZE;
+                    const distanceToTop = yPos;
+                    const extraDistance = 100; // Go a bit beyond the edge
+                    
+                    // Launch the rocket animation - fly straight up at constant size
+                    this.tweens.add({
+                        targets: launchSprite,
+                        y: -extraDistance, // Go beyond the top edge
+                        duration: 2000,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => {
+                            launchSprite.destroy();
+                        }
+                    });
+                }
+            },
+            repeat: flickerSequence.length - 1
         });
     }
 } 

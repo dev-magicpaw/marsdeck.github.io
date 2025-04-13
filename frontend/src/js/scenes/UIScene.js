@@ -1814,52 +1814,90 @@ export default class UIScene extends Phaser.Scene {
             // Update vertical position for next button
             buttonY += this.buttonHeight + buttonSpacing;
         }
-        // If we have a selected Launch Pad with a rocket, show launch action
-        else if (this.selectedCell && 
-                 this.selectedCell.building === 'launchPad' && 
-                 this.selectedCell.hasRocket) {
-            hasActions = true;
+        // If we have a selected building, show available actions
+        else if (this.selectedCell && this.selectedCell.building) {
+            // Get actions for this building type
+            const actions = this.gameScene.buildingActionManager.getBuildingActions(this.selectedCell.building);
             
-            // Get cost and reward information from BUILDINGS definition
-            const building = Object.values(BUILDINGS).find(b => b.id === 'launchPad');
-            const fuelCost = building.launchCost[RESOURCES.FUEL];
-            const steelCost = building.launchCost[RESOURCES.STEEL];
-            const reputationReward = building.launchReward;
-            
-            // Create button text with costs and benefits
-            const launchText = `Launch: -${fuelCost} Fuel, -${steelCost} Steel, +${reputationReward} Rep`;
-            
-            // Check if the rocket is fueled
-            const isFueled = this.selectedCell.rocketState === 'fueled';
-            
-            // Create launch button (enabled or disabled based on state)
-            if (isFueled) {
-                // Enabled launch button
-                const launchButton = this.createActionButton(launchText, () => {
-                    // Launch rocket from the launch pad
-                    this.gameScene.launchRocket(this.selectedCell.x, this.selectedCell.y);
+            if (actions && actions.length > 0) {
+                hasActions = true;
+                
+                actions.forEach(action => {
+                    // Format button text with costs and benefits
+                    let buttonText = action.name;
                     
-                    // Clear selection and refresh UI
-                    this.clearInfoPanel();
-                    this.refreshUI();
-                }, 0x0066cc, 300, this.buttonHeight, 'blueGlossSquareButton'); // Use blue texture with larger width and consistent height
-                
-                // Position the button
-                launchButton.y = buttonY;
-                this.actionsContainer.add(launchButton);
-                
-                // Update vertical position for next button
-                buttonY += this.buttonHeight + buttonSpacing;
-            } else {
-                // Disabled launch button - now we'll use a grayed-out version of the texture
-                const launchButton = this.createDisabledButton(launchText, 'Need fuel to launch rocket', 300, this.buttonHeight, 'blueGlossSquareButton');
-                
-                // Position the button
-                launchButton.y = buttonY;
-                this.actionsContainer.add(launchButton);
-                
-                // Update vertical position for next button
-                buttonY += this.buttonHeight + buttonSpacing;
+                    // Add costs if any
+                    if (action.cost) {
+                        Object.entries(action.cost).forEach(([resource, amount], index) => {
+                            buttonText += `${index === 0 ? ': -' : ', -'}${amount} ${resource}`;
+                        });
+                    }
+                    
+                    // Add effects if any
+                    if (action.effects) {
+                        action.effects.forEach(effect => {
+                            if (effect.type === 'addResource') {
+                                buttonText += `, +${effect.amount} ${effect.resource}`;
+                            }
+                        });
+                    }
+                    
+                    // Check if action is on cooldown
+                    const isOnCooldown = this.gameScene.buildingActionManager.isActionOnCooldown(
+                        this.selectedCell.x, this.selectedCell.y, action.action
+                    );
+                    
+                    // Check resource requirements
+                    const hasSufficientResources = this.gameScene.resourceManager.hasSufficientResources(action.cost);
+                    
+                    // Special handling for launch action
+                    const isLaunchAction = action.action === 'launchRocket';
+                    let canLaunch = true;
+                    
+                    if (isLaunchAction) {
+                        canLaunch = this.selectedCell.hasRocket && this.selectedCell.rocketState === 'fueled';
+                    }
+                    
+                    // Create enabled or disabled button
+                    if (!isOnCooldown && hasSufficientResources && (!isLaunchAction || canLaunch)) {
+                        // Enabled action button
+                        const actionButton = this.createActionButton(buttonText, () => {
+                            // Execute the action
+                            this.gameScene.executeAction(this.selectedCell.x, this.selectedCell.y, action.action);
+                            
+                            // Clear selection and refresh UI
+                            this.clearInfoPanel();
+                            this.refreshUI();
+                        }, 0x0066cc, 300, this.buttonHeight, 'blueGlossSquareButton');
+                        
+                        // Position the button
+                        actionButton.y = buttonY;
+                        this.actionsContainer.add(actionButton);
+                    } else {
+                        // Determine disabled reason
+                        let disabledReason = 'Action unavailable';
+                        if (isOnCooldown) {
+                            const cooldown = this.gameScene.buildingActionManager.getActionCooldown(
+                                this.selectedCell.x, this.selectedCell.y, action.action
+                            );
+                            disabledReason = `On cooldown (${cooldown} turns)`;
+                        } else if (!hasSufficientResources) {
+                            disabledReason = 'Not enough resources';
+                        } else if (isLaunchAction && !canLaunch) {
+                            disabledReason = 'Need fuel to launch rocket';
+                        }
+                        
+                        // Disabled button
+                        const disabledButton = this.createDisabledButton(buttonText, disabledReason, 300, this.buttonHeight, 'blueGlossSquareButton');
+                        
+                        // Position the button
+                        disabledButton.y = buttonY;
+                        this.actionsContainer.add(disabledButton);
+                    }
+                    
+                    // Update vertical position for next button
+                    buttonY += this.buttonHeight + buttonSpacing;
+                });
             }
         }
         
@@ -2032,13 +2070,15 @@ export default class UIScene extends Phaser.Scene {
     
     // Update the launch button if a launch pad is selected
     updateLaunchButtonState() {
-        // Only proceed if a launch pad with a rocket is selected
-        if (this.selectedCell && 
-            this.selectedCell.building === 'launchPad' && 
-            this.selectedCell.hasRocket) {
+        // Only proceed if a building with actions is selected
+        if (this.selectedCell && this.selectedCell.building) {
+            // Get actions for this building
+            const actions = this.gameScene.buildingActionManager.getBuildingActions(this.selectedCell.building);
             
-            // Update the actions panel to refresh the launch button
-            this.updateActionsPanel();
+            // If there are actions, update the actions panel
+            if (actions && actions.length > 0) {
+                this.updateActionsPanel();
+            }
         }
     }
 } 
