@@ -35,7 +35,7 @@ export default class BuildingActionManager {
         const cellId = `${x},${y}`;
         
         // If this is a launch action and there's a rocket in flight from this pad
-        if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
+        if (actionId === 'launchRocket' || actionId === 'FastLaunch' || actionId === 'HeavyLaunch') {
             // Log diagnostics to check the state
             console.log(`isActionOnCooldown:Launch action check for ${cellId}:`, {
                 rocketInFlight: this.rocketInFlight[cellId],
@@ -64,7 +64,7 @@ export default class BuildingActionManager {
     getActionCooldown(x, y, actionId) {
         // For launch actions, we don't directly track cooldown here
         // Instead we check if there's a rocket in flight
-        if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
+        if (actionId === 'launchRocket' || actionId === 'FastLaunch' || actionId === 'HeavyLaunch') {
             const cellId = `${x},${y}`;
             if (this.rocketInFlight[cellId]) {
                 // Check the GridManager to see when the rocket will return
@@ -90,7 +90,7 @@ export default class BuildingActionManager {
         // Check if on cooldown (rocket in flight for launch actions)
         if (this.isActionOnCooldown(x, y, action.action)) {
             const cooldownTurns = this.getActionCooldown(x, y, action.action);
-            const message = action.action === 'FastLaunch' || action.action === 'launchRocket' 
+            const message = action.action === 'FastLaunch' || action.action === 'launchRocket' || action.action === 'HeavyLaunch'
                 ? `Rocket in flight. Returns in ${cooldownTurns} turn${cooldownTurns > 1 ? 's' : ''}.`
                 : `Action is on cooldown for ${cooldownTurns} more turns`;
             
@@ -105,13 +105,18 @@ export default class BuildingActionManager {
         }
         
         // Mark rocket as in flight for launch actions
-        if (action.action === 'launchRocket' || action.action === 'FastLaunch') {
+        if (action.action === 'launchRocket' || action.action === 'FastLaunch' || action.action === 'HeavyLaunch') {
             const cellId = `${x},${y}`;
             this.rocketInFlight[cellId] = true;
             console.log(`performAction: this.rocketInFlight ?  ${this.rocketInFlight[cellId]} for cell: ${x},${y}`);
             this.scene.gridManager.launchRocket(x, y, action.cooldown);
             // Trigger specific action handling (like animations)
-            const launchType = action.action === 'FastLaunch' ? 'fast' : 'regular';
+            let launchType = 'regular';
+            if (action.action === 'FastLaunch') {
+                launchType = 'fast';
+            } else if (action.action === 'HeavyLaunch') {
+                launchType = 'heavy';
+            }
             this.scene.animateRocketLaunch(x, y, launchType);
         }
         

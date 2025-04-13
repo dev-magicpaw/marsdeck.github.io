@@ -773,6 +773,34 @@ export const REWARDS = {
                     }
                 }
             ]
+        },
+        HEAVY_LAUNCH_PAD: {
+            id: 'heavyLaunchPadReward',
+            name: 'Heavy Launch',
+            description: 'Launch Pads can now launch heavy rockets',
+            image: 'rocketInFlight',
+            applicationType: 'buildingUpgrade',
+            reputationCost: 10,
+            effects: [
+                {
+                    buildingId: 'launchPad',
+                    newAction: {
+                        name: 'Heavy Launch',
+                        cost: {
+                            [RESOURCES.FUEL]: 20,
+                            [RESOURCES.STEEL]: 15
+                        },
+                        cooldown: 2,
+                        effects: [
+                            {
+                                type: 'addResource',
+                                resource: RESOURCES.REPUTATION,
+                                amount: 15
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     }
 };
