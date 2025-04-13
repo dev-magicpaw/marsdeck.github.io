@@ -513,8 +513,8 @@ export const CARD_TYPES = {
             [RESOURCES.CONCRETE]: 5,
             [RESOURCES.IRON]: 5,
             [RESOURCES.WATER]: 5,
-            [RESOURCES.STEEL]: 5,
-            [RESOURCES.FUEL]: 5
+            [RESOURCES.STEEL]: 3,
+            [RESOURCES.FUEL]: 3
         },
         effects: [
             {
