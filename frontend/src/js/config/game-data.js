@@ -601,6 +601,34 @@ export const REWARDS = {
                     }
                 }
             ]
+        },
+        IMPROVED_LAUNCH_PAD: {
+            id: 'improvedLaunchPadReward',
+            name: 'Improved Launch Pad',
+            description: 'Launch Pads can now launch fast rockets',
+            image: 'launchPad',
+            applicationType: 'buildingUpgrade',
+            reputationCost: 10,
+            effects: [
+                {
+                    buildingId: 'launchPad',
+                    newAction: {
+                        name: 'Fast Launch',
+                        cost: {
+                            [RESOURCES.FUEL]: 15,
+                            [RESOURCES.STEEL]: 10
+                        },
+                        cooldown: 1,
+                        effects: [
+                            {
+                                type: 'addResource',
+                                resource: RESOURCES.REPUTATION,
+                                amount: 10
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     }
 }; 
