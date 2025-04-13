@@ -256,6 +256,32 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     
+    // Calculate card cost with adjustments from rewards
+    calculateCardCost(card) {
+        // Get base cost from card type
+        let displayCost = {...card.cardType.cost};
+        
+        // Apply cost adjustments from rewards if available and it's a building card
+        if (this.rewardsManager && card.type === 'building' && card.building) {
+            const costAdjustments = this.rewardsManager.getCardCostAdjustments(card.building.id);
+            
+            // Apply adjustments
+            for (const resource in costAdjustments) {
+                if (displayCost[resource]) {
+                    displayCost[resource] += costAdjustments[resource];
+                    // Ensure cost doesn't go below zero
+                    if (displayCost[resource] < 0) {
+                        displayCost[resource] = 0;
+                    }
+                } else {
+                    displayCost[resource] = costAdjustments[resource];
+                }
+            }
+        }
+        
+        return displayCost;
+    }
+    
     // Try to place a building from a card
     tryPlaceBuilding(x, y, building) {
         const cell = this.gridManager.getCell(x, y);
@@ -271,27 +297,8 @@ export default class GameScene extends Phaser.Scene {
             return;
         }
         
-        // Get the cost from the selected card's cardType
-        const cost = this.selectedCard && this.selectedCard.cardType && this.selectedCard.cardType.cost ? 
-                     { ...this.selectedCard.cardType.cost } : {};
-        
-        // Apply cost adjustments from rewards if available
-        if (this.rewardsManager && building) {
-            const costAdjustments = this.rewardsManager.getCardCostAdjustments(building.id);
-            
-            // Apply the adjustments to the base cost
-            for (const resource in costAdjustments) {
-                if (cost[resource]) {
-                    cost[resource] += costAdjustments[resource];
-                    // Ensure cost doesn't go below zero
-                    if (cost[resource] < 0) {
-                        cost[resource] = 0;
-                    }
-                } else {
-                    cost[resource] = costAdjustments[resource];
-                }
-            }
-        }
+        // Get the cost from the selected card with adjustments
+        const cost = this.selectedCard ? this.calculateCardCost(this.selectedCard) : {};
         
         // Check resource requirements
         if (!this.resourceManager.hasSufficientResources(cost)) {
@@ -504,14 +511,15 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // Check if player has enough resources
-        if (!this.resourceManager.hasSufficientResources(card.cardType.cost)) {
+        const cardCost = this.calculateCardCost(card);
+        if (!this.resourceManager.hasSufficientResources(cardCost)) {
             this.uiScene.showMessage('Not enough resources');
             return false;
         }
         
         // Apply the cost
-        for (const resource in card.cardType.cost) {
-            this.resourceManager.spendResource(resource, card.cardType.cost[resource]);
+        for (const resource in cardCost) {
+            this.resourceManager.spendResource(resource, cardCost[resource]);
         }
         
         // Support backward compatibility for old cards with a single effect
