@@ -515,6 +515,22 @@ export default class UIScene extends Phaser.Scene {
             this.selectedCardIndex = null;
         }
         
+        // Check if there are any inconsistencies with launch pads and fix them
+        if (this.gameScene.gridManager && this.gameScene.buildingActionManager) {
+            // Find all launch pads with rockets
+            for (let y = 0; y < this.gameScene.gridManager.gridSize; y++) {
+                for (let x = 0; x < this.gameScene.gridManager.gridSize; x++) {
+                    const cell = this.gameScene.gridManager.getCell(x, y);
+                    if (cell && cell.building === 'launchPad' && cell.hasRocket) {
+                        const cellId = `${x},${y}`;
+                        if (this.gameScene.buildingActionManager.rocketInFlight[cellId]) {
+                            console.warn(`Found inconsistent rocket state during UI refresh, a rocket is in flight but the cell hasRocket is true`);
+                        }
+                    }
+                }
+            }
+        }
+        
         this.updateResourceDisplay();
         this.updateHandDisplay();
         this.updateTurnDisplay();

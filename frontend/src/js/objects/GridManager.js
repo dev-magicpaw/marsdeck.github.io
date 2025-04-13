@@ -229,6 +229,7 @@ export default class GridManager {
         // Find rockets that should return this turn
         for (let i = 0; i < this.rocketsInFlight.length; i++) {
             if (this.rocketsInFlight[i].returnsAtTurn === this.scene.currentTurn) {
+                console.log(`Rocket returning at turn ${this.scene.currentTurn} to position ${this.rocketsInFlight[i].x},${this.rocketsInFlight[i].y}`);
                 returningRockets.push(this.rocketsInFlight[i]);
                 this.rocketsInFlight.splice(i, 1);
                 i--; // Adjust index after removal
@@ -245,6 +246,7 @@ export default class GridManager {
                 
                 // Clear the rocket in flight status in BuildingActionManager
                 if (this.scene.buildingActionManager) {
+                    console.log(`Clearing rocket in flight for ${rocket.x},${rocket.y}`);
                     this.scene.buildingActionManager.clearRocketInFlight(rocket.x, rocket.y);
                 }
             }
