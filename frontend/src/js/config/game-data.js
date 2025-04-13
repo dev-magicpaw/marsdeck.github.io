@@ -450,7 +450,7 @@ export const CARD_TYPES = {
         name: 'Export Water',
         description: 'Export 10 water for 5 fuel',
         cardType: 'event',
-        cardTexture: 'barterIcon',
+        cardTexture: 'waterIcon',
         cost: {
             [RESOURCES.WATER]: 10
         },
@@ -467,7 +467,7 @@ export const CARD_TYPES = {
         name: 'Export Iron',
         description: 'Export 15 iron for 5 fuel',
         cardType: 'event',
-        cardTexture: 'barterIcon',
+        cardTexture: 'ironIcon',
         cost: {
             [RESOURCES.IRON]: 15
         },
