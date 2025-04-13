@@ -606,7 +606,7 @@ export const REWARDS = {
             id: 'improvedLaunchPadReward',
             name: 'Improved Launch Pad',
             description: 'Launch Pads can now launch fast rockets',
-            image: 'launchPad',
+            image: 'rocketInFlight',
             applicationType: 'buildingUpgrade',
             reputationCost: 10,
             effects: [
