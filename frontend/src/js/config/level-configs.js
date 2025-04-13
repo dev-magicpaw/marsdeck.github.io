@@ -98,11 +98,11 @@ export const GAME_LEVELS = [
     reputationGoal: 40,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 250,
-      [RESOURCES.CONCRETE]: 30,
-      [RESOURCES.WATER]: 10,
-      [RESOURCES.FUEL]: 120,
-      [RESOURCES.DRONES]: 15,
+      [RESOURCES.STEEL]: 10,
+      [RESOURCES.CONCRETE]: 10,
+      [RESOURCES.WATER]: 0,
+      [RESOURCES.FUEL]: 0,
+      [RESOURCES.DRONES]: 0,
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },

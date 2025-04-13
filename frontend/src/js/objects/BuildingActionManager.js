@@ -36,6 +36,20 @@ export default class BuildingActionManager {
         
         // If this is a launch action and there's a rocket in flight from this pad
         if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
+            // Log diagnostics to check the state
+            console.log(`Launch action check for ${cellId}:`, {
+                rocketInFlight: this.rocketInFlight[cellId],
+                cell: this.scene.gridManager.getCell(x, y)
+            });
+            
+            // The bug may be that rocketInFlight state isn't being properly cleared
+            // Let's make sure it's in sync with the cell's hasRocket state
+            const cell = this.scene.gridManager.getCell(x, y);
+            if (cell && cell.hasRocket && this.rocketInFlight[cellId]) {
+                // If the cell has a rocket but we still think it's in flight, fix the state
+                console.warn("Found inconsistent rocket state for", cellId);
+            }
+            
             return this.rocketInFlight[cellId] === true;
         }
         
@@ -53,6 +67,7 @@ export default class BuildingActionManager {
                 const rocketsInFlight = this.scene.gridManager.rocketsInFlight;
                 for (const rocket of rocketsInFlight) {
                     if (rocket.x === x && rocket.y === y) {
+                        console.log(`Rocket in flight for ${cellId}, returns in ${rocket.returnsAtTurn - this.scene.currentTurn} turns`);
                         return rocket.returnsAtTurn - this.scene.currentTurn;
                     }
                 }
