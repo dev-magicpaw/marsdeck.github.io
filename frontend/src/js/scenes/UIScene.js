@@ -1676,18 +1676,6 @@ export default class UIScene extends Phaser.Scene {
                         }
                     }
                 }
-                
-                // Add special effects or other card-specific UI elements
-                if (card.cardType && card.cardType.specialEffects && card.cardType.specialEffects.length > 0) {
-                    // Display special effect indicators if needed
-                    const effectsText = this.add.text(
-                        5,
-                        this.cardHeight - 20,
-                        "Special Effect",
-                        { fontSize: '10px', fontFamily: 'Arial', color: '#0000ff' }
-                    );
-                    cardContainer.add(effectsText);
-                }
             } else if (card.type === 'event') {
                 // For event cards, display card texture if available
                 const iconTexture = card.cardType.cardTexture || 'placeholderTexture';
