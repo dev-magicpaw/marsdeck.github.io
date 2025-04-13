@@ -220,6 +220,7 @@ export default class GridManager {
         
         // Update cell state
         cell.hasRocket = false;
+        console.log(`launchRocket: Rocket launched. cell.hasRocket: ${cell.hasRocket} for cell: ${x},${y}`);
         cell.rocketState = null;
         
         return true;
@@ -243,6 +244,7 @@ export default class GridManager {
         for (const rocket of returningRockets) {
             const cell = this.getCell(rocket.x, rocket.y);
             if (cell && cell.building === 'launchPad') {
+                console.log(`processRocketReturns: Rocket returning to launch pad at ${rocket.x},${rocket.y}`);
                 cell.hasRocket = true;
                 cell.justLanded = true; // Mark that this rocket just landed for animation
                 this.updateRocketState(rocket.x, rocket.y);
