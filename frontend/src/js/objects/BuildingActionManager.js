@@ -37,7 +37,7 @@ export default class BuildingActionManager {
         // If this is a launch action and there's a rocket in flight from this pad
         if (actionId === 'launchRocket' || actionId === 'FastLaunch') {
             // Log diagnostics to check the state
-            console.log(`Launch action check for ${cellId}:`, {
+            console.log(`isActionOnCooldown:Launch action check for ${cellId}:`, {
                 rocketInFlight: this.rocketInFlight[cellId],
                 cell: this.scene.gridManager.getCell(x, y)
             });
@@ -47,9 +47,13 @@ export default class BuildingActionManager {
             const cell = this.scene.gridManager.getCell(x, y);
             if (cell && cell.hasRocket && this.rocketInFlight[cellId]) {
                 // If the cell has a rocket but we still think it's in flight, fix the state
-                console.warn("Found inconsistent rocket state for", cellId);
+                console.warn("isActionOnCooldown: Found inconsistent rocket state for", cellId);
+                console.warn("isActionOnCooldown: cell has rocket ? ", cell.hasRocket);
+                console.warn("isActionOnCooldown: rocketInFlight state ? ", this.rocketInFlight[cellId]);
+                console.warn("isActionOnCooldown: cell: ", cell);
             }
             
+            console.log(`isActionOnCooldown: Rocket in flight for ${cellId}:`, this.rocketInFlight[cellId]);
             return this.rocketInFlight[cellId] === true;
         }
         
@@ -104,6 +108,11 @@ export default class BuildingActionManager {
         if (action.action === 'launchRocket' || action.action === 'FastLaunch') {
             const cellId = `${x},${y}`;
             this.rocketInFlight[cellId] = true;
+            console.log(`performAction: this.rocketInFlight ?  ${this.rocketInFlight[cellId]} for cell: ${x},${y}`);
+            this.scene.gridManager.launchRocket(x, y, action.cooldown);
+            // Trigger specific action handling (like animations)
+            const launchType = action.action === 'FastLaunch' ? 'fast' : 'regular';
+            this.scene.animateRocketLaunch(x, y, launchType);
         }
         
         // Consume resources
@@ -116,13 +125,7 @@ export default class BuildingActionManager {
             if (effect.type === 'addResource') {
                 this.scene.resourceManager.modifyResource(effect.resource, effect.amount);
             }
-            // Add other effect types as needed
         }
-        
-        // Trigger specific action handling (like animations)
-        this.scene.gridManager.launchRocket(x, y, action.cooldown);
-        const launchType = action.action === 'FastLaunch' ? 'fast' : 'regular';
-        this.scene.animateRocketLaunch(x, y, launchType);
         
         // Show message about the action
         this.scene.uiScene.showMessage(`${action.name} action executed!`);
