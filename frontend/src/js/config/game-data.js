@@ -703,6 +703,25 @@ export const REWARDS = {
                 }
             ]
         },
+        FUEL_COMPRESSOR: {
+            id: 'fuelCompressorReward',
+            name: 'Fuel Compressor',
+            description: 'Fuel Refineries produce 1 more fuel but require 2 more energy',
+            image: 'fuelRefinery',
+            applicationType: 'buildingUpgrade',
+            reputationCost: 10,
+            effects: [
+                {
+                    buildingId: 'fuelRefinery',
+                    resourceBonus: {
+                        'fuel': 1
+                    },
+                    cardCost: {
+                        [RESOURCES.ENERGY]: 2
+                    }
+                }
+            ]
+        },
         EFFICIENT_SUPPLY_CHAIN: {
             id: 'efficientSupplyChainReward',
             name: 'Efficient Supply Chain',
