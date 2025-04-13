@@ -1199,6 +1199,18 @@ export default class GameScene extends Phaser.Scene {
                 { key: 'rocketFueled', duration: 30 },
                 { key: 'rocketInFlight', duration: 120 }
             ];
+        } else if (launchType === 'heavy') {
+            flickerSequence = [
+                { key: 'rocketInFlight', duration: 300 },
+                { key: 'rocketFueled', duration: 300 },
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 100 },
+                { key: 'rocketFueled', duration: 100 },
+                { key: 'rocketInFlight', duration: 50 },
+                { key: 'rocketFueled', duration: 50 },
+                { key: 'rocketInFlight', duration: 50 }
+            ];
         }
         
         // Initialize sequence counter
@@ -1206,7 +1218,6 @@ export default class GameScene extends Phaser.Scene {
         
         // Create a timer for flickering effect
         const flickerTimer = this.time.addEvent({
-            //delay: 200,
             delay: flickerSequence[sequenceIndex].duration,
             callback: () => {
                 sequenceIndex++;
@@ -1229,7 +1240,14 @@ export default class GameScene extends Phaser.Scene {
                     // Calculate the distance to fly off the screen
                     const extraDistance = 100; // Go a bit beyond the edge
 
-                    const flightDuration = launchType === 'regular' ? 2000 : 1000;
+                    // Set flight duration based on launch type
+                    let flightDuration = 2000; // Default for regular launch
+                    if (launchType === 'fast') {
+                        flightDuration = 1000;
+                    } else if (launchType === 'heavy') {
+                        flightDuration = 3000;
+                    }
+                    
                     // Launch the rocket animation - fly straight up at constant size
                     this.tweens.add({
                         targets: launchSprite,

@@ -1926,7 +1926,7 @@ export default class UIScene extends Phaser.Scene {
                             // Clear selection and refresh UI
                             this.clearInfoPanel();
                             this.refreshUI();
-                        }, 0x0066cc, 300, this.buttonHeight, 'blueGlossSquareButton');
+                        }, 0x0066cc, 350, this.buttonHeight, 'blueGlossSquareButton');
                         
                         // Position the button
                         actionButton.y = buttonY;

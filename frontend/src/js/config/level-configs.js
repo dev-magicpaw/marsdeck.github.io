@@ -110,7 +110,7 @@ export const GAME_LEVELS = [
       rewardIds: [
         REWARDS.DECK_CARDS_REWARDS.ARTIFICIAL_LIGHTS_DECK_REWARD.id,
         REWARDS.DECK_CARDS_REWARDS.CHARITY_EVENT_DECK_REWARD.id,
-        REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_SUPPLY_CHAIN.id
+        REWARDS.BUILDING_UPGRADE_REWARDS.HEAVY_LAUNCH_PAD.id
       ],
       resources: {
         // Don't add any resources for this level
@@ -127,10 +127,10 @@ export const GAME_LEVELS = [
     reputationGoal: 90,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 10,
+      [RESOURCES.STEEL]: 90, //10
       [RESOURCES.CONCRETE]: 10,
       [RESOURCES.WATER]: 0,
-      [RESOURCES.FUEL]: 0,
+      [RESOURCES.FUEL]: 90, //0
       [RESOURCES.DRONES]: 0,
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
