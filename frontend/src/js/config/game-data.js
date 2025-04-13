@@ -234,7 +234,6 @@ export const CARD_TYPES = {
             [RESOURCES.CONCRETE]: 2,
             [RESOURCES.STEEL]: 1,
         },
-        specialEffects: [] // For future expansion
     },
     IRON_MINE_CARD: {
         id: 'ironMineCard',
@@ -247,7 +246,6 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 2,
             [RESOURCES.ENERGY]: 1
         },
-        specialEffects: []
     },
     STEELWORKS_CARD: {
         id: 'steelworksCard',
@@ -261,7 +259,6 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 3
         },
-        specialEffects: []
     },
     CONCRETE_HARVESTER_CARD: {
         id: 'concreteMixerCard',
@@ -274,7 +271,6 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 3,
             [RESOURCES.ENERGY]: 1
         },
-        specialEffects: []
     },
     WATER_PUMP_CARD: {
         id: 'waterPumpCard',
@@ -288,7 +284,6 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 1
         },
-        specialEffects: []
     },
     FUEL_REFINERY_CARD: {
         id: 'fuelRefineryCard',
@@ -301,7 +296,6 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 2
         },
-        specialEffects: []
     },
     WIND_TURBINE_CARD: {
         id: 'windTurbineCard',
@@ -313,7 +307,6 @@ export const CARD_TYPES = {
             [RESOURCES.CONCRETE]: 3,
             [RESOURCES.STEEL]: 1
         },
-        specialEffects: []
     },
     SOLAR_PANEL_CARD: {
         id: 'solarPanelCard',
@@ -326,7 +319,6 @@ export const CARD_TYPES = {
             [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 1
         },
-        specialEffects: []
     },
     LAUNCH_PAD_CARD: {
         id: 'launchPadCard',
@@ -339,7 +331,6 @@ export const CARD_TYPES = {
             [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1
         },
-        specialEffects: []
     },
     TESLA_COIL_CARD: {
         id: 'teslaCoilCard',
@@ -352,7 +343,6 @@ export const CARD_TYPES = {
             [RESOURCES.STEEL]: 2,
             [RESOURCES.DRONES]: 1
         },
-        specialEffects: []
     },
     // Prefab cards
     IRON_MINE_PREFAB_CARD: {
@@ -364,7 +354,6 @@ export const CARD_TYPES = {
         cost: {
             [RESOURCES.ENERGY]: 1
         },
-        specialEffects: []
     },
     STEELWORKS_PREFAB_CARD: {
         id: 'steelworksPrefabCard',
@@ -375,7 +364,6 @@ export const CARD_TYPES = {
         cost: {
             [RESOURCES.ENERGY]: 3
         },
-        specialEffects: []
     },
     // Event cards
     SCRAP_DRONES_EVENT: {
@@ -594,6 +582,6 @@ export const REWARDS = {
                     }
                 }
             ]
-        },
+        }
     }
 }; 
