@@ -212,7 +212,7 @@ export const BUILDINGS = {
         shortName: 'Tesla',
         description: 'Generates a lot of energy immediately when built. Must be placed on water deposits.',
         production: {
-            [RESOURCES.ENERGY]: 15
+            [RESOURCES.ENERGY]: 12
         },
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.WATER.id,
@@ -363,18 +363,6 @@ export const CARD_TYPES = {
             }
         ]
     },
-    TESLA_COIL_CARD: {
-        id: 'teslaCoilCard',
-        name: 'Tesla Coil',
-        description: 'Build a tesla coil to generate a lot of energy',
-        buildingId: 'teslaCoil',
-        cardType: 'building',
-        cost: {
-            [RESOURCES.CONCRETE]: 4,
-            [RESOURCES.STEEL]: 2,
-            [RESOURCES.DRONES]: 1
-        },
-    },
     ARTIFICIAL_LIGHTS_CARD: {
         id: 'artificialLightsCard',
         name: 'Artificial Lights',
@@ -406,6 +394,16 @@ export const CARD_TYPES = {
         cardType: 'prefab',
         cost: {
             [RESOURCES.ENERGY]: 3
+        },
+    },
+    TESLA_COIL_PREFAB_CARD: {   
+        id: 'teslaCoilPrefabCard',
+        name: '*Tesla Coil*',
+        description: 'Build a tesla coil to generate a lot of energy. Being a prefab this card requires way less resources to build.',
+        buildingId: 'teslaCoil',
+        cardType: 'prefab',
+        cost: {
+            [RESOURCES.CONCRETE]: 2
         },
     },
     // Event cards
@@ -578,16 +576,16 @@ export const REWARDS = {
                 }
             ]
         },
-        TESLA_COIL_STARTING_REWARD: {
-            id: 'teslaCoilStartingReward',
-            name: 'Tesla Coil',
-            description: 'Start with an Tesla Coil card in your hand',
+        TESLA_COIL_PREFAB_STARTING_REWARD: {
+            id: 'teslaCoilPrefabStartingReward',
+            name: '*Tesla Coil*',
+            description: 'Start with an Tesla Coil card in your hand. Being a prefab this card requires way less resources to build.',
             image: 'teslaCoil',
             applicationType: 'startingHand',
             reputationCost: 30,
             effects: [
                 {
-                    cardId: 'teslaCoilCard'
+                    cardId: 'teslaCoilPrefabCard'
                 }
             ]
         }
