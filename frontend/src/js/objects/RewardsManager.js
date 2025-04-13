@@ -352,4 +352,33 @@ export default class RewardsManager {
         
         return actions;
     }
+    
+    // Get cost adjustments for a building from rewards
+    // Positive values increase cost, negative values decrease cost
+    getCardCostAdjustments(buildingId) {
+        const costAdjustments = {};
+        
+        // Find all unlocked building upgrade rewards that affect this building
+        for (const rewardId of this.unlockedRewards.buildingUpgrade) {
+            const reward = this.findRewardById(rewardId);
+            
+            if (reward && reward.effects) {
+                for (const effect of reward.effects) {
+                    if (effect.buildingId === buildingId && effect.cardCost) {
+                        for (const resourceType in effect.cardCost) {
+                            const adjustment = effect.cardCost[resourceType];
+                            
+                            if (costAdjustments[resourceType]) {
+                                costAdjustments[resourceType] += adjustment;
+                            } else {
+                                costAdjustments[resourceType] = adjustment;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return costAdjustments;
+    }
 } 

@@ -662,12 +662,34 @@ export default class UIScene extends Phaser.Scene {
         if (card.cardType && card.cardType.cost) {
             // Cost text
             let costY = 75;
-            for (const resource in card.cardType.cost) {
-                if (card.cardType.cost[resource] > 0) {
+            
+            // Get base cost from card type
+            let displayCost = {...card.cardType.cost};
+            
+            // Apply cost adjustments from rewards if gameScene is available and it's a building card
+            if (this.gameScene && this.gameScene.rewardsManager && card.type === 'building' && card.building) {
+                const costAdjustments = this.gameScene.rewardsManager.getCardCostAdjustments(card.building.id);
+                
+                // Apply adjustments
+                for (const resource in costAdjustments) {
+                    if (displayCost[resource]) {
+                        displayCost[resource] += costAdjustments[resource];
+                        // Ensure cost doesn't go below zero
+                        if (displayCost[resource] < 0) {
+                            displayCost[resource] = 0;
+                        }
+                    } else {
+                        displayCost[resource] = costAdjustments[resource];
+                    }
+                }
+            }
+            
+            for (const resource in displayCost) {
+                if (displayCost[resource] > 0) {
                     const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                     
                     // Check if player has enough of this resource
-                    const requiredAmount = card.cardType.cost[resource];
+                    const requiredAmount = displayCost[resource];
                     const playerAmount = this.resourceManager.getResource(resource);
                     const hasEnough = playerAmount >= requiredAmount;
                     
@@ -677,7 +699,7 @@ export default class UIScene extends Phaser.Scene {
                     const costText = this.add.text(
                         5, 
                         costY, 
-                        `${resourceName}: ${card.cardType.cost[resource]}`, 
+                        `${resourceName}: ${requiredAmount}`, 
                         { fontSize: '10px', fontFamily: 'Arial', color: textColor }
                     );
                     cardContainer.add(costText);
@@ -850,11 +872,32 @@ export default class UIScene extends Phaser.Scene {
                 let content = card.cardType.description + '\n\n';
                 content += "Construction cost:\n";
                 
-                // Show cost from card type
-                for (const resource in card.cardType.cost) {
-                    if (card.cardType.cost[resource] > 0) {
+                // Get base cost from card type
+                let displayCost = {...card.cardType.cost};
+                
+                // Apply cost adjustments from rewards if gameScene is available
+                if (this.gameScene && this.gameScene.rewardsManager) {
+                    const costAdjustments = this.gameScene.rewardsManager.getCardCostAdjustments(building.id);
+                    
+                    // Apply adjustments
+                    for (const resource in costAdjustments) {
+                        if (displayCost[resource]) {
+                            displayCost[resource] += costAdjustments[resource];
+                            // Ensure cost doesn't go below zero
+                            if (displayCost[resource] < 0) {
+                                displayCost[resource] = 0;
+                            }
+                        } else {
+                            displayCost[resource] = costAdjustments[resource];
+                        }
+                    }
+                }
+                
+                // Show adjusted cost
+                for (const resource in displayCost) {
+                    if (displayCost[resource] > 0) {
                         // Check if we have enough resources
-                        const required = card.cardType.cost[resource];
+                        const required = displayCost[resource];
                         const available = this.resourceManager.getResource(resource);
                         const hasEnough = available >= required;
                         
@@ -915,7 +958,7 @@ export default class UIScene extends Phaser.Scene {
                 if (Object.keys(building.consumption).length > 0) {
                     additionalText += "\nConsumption:\n";
                     for (const resource in building.consumption) {
-                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                        const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);                        
                         additionalText += `${resourceName}: -${building.consumption[resource]}\n`;
                     }
                 }
@@ -924,7 +967,7 @@ export default class UIScene extends Phaser.Scene {
                 content += additionalText;
                 
                 this.infoContent.setText(content);
-                
+
                 // Show building sprite
                 this.infoSprite.setTexture(building.texture);
                 this.infoSprite.setDisplaySize(this.INFO_SPRITE_SIZE, this.INFO_SPRITE_SIZE);
@@ -936,7 +979,7 @@ export default class UIScene extends Phaser.Scene {
             // Handle event card info display
             let content = card.cardType.description + '\n\n';
             content += "Cost:\n";
-            
+
             // Show cost from card type
             for (const resource in card.cardType.cost) {
                 if (card.cardType.cost[resource] > 0) {
@@ -956,13 +999,13 @@ export default class UIScene extends Phaser.Scene {
                     }
                 }
             }
-            
+
             // Add effect description
             content += "\nEffect:\n";
-            
+
             // Support backward compatibility for old cards with a single effect
             const effects = card.cardType.effects || (card.cardType.effect ? [card.cardType.effect] : []);
-            
+
             if (effects.length === 0) {
                 content += "No effects\n";
             } else {
@@ -974,9 +1017,9 @@ export default class UIScene extends Phaser.Scene {
                     // Future effect types can be added here
                 }
             }
-            
+
             this.infoContent.setText(content);
-            
+
             // Use proper card texture if available
             const texture = card.cardType.cardTexture || 'placeholderTexture';
             this.infoSprite.setTexture(texture);
@@ -1691,12 +1734,34 @@ export default class UIScene extends Phaser.Scene {
                 if (card.cardType && card.cardType.cost) {
                     // Cost text
                     let costY = 75;
-                    for (const resource in card.cardType.cost) {
-                        if (card.cardType.cost[resource] > 0) {
+                    
+                    // Get base cost from card type
+                    let displayCost = {...card.cardType.cost};
+                    
+                    // Apply cost adjustments from rewards if gameScene is available and it's a building card
+                    if (this.gameScene && this.gameScene.rewardsManager && card.type === 'building' && card.building) {
+                        const costAdjustments = this.gameScene.rewardsManager.getCardCostAdjustments(card.building.id);
+                        
+                        // Apply adjustments
+                        for (const resource in costAdjustments) {
+                            if (displayCost[resource]) {
+                                displayCost[resource] += costAdjustments[resource];
+                                // Ensure cost doesn't go below zero
+                                if (displayCost[resource] < 0) {
+                                    displayCost[resource] = 0;
+                                }
+                            } else {
+                                displayCost[resource] = costAdjustments[resource];
+                            }
+                        }
+                    }
+                    
+                    for (const resource in displayCost) {
+                        if (displayCost[resource] > 0) {
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                             
                             // Check if player has enough of this resource
-                            const requiredAmount = card.cardType.cost[resource];
+                            const requiredAmount = displayCost[resource];
                             const playerAmount = this.resourceManager.getResource(resource);
                             const hasEnough = playerAmount >= requiredAmount;
                             
@@ -1706,7 +1771,7 @@ export default class UIScene extends Phaser.Scene {
                             const costText = this.add.text(
                                 5, 
                                 costY, 
-                                `${resourceName}: ${card.cardType.cost[resource]}`, 
+                                `${resourceName}: ${requiredAmount}`, 
                                 { fontSize: '10px', fontFamily: 'Arial', color: textColor }
                             );
                             cardContainer.add(costText);
@@ -1727,12 +1792,16 @@ export default class UIScene extends Phaser.Scene {
                 if (card.cardType && card.cardType.cost) {
                     // Cost text
                     let costY = 75;
-                    for (const resource in card.cardType.cost) {
-                        if (card.cardType.cost[resource] > 0) {
+                    
+                    // Get base cost from card type
+                    let displayCost = {...card.cardType.cost};
+                    
+                    for (const resource in displayCost) {
+                        if (displayCost[resource] > 0) {
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                             
                             // Check if player has enough of this resource
-                            const requiredAmount = card.cardType.cost[resource];
+                            const requiredAmount = displayCost[resource];
                             const playerAmount = this.resourceManager.getResource(resource);
                             const hasEnough = playerAmount >= requiredAmount;
                             
@@ -1742,7 +1811,7 @@ export default class UIScene extends Phaser.Scene {
                             const costText = this.add.text(
                                 5, 
                                 costY, 
-                                `${resourceName}: ${card.cardType.cost[resource]}`, 
+                                `${resourceName}: ${requiredAmount}`, 
                                 { fontSize: '10px', fontFamily: 'Arial', color: textColor }
                             );
                             cardContainer.add(costText);

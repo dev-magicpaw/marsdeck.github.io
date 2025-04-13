@@ -53,7 +53,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('waterIcon', require('../../assets/images/game_icons/water.png'));
         this.load.image('ironIcon', require('../../assets/images/game_icons/iron.png'));
         this.load.image('rawExportIcon', require('../../assets/images/game_icons/raw_trade.png'));
-        this.load.image('charityIcon', require('../../assets/images/game_icons/present_gree.png'));
+        this.load.image('charityIcon', require('../../assets/images/game_icons/present_green.png'));
+        this.load.image('fuelPumpIcon', require('../../assets/images/game_icons/gas_pump_blue.png'));
 
         // Load illegal tile shading sprite
         this.load.image('illegalTileShade', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_large_square.png'));
