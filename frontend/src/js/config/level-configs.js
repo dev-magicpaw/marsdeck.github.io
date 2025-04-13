@@ -93,7 +93,7 @@ export const GAME_LEVELS = [
     id: 'level4',
     name: 'Advanced Colony',
     description: 'Develop advanced infrastructure and technology',
-    mapId: 'RESOURCE_RICH_MAP',
+    mapId: 'LEVEL_4_MAP',
     turnLimit: 20,
     reputationGoal: 40,
     startingResources: {
