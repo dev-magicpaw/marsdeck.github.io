@@ -264,7 +264,6 @@ export default class GameScene extends Phaser.Scene {
         
         // Check placement requirements
         if (!this.gridManager.canPlaceBuilding(x, y, building)) {
-            console.log('Cannot place building here');
             // Show UI error message
             if (this.uiScene) {
                 this.uiScene.showMessage('Cannot place building here.');
@@ -278,7 +277,6 @@ export default class GameScene extends Phaser.Scene {
         
         // Check resource requirements
         if (!this.resourceManager.hasSufficientResources(cost)) {
-            console.log('Not enough resources');
             // Show UI error message
             if (this.uiScene) {
                 this.uiScene.showMessage('Not enough resources to build this.');
@@ -544,11 +542,6 @@ export default class GameScene extends Phaser.Scene {
         // Process building production first
         this.processProduction();
         
-        // Process building action cooldowns
-        this.buildingActionManager.processTurnEnd();
-        
-        // Reset resources (if needed)
-        
         // Process end game condition
         if (this.currentTurn >= this.maxTurns) {
             this.gameOver();
@@ -577,7 +570,6 @@ export default class GameScene extends Phaser.Scene {
         
         // Reset event card mechanics tracking for the new turn
         this.extraCardAddedThisTurn = false;
-        console.log('extraCardAddedThisTurn reset to false');
         this.eventCardSelectedThisTurn = false;
         this.pendingSecondChoice = false;
         
@@ -941,9 +933,6 @@ export default class GameScene extends Phaser.Scene {
         
         // Check if any of the cards is an event card
         const hasEventCard = tempCards.some(card => card.type === 'event');
-        console.log('hasEventCard:', hasEventCard);
-        console.log('extraCardAddedThisTurn:', this.extraCardAddedThisTurn);
-        console.log('cardManager.deck.length:', this.cardManager.deck.length);
         
         // If there's an event card and we haven't added an extra card this turn, add one more
         if (hasEventCard && !this.extraCardAddedThisTurn && this.cardManager.deck.length > 0) {
@@ -1123,7 +1112,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Animate rocket launching from a launch pad
-    animateRocketLaunch(x, y) {
+    animateRocketLaunch(x, y, launchType = 'regular') {
         const cell = this.gridManager.getCell(x, y);
         
         // Reference for later use
@@ -1144,22 +1133,36 @@ export default class GameScene extends Phaser.Scene {
         this.gridContainer.add(flickerSprite);
         
         // Define the flickering sequence
-        const flickerSequence = [
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 },
-            { key: 'rocketFueled', duration: 200 },
-            { key: 'rocketInFlight', duration: 200 }
-        ];
+        let flickerSequence = []
+        if (launchType === 'regular') {
+            flickerSequence = [
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 },
+                { key: 'rocketFueled', duration: 200 },
+                { key: 'rocketInFlight', duration: 200 }
+            ];
+        } else if (launchType === 'fast') {
+            flickerSequence = [
+                { key: 'rocketInFlight', duration: 120 },
+                { key: 'rocketFueled', duration: 30 },
+                { key: 'rocketInFlight', duration: 120 },
+                { key: 'rocketFueled', duration: 30 },
+                { key: 'rocketInFlight', duration: 120 },
+                { key: 'rocketFueled', duration: 30 },
+                { key: 'rocketInFlight', duration: 120 }
+            ];
+        }
         
         // Initialize sequence counter
         let sequenceIndex = 0;
         
         // Create a timer for flickering effect
         const flickerTimer = this.time.addEvent({
-            delay: 200,
+            //delay: 200,
+            delay: flickerSequence[sequenceIndex].duration,
             callback: () => {
                 sequenceIndex++;
                 if (sequenceIndex < flickerSequence.length) {
@@ -1179,15 +1182,14 @@ export default class GameScene extends Phaser.Scene {
                     flickerSprite.destroy();
                     
                     // Calculate the distance to fly off the screen
-                    const mapHeight = this.gridManager.gridSize * CELL_SIZE;
-                    const distanceToTop = yPos;
                     const extraDistance = 100; // Go a bit beyond the edge
-                    
+
+                    const flightDuration = launchType === 'regular' ? 2000 : 1000;
                     // Launch the rocket animation - fly straight up at constant size
                     this.tweens.add({
                         targets: launchSprite,
                         y: -extraDistance, // Go beyond the top edge
-                        duration: 2000,
+                        duration: flightDuration,
                         ease: 'Quad.easeIn',
                         onComplete: () => {
                             launchSprite.destroy();
