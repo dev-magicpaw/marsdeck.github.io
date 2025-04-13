@@ -685,10 +685,10 @@ export const REWARDS = {
     
     // Building upgrade rewards - improve building performance
     BUILDING_UPGRADE_REWARDS: {
-        IMPROVED_WIND_TURBINE: {
-            id: 'improvedWindTurbineReward',
-            name: 'Improved Wind Turbine',
-            description: 'Wind Turbines produce 2 more energy',
+        IMPROVED_ELECTRIC_GENERATION: {
+            id: 'improvedElectricGenerationReward',
+            name: 'Improved Electric Generation',
+            description: 'Wind Turbines produce 2 more energy. Solar panels produce +1 energy per each adjacent building.',
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
             reputationCost: 5,
@@ -697,6 +697,13 @@ export const REWARDS = {
                     buildingId: 'windTurbine',
                     resourceBonus: {
                         'energy': 2
+                    }
+                },
+                {
+                    buildingId: 'solarPanel',
+                    adjacentBuildingId: 'any',
+                    adjacencyBonus: {
+                        'energy': 1
                     }
                 }
             ]
