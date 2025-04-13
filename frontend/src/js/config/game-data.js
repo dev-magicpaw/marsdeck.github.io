@@ -190,7 +190,7 @@ export const BUILDINGS = {
         id: 'launchPadSurrounding',
         name: 'Launch Pad Surrounding',
         shortName: 'Launch Area',
-        description: 'Part of the launch pad area, cannot be built on',
+        description: 'Part of the launch pad area, cannot be built on.',
         production: {},
         consumption: {},
         terrainRequirement: null,
@@ -200,7 +200,7 @@ export const BUILDINGS = {
         id: 'windTurbineSurrounding',
         name: 'Wind Turbine Surrounding',
         shortName: 'Wind Area',
-        description: 'Part of the wind turbine area, cannot be built on',
+        description: 'Part of the wind turbine area, cannot be built on.',
         production: {},
         consumption: {},
         terrainRequirement: null,
@@ -217,6 +217,18 @@ export const BUILDINGS = {
         consumption: {},
         terrainRequirement: TERRAIN_FEATURES.WATER.id,
         texture: 'teslaCoil'
+    },
+    ARTIFICIAL_LIGHTS: {
+        id: 'artificialLights',
+        name: 'Artificial Lights',
+        shortName: 'Lights',
+        description: 'Generates respect by makeing the colony look nice.',
+        production: {
+            [RESOURCES.REPUTATION]: 2
+        },
+        consumption: {},
+        terrainRequirement: null,
+        texture: 'artificialLights'
     }
 };
 
@@ -363,6 +375,18 @@ export const CARD_TYPES = {
             [RESOURCES.DRONES]: 1
         },
     },
+    ARTIFICIAL_LIGHTS_CARD: {
+        id: 'artificialLightsCard',
+        name: 'Artificial Lights',
+        description: 'Build artificial lights - makes the area pretty and brings respect to the colony',
+        buildingId: 'artificialLights',
+        cardType: 'building',
+        cost: {
+            [RESOURCES.CONCRETE]: 2,
+            [RESOURCES.ENERGY]: 2,
+            [RESOURCES.DRONES]: 1
+        },
+    },
     // Prefab cards
     IRON_MINE_PREFAB_CARD: {
         id: 'ironMinePrefabCard',
@@ -478,7 +502,28 @@ export const CARD_TYPES = {
                 amount: 5
             }
         ]
-    }
+    },
+    CHARITY_EVENT: {
+        id: 'charityEvent',
+        name: 'Charity',
+        description: 'Charity event - provide resources to another colony for 5 reputation',
+        cardType: 'event',
+        cardTexture: 'charityIcon',
+        cost: {
+            [RESOURCES.CONCRETE]: 5,
+            [RESOURCES.IRON]: 5,
+            [RESOURCES.WATER]: 5,
+            [RESOURCES.STEEL]: 5,
+            [RESOURCES.FUEL]: 5
+        },
+        effects: [
+            {
+                type: 'addResource',
+                resource: RESOURCES.REPUTATION,
+                amount: 5
+            }
+        ]
+    },
 
 };
 
@@ -607,6 +652,34 @@ export const REWARDS = {
                 {
                     cardId: 'exportIronEvent',
                     count: 2
+                }
+            ]
+        },
+        ARTIFICIAL_LIGHTS_DECK_REWARD: {
+            id: 'artificialLightsDeckReward',
+            name: 'Artificial Lights',
+            description: 'Add 3 Artificial Lights cards to your deck',
+            image: 'artificialLights',
+            applicationType: 'deckCards',
+            reputationCost: 30,
+            effects: [
+                {
+                    cardId: 'artificialLightsCard',
+                    count: 3
+                }
+            ]
+        },
+        CHARITY_EVENT_DECK_REWARD: {
+            id: 'charityEventDeckReward',
+            name: 'Charity Event',
+            description: 'Add 4 Charity Event cards to your deck',
+            image: 'charityIcon',
+            applicationType: 'deckCards',
+            reputationCost: 30,
+            effects: [
+                {
+                    cardId: 'charityEvent',
+                    count: 4
                 }
             ]
         }

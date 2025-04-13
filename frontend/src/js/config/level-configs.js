@@ -98,18 +98,18 @@ export const GAME_LEVELS = [
     reputationGoal: 40,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 10,
+      [RESOURCES.STEEL]: 50, //10
       [RESOURCES.CONCRETE]: 10,
       [RESOURCES.WATER]: 0,
-      [RESOURCES.FUEL]: 0,
+      [RESOURCES.FUEL]: 50, //0
       [RESOURCES.DRONES]: 0,
       [RESOURCES.ENERGY]: 0,
       [RESOURCES.REPUTATION]: 0
     },
     rewards: {
       rewardIds: [
-        REWARDS.STARTING_HAND_REWARDS.IRON_MINE_PREFAB_STARTING_REWARD.id,
-        REWARDS.DECK_CARDS_REWARDS.RESOURCE_SUPPLY_EVENT_DECK_REWARD.id,
+        REWARDS.DECK_CARDS_REWARDS.ARTIFICIAL_LIGHTS_DECK_REWARD.id,
+        REWARDS.DECK_CARDS_REWARDS.CHARITY_EVENT_DECK_REWARD.id,
         REWARDS.BUILDING_UPGRADE_REWARDS.EFFICIENT_SUPPLY_CHAIN.id
       ],
       resources: {
@@ -127,8 +127,8 @@ export const GAME_LEVELS = [
     reputationGoal: 90,
     startingResources: {
       [RESOURCES.IRON]: 0,
-      [RESOURCES.STEEL]: 5,
-      [RESOURCES.CONCRETE]: 5,
+      [RESOURCES.STEEL]: 10,
+      [RESOURCES.CONCRETE]: 10,
       [RESOURCES.WATER]: 0,
       [RESOURCES.FUEL]: 0,
       [RESOURCES.DRONES]: 0,
