@@ -1,4 +1,4 @@
-import { RESOURCES, REWARDS } from '../config/game-data';
+import { RESOURCES, REWARDS, STARTING_REWARDS } from '../config/game-data';
 import levelManager from './LevelManager';
 
 export default class RewardsManager {
@@ -14,6 +14,9 @@ export default class RewardsManager {
         
         // Load already unlocked rewards from levelManager if available
         this.loadUnlockedRewardsFromLevelManager();
+        
+        // Apply starting rewards if none exist from previous plays
+        this.loadStartingRewards();
     }
     
     // Load unlocked rewards from level manager persistent rewards
@@ -31,6 +34,21 @@ export default class RewardsManager {
                 this.resourceBonuses = { ...levelManager.LEVEL_PROGRESS.persistentRewards.resourceBonuses };
             }
         }
+    }
+    
+    loadStartingRewards() {
+        // Unlock each starting reward
+        STARTING_REWARDS.forEach(rewardId => {
+            const reward = this.findRewardById(rewardId);
+            if (reward) {
+                this.addRewardById(rewardId);
+            } else {
+                console.warn(`Starting reward with ID ${rewardId} not found in rewards configuration`);
+            }
+        });
+        
+        // Save to level manager so they persist
+        this.saveRewardsToLevelManager();
     }
     
     // Add a reward by its ID - categorize it and add to the appropriate list
