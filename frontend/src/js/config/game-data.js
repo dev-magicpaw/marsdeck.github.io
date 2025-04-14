@@ -556,7 +556,6 @@ export const REWARDS = {
             description: 'Start with an additional Iron Mine Prefab card in your hand',
             image: 'ironMine', // Using existing texture
             applicationType: 'startingHand',
-            reputationCost: 10,
             effects: [
                 {
                     cardId: 'ironMinePrefabCard'
@@ -569,7 +568,6 @@ export const REWARDS = {
             description: 'Start with an additional Steelworks Prefab card in your hand',
             image: 'steelworks',
             applicationType: 'startingHand',
-            reputationCost: 20,
             effects: [
                 {
                     cardId: 'steelworksPrefabCard'
@@ -582,7 +580,6 @@ export const REWARDS = {
             description: 'Start with an Tesla Coil card in your hand. Being a prefab this card requires way less resources to build.',
             image: 'teslaCoil',
             applicationType: 'startingHand',
-            reputationCost: 30,
             effects: [
                 {
                     cardId: 'teslaCoilPrefabCard'
@@ -599,7 +596,6 @@ export const REWARDS = {
             description: 'Add two Drone Event cards to your deck',
             image: 'droneIcon',
             applicationType: 'deckCards',
-            reputationCost: 10,
             effects: [
                 {
                     cardId: 'scrapDronesEvent',
@@ -613,7 +609,6 @@ export const REWARDS = {
             description: 'Add two Resource Supply Event cards to your deck',
             image: 'resourceSupplyIcon',
             applicationType: 'deckCards',
-            reputationCost: 10,
             effects: [
                 {
                     cardId: 'resourceSupplyEvent',
@@ -627,7 +622,6 @@ export const REWARDS = {
             description: 'Add two Barter Event cards to your deck',
             image: 'barterIcon',
             applicationType: 'deckCards',
-            reputationCost: 20,
             effects: [
                 {
                     cardId: 'barterEvent',
@@ -641,7 +635,6 @@ export const REWARDS = {
             description: 'Add two Raw Export Event cards to your deck',
             image: 'rawExportIcon',
             applicationType: 'deckCards',
-            reputationCost: 20,
             effects: [
                 {
                     cardId: 'exportWaterEvent',
@@ -659,7 +652,6 @@ export const REWARDS = {
             description: 'Add 3 Artificial Lights cards to your deck',
             image: 'artificialLights',
             applicationType: 'deckCards',
-            reputationCost: 30,
             effects: [
                 {
                     cardId: 'artificialLightsCard',
@@ -673,7 +665,6 @@ export const REWARDS = {
             description: 'Add 4 Charity Event cards to your deck',
             image: 'charityIcon',
             applicationType: 'deckCards',
-            reputationCost: 30,
             effects: [
                 {
                     cardId: 'charityEvent',
@@ -691,7 +682,6 @@ export const REWARDS = {
             description: 'Wind Turbines produce 2 more energy. Solar panels produce +1 energy per each adjacent building.',
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
-            reputationCost: 5,
             effects: [
                 {
                     buildingId: 'windTurbine',
@@ -715,7 +705,6 @@ export const REWARDS = {
             description: 'Fuel Refineries produce 1 more fuel but require 2 more energy',
             image: 'fuelPumpIcon',
             applicationType: 'buildingUpgrade',
-            reputationCost: 10,
             effects: [
                 {
                     buildingId: 'fuelRefinery',
@@ -734,7 +723,6 @@ export const REWARDS = {
             description: 'Steelworks produce 1 more steel if adjacent to an Iron Mine. Fuel Refineries produce 1 more fuel if adjacent to a Water Pump.',
             image: 'supplyChainIcon',
             applicationType: 'buildingUpgrade',
-            reputationCost: 8,
             effects: [
                 {
                     buildingId: 'steelworks',
@@ -758,7 +746,6 @@ export const REWARDS = {
             description: 'Launch Pads can now launch fast rockets',
             image: 'rocketInFlight',
             applicationType: 'buildingUpgrade',
-            reputationCost: 10,
             effects: [
                 {
                     buildingId: 'launchPad',
@@ -786,7 +773,6 @@ export const REWARDS = {
             description: 'Launch Pads can now launch heavy rockets',
             image: 'rocketInFlight',
             applicationType: 'buildingUpgrade',
-            reputationCost: 10,
             effects: [
                 {
                     buildingId: 'launchPad',

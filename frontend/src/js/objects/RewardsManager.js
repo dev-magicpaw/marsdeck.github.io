@@ -1,4 +1,4 @@
-import { RESOURCES, REWARDS, STARTING_REWARDS } from '../config/game-data';
+import { REWARDS, STARTING_REWARDS } from '../config/game-data';
 import levelManager from './LevelManager';
 
 export default class RewardsManager {
@@ -190,7 +190,6 @@ export default class RewardsManager {
         return null;
     }
     
-    // Unlock a reward using reputation points
     unlockReward(rewardId) {
         const reward = this.findRewardById(rewardId);
         
@@ -203,15 +202,6 @@ export default class RewardsManager {
         if (this.isRewardUnlocked(rewardId)) {
             return false;
         }
-        
-        // Check if player has enough reputation
-        const currentReputation = this.scene.resourceManager.getResource(RESOURCES.REPUTATION);
-        if (currentReputation < reward.reputationCost) {
-            return false;
-        }
-        
-        // Spend reputation points
-        this.scene.resourceManager.spendResource(RESOURCES.REPUTATION, reward.reputationCost);
         
         // Add to appropriate unlocked rewards list
         const added = this.addRewardById(rewardId);
