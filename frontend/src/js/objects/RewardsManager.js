@@ -301,7 +301,27 @@ export default class RewardsManager {
                     // Apply adjacency bonuses if coordinates are provided
                     if (effect.buildingId === buildingId && effect.adjacencyBonus && x !== undefined && y !== undefined) {
                         // Check if this building is adjacent to the required building type
-                        if (this.scene.gridManager.isAdjacentToBuildingType(x, y, effect.adjacentBuildingId)) {
+                        // Handle any excluded building types
+                        let isAdjacent = false;
+                        if (effect.adjacentBuildingId === 'any') {
+                            // Custom handling for 'any' to exclude specific building types
+                            const adjacentCells = this.scene.gridManager.getAdjacentCells(x, y);
+                            isAdjacent = adjacentCells.some(cell => {
+                                if (!cell.building) return false;
+                                
+                                // Check if this building type should be excluded
+                                if (effect.excludeBuildingTypes && effect.excludeBuildingTypes.includes(cell.building)) {
+                                    return false;
+                                }
+                                
+                                return true;
+                            });
+                        } else {
+                            // Standard check for specific building type
+                            isAdjacent = this.scene.gridManager.isAdjacentToBuildingType(x, y, effect.adjacentBuildingId);
+                        }
+                        
+                        if (isAdjacent) {
                             // Apply the adjacency bonuses
                             for (const resourceType in effect.adjacencyBonus) {
                                 const bonus = effect.adjacencyBonus[resourceType];

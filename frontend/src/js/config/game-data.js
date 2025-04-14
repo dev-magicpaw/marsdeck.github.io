@@ -702,6 +702,7 @@ export const REWARDS = {
                 {
                     buildingId: 'solarPanel',
                     adjacentBuildingId: 'any',
+                    excludeBuildingTypes: ['launchPadSurrounding', 'windTurbineSurrounding'],
                     adjacencyBonus: {
                         'energy': 1
                     }

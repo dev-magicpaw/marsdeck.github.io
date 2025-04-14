@@ -423,6 +423,44 @@ export default class GameScene extends Phaser.Scene {
             }
         }
         
+        // Check for adjacent solar panels that should gain energy when this building is placed
+        // Only applies if:
+        // 1. The improved electric generation reward is unlocked
+        // 2. This building is not a surroundings type building
+        if (this.rewardsManager && 
+            this.rewardsManager.isRewardUnlocked('improvedElectricGenerationReward') &&
+            building.id !== 'launchPadSurrounding' && 
+            building.id !== 'windTurbineSurrounding') {
+            
+            // Get adjacent cells to check for solar panels
+            const adjacentCells = this.gridManager.getAdjacentCells(x, y);
+            let totalBonusEnergy = 0;
+            
+            // Check each adjacent cell for solar panels
+            for (const adjCell of adjacentCells) {
+                if (adjCell.building === 'solarPanel') {
+                    // Find the reward effect
+                    const reward = this.rewardsManager.findRewardById('improvedElectricGenerationReward');
+                    if (reward && reward.effects) {
+                        const solarEffect = reward.effects.find(effect => 
+                            effect.buildingId === 'solarPanel' && effect.adjacencyBonus);
+                        
+                        // If found, add the energy bonus
+                        if (solarEffect && solarEffect.adjacencyBonus.energy) {
+                            const energyBonus = solarEffect.adjacencyBonus.energy;
+                            totalBonusEnergy += energyBonus;
+                        }
+                    }
+                }
+            }
+            
+            // If any bonus energy was generated, add it and show message
+            if (totalBonusEnergy > 0) {
+                this.resourceManager.addResource(RESOURCES.ENERGY, totalBonusEnergy);
+                this.uiScene.showMessage(`Adjacent Solar Panels generated ${totalBonusEnergy} Energy`);
+            }
+        }
+        
         // Remove the card from hand now that it's actually been used
         if (this.selectedCardIndex !== undefined) {
             this.cardManager.playCard(this.selectedCardIndex);
