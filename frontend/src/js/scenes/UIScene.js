@@ -1236,12 +1236,11 @@ export default class UIScene extends Phaser.Scene {
             { fontSize: '32px', fontFamily: 'Arial', color: '#0b5394', align: 'center' }
         ).setOrigin(0.5);
         
-        // Available reputation display
-        const currentReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
+        // Instructions text
         this.add.text(
             width / 2, 
             panelY + 75, 
-            `Available reputation: ${currentReputation}`, 
+            'You may select one reward', 
             { fontSize: '20px', fontFamily: 'Arial', color: '#ffcc00', align: 'center' }
         ).setOrigin(0.5);
         
@@ -1282,24 +1281,17 @@ export default class UIScene extends Phaser.Scene {
                 name: reward.name,
                 image: reward.image,
                 description: reward.description,
-                reputationCost: reward.reputationCost,
                 effect: () => {
                     const unlocked = this.rewardsManager.unlockReward(reward.id);
                     if (unlocked) {
                         // Show message
                         this.showMessage(`Unlocked: ${reward.name}`);
                         
-                        // Update available reputation display
-                        const updatedReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
-                        this.updateReputationDisplay(updatedReputation);
-                        
                         // Replace the button with "UNLOCKED" label for this specific reward
                         this.replaceUnlockButtonWithLabel(mapIndex, reward.name);
                         
-                        // Update other reward buttons that might be affected by new reputation amount
-                        this.updateRewardButtons(rewards, mapIndex);
-                    } else {
-                        this.showMessage(`Not enough reputation to unlock ${reward.name}`);
+                        // Disable all other reward buttons (can select only one)
+                        this.disableAllRewardsExcept(mapIndex);
                     }
                 },
                 isUnlocked: this.rewardsManager.isRewardUnlocked(reward.id)
@@ -1404,23 +1396,8 @@ export default class UIScene extends Phaser.Scene {
             ).setOrigin(0.5);
             rewardsContainer.add(descriptionText);
             
-            // Cost display
-            const costText = this.add.text(
-                slotX + slotWidth/2, 
-                slotsY + 260, 
-                `Cost: ${reward.reputationCost} Reputation`, 
-                { 
-                    fontSize: '16px', 
-                    fontFamily: 'Arial', 
-                    color: '#ffcc00', 
-                    align: 'center'
-                }
-            ).setOrigin(0.5);
-            rewardsContainer.add(costText);
-            
             // Select button
             const isUnlocked = reward.isUnlocked;
-            const canAfford = !isUnlocked && this.resourceManager.getResource(RESOURCES.REPUTATION) >= reward.reputationCost;
             const unlockButtonVerticalShift = 45;
             const unlockButtonHorizontalShift = 60;
 
@@ -1439,7 +1416,7 @@ export default class UIScene extends Phaser.Scene {
                     }
                 ).setOrigin(0.5);
                 rewardsContainer.add(unlockedLabel);
-            } else if (canAfford) {
+            } else {
                 const selectButton = this.createActionButton(
                     "UNLOCK", 
                     reward.effect, 
@@ -1453,17 +1430,6 @@ export default class UIScene extends Phaser.Scene {
                 // Store the button reference in the reward object for later updates
                 reward.button = selectButton;
                 rewardsContainer.add(selectButton);
-            } else {
-                const disabledButton = this.createDisabledButton(
-                    "UNLOCK", 
-                    "Not enough reputation", 
-                    120, 
-                    40, 
-                    'blueGlossSquareButton'
-                );
-                disabledButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
-                disabledButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
-                rewardsContainer.add(disabledButton);
             }
         });
         
@@ -1496,18 +1462,68 @@ export default class UIScene extends Phaser.Scene {
         nextMissionButton.y = height - panelY - 60; // Position at bottom of panel
     }
     
-    // Handle reward selection - replacing the old selectReward method with these new helper methods
-    updateReputationDisplay(reputation) {
-        // Find and update the reputation text in the rewards panel
-        const reputationText = this.children.list.find(child => 
-            child.type === 'Text' && 
-            child.text && 
-            child.text.startsWith('Available reputation')
+    // New method to disable all reward buttons except the selected one
+    disableAllRewardsExcept(selectedIndex) {
+        // Find the rewards container
+        const rewardsContainer = this.children.list.find(child => 
+            child.type === 'Container' && 
+            child.name === 'rewardsContainer'
         );
         
-        if (reputationText) {
-            reputationText.setText(`Available reputation: ${reputation}`);
-        }
+        if (!rewardsContainer) return;
+        
+        // Disable all buttons in other reward slots
+        const availableRewards = levelManager.getAvailableRewards();
+        let rewardIds = availableRewards && availableRewards.rewardIds ? 
+                        availableRewards.rewardIds : [];
+        
+        rewardIds.forEach((rewardId, index) => {
+            // Skip the selected reward
+            if (index === selectedIndex) return;
+            
+            const reward = this.rewardsManager.findRewardById(rewardId);
+            if (!reward) return;
+            
+            // Only process rewards that are not already unlocked
+            if (this.rewardsManager.isRewardUnlocked(rewardId)) return;
+            
+            // Calculate position (same calculation as in showRewards)
+            const width = this.cameras.main.width;
+            const slotWidth = 250;
+            const slotSpacing = 50;
+            const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
+            const startX = (width - totalSlotsWidth) / 2;
+            const slotX = startX + (index * (slotWidth + slotSpacing));
+            const panelY = 10;
+            const slotsY = panelY + 120;
+            const slotHeight = 350;
+            const unlockButtonVerticalShift = 45;
+            const unlockButtonHorizontalShift = 60;
+            
+            // Find the button by approximate position
+            const buttonToReplace = rewardsContainer.list.find(child => 
+                child.type === 'Container' && 
+                Math.abs(child.x - (slotX + slotWidth/2 - unlockButtonHorizontalShift)) < 10 &&
+                Math.abs(child.y - (slotsY + slotHeight - unlockButtonVerticalShift)) < 10
+            );
+            
+            if (buttonToReplace) {
+                // Remove the button
+                rewardsContainer.remove(buttonToReplace, true);
+                
+                // Replace with a disabled button
+                const disabledButton = this.createDisabledButton(
+                    "UNLOCK", 
+                    "You can only select one reward", 
+                    120, 
+                    40, 
+                    'blueGlossSquareButton'
+                );
+                disabledButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
+                disabledButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
+                rewardsContainer.add(disabledButton);
+            }
+        });
     }
 
     replaceUnlockButtonWithLabel(rewardIndex, rewardName) {
@@ -1568,61 +1584,8 @@ export default class UIScene extends Phaser.Scene {
     }
 
     updateRewardButtons(rewards, excludeIndex) {
-        // Current reputation after unlocking
-        const currentReputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
-        
-        // Find the rewards container
-        const rewardsContainer = this.children.list.find(child => 
-            child.type === 'Container' && 
-            child.name === 'rewardsContainer'
-        );
-        
-        if (!rewardsContainer) return;
-        
-        // Update buttons for other rewards based on new reputation
-        rewards.forEach((reward, index) => {
-            // Skip the one we just unlocked
-            if (index === excludeIndex || reward.isUnlocked) return;
-            
-            const canAfford = currentReputation >= reward.reputationCost;
-            
-            // If this reward has a button reference
-            if (reward.button) {
-                const buttonX = reward.button.x;
-                const buttonY = reward.button.y;
-                
-                // Remove the old button
-                rewardsContainer.remove(reward.button, true);
-                
-                // Add appropriate new button
-                if (canAfford) {
-                    const newButton = this.createActionButton(
-                        "UNLOCK", 
-                        reward.effect, 
-                        0x33cc33, 
-                        120, 
-                        40, 
-                        'blueGlossSquareButton'
-                    );
-                    newButton.x = buttonX;
-                    newButton.y = buttonY;
-                    reward.button = newButton;
-                    rewardsContainer.add(newButton);
-                } else {
-                    const disabledButton = this.createDisabledButton(
-                        "UNLOCK", 
-                        "Not enough reputation", 
-                        120, 
-                        40, 
-                        'blueGlossSquareButton'
-                    );
-                    disabledButton.x = buttonX;
-                    disabledButton.y = buttonY;
-                    reward.button = null;
-                    rewardsContainer.add(disabledButton);
-                }
-            }
-        });
+        // This method is no longer needed since we removed reputation costs
+        // Left as a stub for backward compatibility
     }
     
     // Show card choices for player selection
