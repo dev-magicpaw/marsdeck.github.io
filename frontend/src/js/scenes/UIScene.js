@@ -1952,7 +1952,7 @@ export default class UIScene extends Phaser.Scene {
                         }
                         
                         // Disabled button
-                        const disabledButton = this.createDisabledButton(buttonText, disabledReason, 300, this.buttonHeight, 'blueGlossSquareButton');
+                        const disabledButton = this.createDisabledButton(buttonText, disabledReason, 350, this.buttonHeight, 'blueGlossSquareButton');
                         
                         // Position the button
                         disabledButton.y = buttonY;
