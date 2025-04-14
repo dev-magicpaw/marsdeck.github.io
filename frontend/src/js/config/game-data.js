@@ -678,7 +678,7 @@ export const REWARDS = {
     BUILDING_UPGRADE_REWARDS: {
         IMPROVED_ELECTRIC_GENERATION: {
             id: 'improvedElectricGenerationReward',
-            name: 'Improved Electric Generation',
+            name: 'Improved Electrics',
             description: 'Wind Turbines produce 2 more energy. Solar panels produce +1 energy per each adjacent building.',
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
