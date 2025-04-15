@@ -24,9 +24,64 @@ export default class RewardsManager {
         if (levelManager && levelManager.LEVEL_PROGRESS && levelManager.LEVEL_PROGRESS.persistentRewards) {
             const persistentRewardIds = levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds || [];
             
+            // Clear existing unlocked rewards
+            this.unlockedRewards = {
+                startingHand: [],
+                deckCards: [],
+                buildingUpgrade: []
+            };
+            
             // Categorize each reward into the appropriate list based on its application type
+            // We process them in the original order for consistency
             persistentRewardIds.forEach(rewardId => {
-                this.addRewardById(rewardId);
+                const reward = this.findRewardById(rewardId);
+                if (!reward) {
+                    console.warn(`Reward ${rewardId} not found in rewards configuration during loading`);
+                    return;
+                }
+                
+                // Add to appropriate unlocked rewards lists based on application type and effects
+                let added = false;
+                
+                // Add to the list based on the main application type
+                if (reward.applicationType) {
+                    switch (reward.applicationType) {
+                        case 'startingHand':
+                            this.unlockedRewards.startingHand.push(rewardId);
+                            added = true;
+                            break;
+                        case 'deckCards':
+                            this.unlockedRewards.deckCards.push(rewardId);
+                            added = true;
+                            break;
+                        case 'buildingUpgrade':
+                            this.unlockedRewards.buildingUpgrade.push(rewardId);
+                            added = true;
+                            break;
+                    }
+                }
+                
+                // Check for secondary effects only if not already categorized
+                if (!added && reward.effects) {
+                    for (const effect of reward.effects) {
+                        if (!added && effect.cardId && !effect.count) {
+                            this.unlockedRewards.startingHand.push(rewardId);
+                            added = true;
+                        } else if (!added && effect.cardId && effect.count) {
+                            this.unlockedRewards.deckCards.push(rewardId);
+                            added = true;
+                        } else if (!added && effect.buildingId && effect.resourceBonus) {
+                            this.unlockedRewards.buildingUpgrade.push(rewardId);
+                            added = true;
+                        }
+                    }
+                }
+                
+                // If still not categorized, default to starting hand
+                if (!added) {
+                    console.warn(`Reward ${rewardId} could not be categorized, defaulting to startingHand`);
+                    this.unlockedRewards.startingHand.push(rewardId);
+                }
             });
             
             // Load resource bonuses
@@ -37,6 +92,13 @@ export default class RewardsManager {
     }
     
     loadStartingRewards() {
+        // Only add starting rewards if we don't have any rewards yet
+        if (levelManager.LEVEL_PROGRESS.persistentRewards &&
+            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds &&
+            levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds.length > 0) {
+            return; // Already have rewards, don't add starting ones again
+        }
+        
         // Unlock each starting reward
         STARTING_REWARDS.forEach(rewardId => {
             const reward = this.findRewardById(rewardId);
@@ -123,15 +185,25 @@ export default class RewardsManager {
             };
         }
         
-        // Create a flat list of all reward IDs
-        const allRewardIds = [
+        // Instead of creating a flat list grouped by type, preserve the existing order
+        // and only add new rewards at the end
+        const existingRewardIds = levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds || [];
+        
+        // Create a set of existing rewards for quick lookup
+        const existingRewardsSet = new Set(existingRewardIds);
+        
+        // Create a list of all currently unlocked rewards
+        const allCurrentRewards = [
             ...this.unlockedRewards.startingHand,
             ...this.unlockedRewards.deckCards,
             ...this.unlockedRewards.buildingUpgrade
         ];
         
-        // Update the level manager's persistent rewards
-        levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds = [...allRewardIds];
+        // Filter out rewards that already exist in the persistent rewards
+        const newRewards = allCurrentRewards.filter(rewardId => !existingRewardsSet.has(rewardId));
+        
+        // Update the level manager's persistent rewards by preserving existing order and adding new ones
+        levelManager.LEVEL_PROGRESS.persistentRewards.rewardIds = [...existingRewardIds, ...newRewards];
         
         // Save the level progress to persist the changes
         levelManager.saveLevelProgress();
@@ -141,11 +213,13 @@ export default class RewardsManager {
     addLevelRewards(levelRewards) {
         if (!levelRewards) return;
         
-        // Add reward IDs
+        // Add reward IDs in the order they appear in the level rewards
         if (levelRewards.rewardIds && levelRewards.rewardIds.length > 0) {
-            levelRewards.rewardIds.forEach(rewardId => {
+            // Process rewards in the original order they appear in levelRewards.rewardIds
+            for (let i = 0; i < levelRewards.rewardIds.length; i++) {
+                const rewardId = levelRewards.rewardIds[i];
                 this.addRewardById(rewardId);
-            });
+            }
         }
         
         // Save the updated rewards to level manager
