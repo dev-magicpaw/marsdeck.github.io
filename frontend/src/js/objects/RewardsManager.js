@@ -369,9 +369,9 @@ export default class RewardsManager {
                                 const bonus = effect.adjacentBuildingBonus[resourceType];
                                 
                                 if (resourceType === 'any') {
-                                    // Apply bonus to all production resources except energy and drones
+                                    // Apply bonus to all production resources except energy, drones, and reputation
                                     Object.keys(upgradedValues).forEach(res => {
-                                        if (res !== 'energy' && res !== 'drones') {
+                                        if (res !== 'energy' && res !== 'drones' && res !== 'reputation') {
                                             upgradedValues[res] += bonus;
                                         }
                                     });
