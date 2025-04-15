@@ -1438,7 +1438,7 @@ export default class UIScene extends Phaser.Scene {
             if (isUnlocked) {
                 const unlockedLabel = this.add.text(
                     slotX + slotWidth/2, 
-                    slotsY + slotHeight - lableYOffset,
+                    slotsY + slotHeight + lableYOffset,
                     "UNLOCKED", 
                     { 
                         fontSize: '18px', 
@@ -1455,7 +1455,7 @@ export default class UIScene extends Phaser.Scene {
                 // Create unlock button
                 const buttonWidth = 140;
                 const buttonHeight = 40;
-                const unlockButtonYOffset = -25;
+                const unlockButtonYOffset = 45;
                 const buttonBg = this.add.sprite(0, 0, 'blueGlossSquareButton');
                 buttonBg.setDisplaySize(buttonWidth, buttonHeight);
                 buttonBg.setOrigin(0, 0);
@@ -1463,15 +1463,19 @@ export default class UIScene extends Phaser.Scene {
                 const buttonText = this.add.text(
                     buttonWidth / 2,
                     buttonHeight / 2,
-                    'UNLOCK',
+                    "UNLOCK",
                     { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
                 );
                 buttonText.setOrigin(0.5);
                 
                 const selectButton = this.add.container(
                     slotX + slotWidth/2 - buttonWidth/2,
-                    slotsY + slotHeight - buttonHeight - unlockButtonYOffset
+                    slotsY + slotHeight - buttonHeight + unlockButtonYOffset
                 );
+                
+                // Give the button a name with index for easier identification
+                selectButton.name = `unlock-button-${index}`;
+                
                 selectButton.add(buttonBg);
                 selectButton.add(buttonText);
                 
@@ -1562,25 +1566,25 @@ export default class UIScene extends Phaser.Scene {
         const startX = (width - totalSlotsWidth) / 2;
         const slotX = startX + (rewardIndex * (slotWidth + slotSpacing));
         const panelY = 10;
-        const slotsY = panelY + 120;
+        const slotYOffset = 150;
+        const slotsY = panelY + slotYOffset;
         
-        // Find the button by approximate position
+        // Find the button by name instead of position
         const buttonToReplace = rewardsContainer.list.find(child => 
             child.type === 'Container' && 
-            child.x >= slotX && 
-            child.x < slotX + slotWidth &&
-            child.y >= slotsY + slotHeight - 90 && 
-            child.y < slotsY + slotHeight
+            child.name === `unlock-button-${rewardIndex}`
         );
         
         if (buttonToReplace) {
             // Remove the button
             rewardsContainer.remove(buttonToReplace, true);
             
+            const lableYOffset = 25;
+            
             // Create and add the "UNLOCKED" label
             const unlockedLabel = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + slotHeight - unlockButtonYOffset,
+                slotsY + slotHeight + lableYOffset,
                 "UNLOCKED", 
                 { 
                     fontSize: '18px', 
@@ -1622,7 +1626,10 @@ export default class UIScene extends Phaser.Scene {
         const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
         const startX = (width - totalSlotsWidth) / 2;
         const panelY = 10;
-        const slotsY = panelY + 120;
+        const slotYOffset = 150;
+        const slotsY = panelY + slotYOffset;
+        const lableYOffset = 70;
+
         
         rewardIds.forEach((rewardId, index) => {
             // Skip the selected reward
@@ -1636,34 +1643,15 @@ export default class UIScene extends Phaser.Scene {
             
             const slotX = startX + (index * (slotWidth + slotSpacing));
             
-            // Find the button by approximate position
+            // Find the button by name
             const buttonToReplace = rewardsContainer.list.find(child => 
                 child.type === 'Container' && 
-                child.x >= slotX && 
-                child.x < slotX + slotWidth &&
-                child.y >= slotsY + slotHeight - 70 && 
-                child.y < slotsY + slotHeight
+                child.name === `unlock-button-${index}`
             );
             
             if (buttonToReplace) {
                 // Remove the button
                 rewardsContainer.remove(buttonToReplace, true);
-                
-                // Add "UNAVAILABLE" label
-                const disabledLabel = this.add.text(
-                    slotX + slotWidth/2, 
-                    slotsY + slotHeight - 25, // Adjust to be vertically centered in the button area
-                    "UNAVAILABLE", 
-                    { 
-                        fontSize: '16px', 
-                        fontFamily: 'Arial', 
-                        color: '#888888', 
-                        align: 'center',
-                        fontWeight: 'bold'
-                    }
-                ).setOrigin(0.5);
-                
-                rewardsContainer.add(disabledLabel);
                 
                 // Add a semi-transparent overlay to show it's disabled
                 const disabledOverlay = this.add.graphics();
