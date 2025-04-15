@@ -1233,10 +1233,11 @@ export default class UIScene extends Phaser.Scene {
         panel.setOrigin(0.5);
         panel.setTint(0x0b5394); // Deep blue tint for better contrast
         
-        // Title with improved styling
+        // Title
+        const titleYOffset = 50;
         const titleText = this.add.text(
             width / 2, 
-            panelY + 40, 
+            panelY + titleYOffset, 
             'SELECT YOUR REWARD', 
             { 
                 fontSize: '38px', 
@@ -1251,10 +1252,11 @@ export default class UIScene extends Phaser.Scene {
         ).setOrigin(0.5);
         
         // Instructions text
+        const instructionsYOffset = 100;
         this.add.text(
             width / 2, 
-            panelY + 85, 
-            'Choose one powerful enhancement for your colony', 
+            panelY + instructionsYOffset, 
+            'Choose one enhancement for your colony', 
             { 
                 fontSize: '20px', 
                 fontFamily: 'Arial', 
@@ -1272,7 +1274,8 @@ export default class UIScene extends Phaser.Scene {
         const slotWidth = 250;
         const slotHeight = 350;
         const slotSpacing = 50;
-        const slotsY = panelY + 120;
+        const slotYOffset = 150
+        const slotsY = panelY + slotYOffset;
         
         // Calculate total width of all slots with spacing
         const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
@@ -1350,9 +1353,10 @@ export default class UIScene extends Phaser.Scene {
                 }
             }
             
-            // Slot background with improved styling
+            // Slot background
             const slotBg = this.add.nineslice(
-                slotX + slotWidth/2, slotsY + slotHeight/2,
+                slotX + slotWidth/2,
+                slotsY + slotHeight/2,
                 textureKey,
                 null,
                 slotWidth, slotHeight,
@@ -1363,17 +1367,20 @@ export default class UIScene extends Phaser.Scene {
             
             // Dark background for the description to improve readability
             const descBg = this.add.graphics();
+            const descBgYOffset = 190;
+            const descBgHeight = 140;
             descBg.fillStyle(0x000000, 0.6);
-            descBg.fillRoundedRect(slotX + 20, slotsY + 190, slotWidth - 40, 140, 8); // Increased height from 110 to 140
+            descBg.fillRoundedRect(slotX + 20, slotsY + descBgYOffset, slotWidth - 40, descBgHeight, 8);
             rewardsContainer.add(descBg);
             
-            // Reward name with improved styling
+            // Reward name
+            const nameYOffset = 20;
             const nameText = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + 20, 
+                slotsY + nameYOffset, 
                 reward.name, 
                 { 
-                    fontSize: '22px', 
+                    fontSize: '20px', 
                     fontFamily: 'Arial', 
                     color: '#ffffff', 
                     align: 'center', 
@@ -1385,38 +1392,34 @@ export default class UIScene extends Phaser.Scene {
             rewardsContainer.add(nameText);
             
             // Reward image
+            const imageYOffset = 120;
             const rewardImage = this.add.sprite(
                 slotX + slotWidth/2,
-                slotsY + 120,
+                slotsY + imageYOffset,
                 reward.image
             );
             
             // Set fixed height and calculate width based on aspect ratio
             const imageTexture = this.textures.get(reward.image);
+            const imageHeight = 130;    
+            let displayWidth = imageHeight;
             if (imageTexture && imageTexture.get()) {
                 const sourceWidth = imageTexture.get().width;
                 const sourceHeight = imageTexture.get().height;
                 
                 if (sourceWidth && sourceHeight) {
                     const aspectRatio = sourceWidth / sourceHeight;
-                    const displayHeight = 130;
-                    const displayWidth = displayHeight * aspectRatio;
-                    
-                    // Apply the calculated dimensions
-                    rewardImage.setDisplaySize(displayWidth, displayHeight);
-                } else {
-                    rewardImage.setDisplaySize(130, 130);
+                    displayWidth = imageHeight * aspectRatio;
                 }
-            } else {
-                rewardImage.setDisplaySize(130, 130);
             }
-            
+            rewardImage.setDisplaySize(displayWidth, imageHeight);
             rewardsContainer.add(rewardImage);
             
-            // Reward description with improved readability
+            // Reward description
+            const descriptionYOffset = 210;
             const descriptionText = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + 210, 
+                slotsY + descriptionYOffset, 
                 reward.description, 
                 { 
                     fontSize: '16px', 
@@ -1426,17 +1429,16 @@ export default class UIScene extends Phaser.Scene {
                     wordWrap: { width: slotWidth - 60 },
                     lineSpacing: 5
                 }
-            ).setOrigin(0.5, 0);
+            ).setOrigin(0.5, 0); // TODO: try 0.5, 0.5
             rewardsContainer.add(descriptionText);
             
             // Select button
             const isUnlocked = reward.isUnlocked;
-            
+            const lableYOffset = 25;
             if (isUnlocked) {
-                // If already unlocked, show an "UNLOCKED" label
                 const unlockedLabel = this.add.text(
                     slotX + slotWidth/2, 
-                    slotsY + slotHeight - 25, // Adjusted to match new button position
+                    slotsY + slotHeight - lableYOffset,
                     "UNLOCKED", 
                     { 
                         fontSize: '18px', 
@@ -1453,6 +1455,7 @@ export default class UIScene extends Phaser.Scene {
                 // Create unlock button
                 const buttonWidth = 140;
                 const buttonHeight = 40;
+                const unlockButtonYOffset = -25;
                 const buttonBg = this.add.sprite(0, 0, 'blueGlossSquareButton');
                 buttonBg.setDisplaySize(buttonWidth, buttonHeight);
                 buttonBg.setOrigin(0, 0);
@@ -1467,7 +1470,7 @@ export default class UIScene extends Phaser.Scene {
                 
                 const selectButton = this.add.container(
                     slotX + slotWidth/2 - buttonWidth/2,
-                    slotsY + slotHeight - buttonHeight - 10  // Position 10px from bottom edge
+                    slotsY + slotHeight - buttonHeight - unlockButtonYOffset
                 );
                 selectButton.add(buttonBg);
                 selectButton.add(buttonText);
@@ -1482,7 +1485,6 @@ export default class UIScene extends Phaser.Scene {
                     buttonBg.clearTint();
                 });
                 
-                // Add to rewards container
                 rewardsContainer.add(selectButton);
                 
                 // Store for later reference
@@ -1505,9 +1507,10 @@ export default class UIScene extends Phaser.Scene {
         );
         nextButtonText.setOrigin(0.5);
         
+        const nextButtonYOffset = 70;
         const nextMissionButton = this.add.container(
             width / 2 - nextButtonWidth/2,
-            height - panelY - 70
+            height - panelY - nextButtonYOffset
         );
         nextMissionButton.add(nextButtonBg);
         nextMissionButton.add(nextButtonText);
@@ -1566,7 +1569,7 @@ export default class UIScene extends Phaser.Scene {
             child.type === 'Container' && 
             child.x >= slotX && 
             child.x < slotX + slotWidth &&
-            child.y >= slotsY + slotHeight - 70 && 
+            child.y >= slotsY + slotHeight - 90 && 
             child.y < slotsY + slotHeight
         );
         
@@ -1574,10 +1577,10 @@ export default class UIScene extends Phaser.Scene {
             // Remove the button
             rewardsContainer.remove(buttonToReplace, true);
             
-            // Create and add the "UNLOCKED" label with improved styling
+            // Create and add the "UNLOCKED" label
             const unlockedLabel = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + slotHeight - 25, // Adjusted to match new button position
+                slotsY + slotHeight - unlockButtonYOffset,
                 "UNLOCKED", 
                 { 
                     fontSize: '18px', 
