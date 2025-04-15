@@ -175,12 +175,13 @@ export default class LevelSelectScene extends Phaser.Scene {
         rewardsTitle.setOrigin(0.5, 0);
         
         // Create 6 reward slots
-        const slotWidth = 150;
-        const slotHeight = 210;
+        const slotWidth = 175; // 5
+        const slotHeight = 245; // 7
         const slotSpacing = 20;
         const slotsY = rewardsY + 50;
         
         // TODO: calculate dimentions with maximased width and maximized height. Compare and take smaller of the two.
+
         // Calculate total width of all slots with spacing
         const totalSlotsWidth = (slotWidth * 6) + (slotSpacing * 5);
         // Calculate starting X position to center all slots
@@ -238,8 +239,8 @@ export default class LevelSelectScene extends Phaser.Scene {
                     
                     // Dark background for the description to improve readability
                     const descBg = this.add.graphics();
-                    const descBgYOffset = slotHeight - 80;
-                    const descBgHeight = 75;
+                    const descBgYOffset = slotHeight - 120;
+                    const descBgHeight = 110;
                     descBg.fillStyle(0x000000, 0.6);
                     descBg.fillRoundedRect(slotX + 10, slotsY + descBgYOffset, slotWidth - 20, descBgHeight, 8);
                     
@@ -250,7 +251,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                         slotsY + nameYOffset, 
                         reward.name, 
                         { 
-                            fontSize: '12px', 
+                            fontSize: '14px', 
                             fontFamily: 'Arial', 
                             color: '#ffffff', 
                             align: 'center', 
@@ -271,7 +272,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                         );
                         
                         // Set fixed height and calculate width based on aspect ratio
-                        const imageHeight = 70;
+                        const imageHeight = 80;
                         let displayWidth = imageHeight;
                         const imageTexture = this.textures.get(reward.image);
                         if (imageTexture && imageTexture.get()) {
@@ -287,7 +288,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                     }
                     
                     // Reward description (shortened)
-                    const descriptionYOffset = slotHeight - 70;
+                    const descriptionYOffset = slotHeight - 110;
                     const descriptionText = this.add.text(
                         slotX + slotWidth/2, 
                         slotsY + descriptionYOffset, 
@@ -310,19 +311,6 @@ export default class LevelSelectScene extends Phaser.Scene {
                     slotWidth, slotHeight,
                     0x333333, 0.6
                 );
-                emptySlotBg.setStrokeStyle(2, 0x777777);
-                
-                // Empty text
-                const emptyText = this.add.text(
-                    slotX + slotWidth/2,
-                    slotsY + slotHeight/2,
-                    'Empty',
-                    { 
-                        fontSize: '16px', 
-                        fontFamily: 'Arial', 
-                        color: '#777777'
-                    }
-                ).setOrigin(0.5);
             }
         }
     }
