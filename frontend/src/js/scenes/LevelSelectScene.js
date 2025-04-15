@@ -89,10 +89,16 @@ export default class LevelSelectScene extends Phaser.Scene {
                 button.setTint(0x555555);
                 button.setOrigin(0.5);
             } else {
-                // Use rectangles for locked levels
-                const buttonColor = 0x555555; // Gray for locked levels
-                button = this.add.rectangle(x, y, buttonWidth, buttonHeight, buttonColor, 0.8);
-                button.setStrokeStyle(2, 0xFFFFFF);
+                // Use greySquareButton for locked levels
+                button = this.add.nineslice(
+                    x, y,
+                    'greySquareButton',
+                    null,
+                    buttonWidth, buttonHeight,
+                    15, 15, 15, 15  // Left, right, top, bottom slice points
+                );
+                button.setTint(0x000000); // Light grey tint
+                button.setOrigin(0.5);
             }
             
             // Add button text
@@ -161,8 +167,19 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.createRewardsDisplay();
         
         // Add reset progress button
-        const resetButton = this.add.rectangle(width / 2, height - 60, 220, 40, 0xCC2222, 0.8);
-        resetButton.setStrokeStyle(2, 0xFFFFFF);
+        const resetButtonWidth = 220;
+        const resetButtonHeight = 40;
+        
+        // Use redSquareButton with nine-slice for reset button
+        const resetButton = this.add.nineslice(
+            width / 2,
+            height - 60,
+            'redSquareButton',
+            null,
+            resetButtonWidth, resetButtonHeight,
+            15, 15, 15, 15  // Left, right, top, bottom slice points
+        );
+        resetButton.setOrigin(0.5);
         resetButton.setInteractive({ useHandCursor: true });
         
         const resetText = this.add.text(width / 2, height - 60, 'RESET ALL PROGRESS', {
@@ -174,11 +191,11 @@ export default class LevelSelectScene extends Phaser.Scene {
         
         // Add hover effect for reset button
         resetButton.on('pointerover', () => {
-            resetButton.setFillStyle(0xEE4444);
+            resetButton.setTint(0xdddddd);
         });
         
         resetButton.on('pointerout', () => {
-            resetButton.setFillStyle(0xCC2222);
+            resetButton.clearTint();
         });
         
         // Reset game progress when clicked
