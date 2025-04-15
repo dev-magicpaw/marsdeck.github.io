@@ -54,11 +54,39 @@ export default class LevelSelectScene extends Phaser.Scene {
             // Check if level is unlocked
             const isUnlocked = levelManager.LEVEL_PROGRESS.unlockedLevels.includes(level.id);
             const isCompleted = levelManager.LEVEL_PROGRESS.completedLevels[level.id];
+            const isCurrentPlayable = isUnlocked && !isCompleted;
             
-            // Create button background
-            const buttonColor = isCompleted ? 0x00FF00 : (isUnlocked ? 0x0088FF : 0x555555);
-            const button = this.add.rectangle(x, y, buttonWidth, buttonHeight, buttonColor, 0.8);
-            button.setStrokeStyle(2, 0xFFFFFF);
+            // Create button background - use image for current playable level
+            let button;
+            if (isCurrentPlayable) {
+                // Use the blueSquareButton image for current playable level
+                button = this.add.sprite(x, y, 'blueSquareButton');
+                button.setDisplaySize(buttonWidth, buttonHeight);
+                
+                // Add "PLAY NOW" text below the button to make it more visible
+                const playNowText = this.add.text(x, y + 20, 'PLAY NOW', {
+                    fontSize: '12px',
+                    color: '#FFDD00',
+                    fontStyle: 'bold',
+                    stroke: '#000000',
+                    strokeThickness: 2
+                });
+                playNowText.setOrigin(0.5);
+                
+                // Add a simple glow effect (pulsing alpha)
+                this.tweens.add({
+                    targets: button,
+                    alpha: 0.8,
+                    duration: 800,
+                    yoyo: true,
+                    repeat: -1
+                });
+            } else {
+                // Use rectangles for completed or locked levels
+                const buttonColor = isCompleted ? 0x00FF00 : (isUnlocked ? 0x0088FF : 0x555555);
+                button = this.add.rectangle(x, y, buttonWidth, buttonHeight, buttonColor, 0.8);
+                button.setStrokeStyle(2, 0xFFFFFF);
+            }
             
             // Add button text
             const buttonText = this.add.text(x, y, level.name, {
@@ -92,11 +120,19 @@ export default class LevelSelectScene extends Phaser.Scene {
                 
                 // Add hover effect
                 button.on('pointerover', () => {
-                    button.setFillStyle(0x66BBFF);
+                    if (button.type === 'Sprite') {
+                        button.setTint(0xbbbbff);
+                    } else {
+                        button.setFillStyle(0x66BBFF);
+                    }
                 });
                 
                 button.on('pointerout', () => {
-                    button.setFillStyle(0x0088FF);
+                    if (button.type === 'Sprite') {
+                        button.clearTint();
+                    } else {
+                        button.setFillStyle(0x0088FF);
+                    }
                 });
                 
                 // Add click event
