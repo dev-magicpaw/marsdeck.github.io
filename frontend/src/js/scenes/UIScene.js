@@ -784,7 +784,9 @@ export default class UIScene extends Phaser.Scene {
                             // Check for different types of bonuses
                             const isDroneDepoBonus = gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'droneDepo') && 
                                                      resource !== RESOURCES.ENERGY && 
-                                                     resource !== RESOURCES.DRONES;
+                                                     resource !== RESOURCES.DRONES &&
+                                                     gameScene.rewardsManager && 
+                                                     gameScene.rewardsManager.isRewardUnlocked('droneSupportReward');
                             
                             // Check for efficient supply chain bonus
                             const isSupplyChainSteelBonus = building.id === 'steelworks' && resource === RESOURCES.STEEL && 
