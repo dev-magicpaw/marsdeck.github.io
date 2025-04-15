@@ -185,8 +185,8 @@ export default class LevelSelectScene extends Phaser.Scene {
         );
         confirmText.setOrigin(0.5);
         
-        // Make the message disappear after 1.5 seconds
-        this.time.delayedCall(1500, () => {
+        // Make the message disappear after 0.5 seconds
+        this.time.delayedCall(500, () => {
             confirmText.destroy();
             // Refresh the level selection UI
             this.scene.restart();
