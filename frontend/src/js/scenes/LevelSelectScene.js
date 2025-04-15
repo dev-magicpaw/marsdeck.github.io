@@ -37,18 +37,9 @@ export default class LevelSelectScene extends Phaser.Scene {
         });
         title.setOrigin(0.5, 0);
         
-        // // Create current level info
-        // const currentLevel = levelManager.getCurrentLevel();
-        // const currentLevelInfo = this.add.text(width / 2, 100, 
-        //     `Current Level: ${currentLevel.name}`, {
-        //     fontSize: '18px',
-        //     color: '#FFFFFF'
-        // });
-        // currentLevelInfo.setOrigin(0.5, 0);
-        
         // Create level buttons
         const buttonSpacing = 80;
-        const startY = 180;
+        const startY = 145;
         const levelsPerRow = 3;
         const buttonWidth = 200;
         const buttonHeight = 60;
@@ -171,7 +162,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         
         // Position for rewards section (between level buttons and start button)
-        const rewardsY = 350;
+        const rewardsY = 320;
         
         // Add title for rewards section
         const rewardsTitle = this.add.text(width / 2, rewardsY, 'UNLOCKED REWARDS', {
@@ -189,6 +180,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         const slotSpacing = 20;
         const slotsY = rewardsY + 50;
         
+        // TODO: calculate dimentions with maximased width and maximized height. Compare and take smaller of the two.
         // Calculate total width of all slots with spacing
         const totalSlotsWidth = (slotWidth * 6) + (slotSpacing * 5);
         // Calculate starting X position to center all slots
@@ -258,7 +250,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                         slotsY + nameYOffset, 
                         reward.name, 
                         { 
-                            fontSize: '16px', 
+                            fontSize: '12px', 
                             fontFamily: 'Arial', 
                             color: '#ffffff', 
                             align: 'center', 
@@ -295,7 +287,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                     }
                     
                     // Reward description (shortened)
-                    const descriptionYOffset = slotHeight - 50;
+                    const descriptionYOffset = slotHeight - 70;
                     const descriptionText = this.add.text(
                         slotX + slotWidth/2, 
                         slotsY + descriptionYOffset, 
@@ -309,22 +301,6 @@ export default class LevelSelectScene extends Phaser.Scene {
                             lineSpacing: 2
                         }
                     ).setOrigin(0.5, 0);
-                    
-                    // Add "UNLOCKED" label at the bottom
-                    const unlockedLabel = this.add.text(
-                        slotX + slotWidth/2, 
-                        slotsY + slotHeight + 15,
-                        "UNLOCKED", 
-                        { 
-                            fontSize: '14px', 
-                            fontFamily: 'Arial', 
-                            color: '#ffcc00', 
-                            align: 'center',
-                            fontWeight: 'bold',
-                            stroke: '#000000',
-                            strokeThickness: 2
-                        }
-                    ).setOrigin(0.5);
                 }
             } else {
                 // Empty slot - just a simple background
