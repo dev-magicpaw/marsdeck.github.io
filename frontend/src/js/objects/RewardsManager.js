@@ -275,7 +275,7 @@ export default class RewardsManager {
                 // Loop through all effects
                 for (const effect of reward.effects) {
                     // Apply direct resource bonuses to this building
-                    if (effect.buildingId === buildingId && effect.resourceBonus) {
+                    if ((effect.buildingId === buildingId || effect.buildingId === 'any') && effect.resourceBonus) {
                         // Apply the resource bonuses
                         for (const resourceType in effect.resourceBonus) {
                             const bonus = effect.resourceBonus[resourceType];
@@ -289,7 +289,7 @@ export default class RewardsManager {
                     }
                     
                     // Apply adjacency bonuses if coordinates are provided
-                    if (effect.buildingId === buildingId && effect.adjacencyBonus && x !== undefined && y !== undefined) {
+                    if ((effect.buildingId === buildingId || effect.buildingId === 'any') && effect.adjacencyBonus && x !== undefined && y !== undefined) {
                         // Special handling for solar panels - they get bonus per adjacent building
                         if (buildingId === 'solarPanel' && effect.adjacentBuildingId === 'any') {
                             const adjacentCells = this.scene.gridManager.getAdjacentCells(x, y);
@@ -346,6 +346,37 @@ export default class RewardsManager {
                                 for (const resourceType in effect.adjacencyBonus) {
                                     const bonus = effect.adjacencyBonus[resourceType];
                                     
+                                    if (upgradedValues[resourceType]) {
+                                        upgradedValues[resourceType] += bonus;
+                                    } else {
+                                        upgradedValues[resourceType] = bonus;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Handle adjacentBuildingBonus property (used by drone support reward)
+                    if ((effect.buildingId === buildingId || effect.buildingId === 'any') && 
+                        effect.adjacentBuildingBonus && x !== undefined && y !== undefined) {
+                        
+                        // Check if adjacent to the specified building type
+                        const isAdjacent = this.scene.gridManager.isAdjacentToBuildingType(x, y, effect.adjacentBuildingId);
+                        
+                        if (isAdjacent) {
+                            // Apply bonuses to resources
+                            for (const resourceType in effect.adjacentBuildingBonus) {
+                                const bonus = effect.adjacentBuildingBonus[resourceType];
+                                
+                                if (resourceType === 'any') {
+                                    // Apply bonus to all production resources except energy and drones
+                                    Object.keys(upgradedValues).forEach(res => {
+                                        if (res !== 'energy' && res !== 'drones') {
+                                            upgradedValues[res] += bonus;
+                                        }
+                                    });
+                                } else {
+                                    // Apply to specific resource
                                     if (upgradedValues[resourceType]) {
                                         upgradedValues[resourceType] += bonus;
                                     } else {

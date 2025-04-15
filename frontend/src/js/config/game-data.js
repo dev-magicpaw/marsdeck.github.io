@@ -72,7 +72,7 @@ export const BUILDINGS = {
         id: 'droneDepo',
         name: 'Drone Depo',
         shortName: 'Drone Depo',
-        description: 'Produces drones immediately when built. Adjacent buildings get +1 to each production resource.',
+        description: 'Produces drones immediately when built.',
         production: {
             [RESOURCES.DRONES]: 7
         },
