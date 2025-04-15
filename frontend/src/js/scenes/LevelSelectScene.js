@@ -38,11 +38,11 @@ export default class LevelSelectScene extends Phaser.Scene {
         title.setOrigin(0.5, 0);
         
         // Create level buttons
-        const buttonSpacing = 80;
+        const buttonSpacing = 100;
         const startY = 145;
         const levelsPerRow = 3;
-        const buttonWidth = 200;
-        const buttonHeight = 60;
+        const buttonWidth = 220;
+        const buttonHeight = 80;
         
         GAME_LEVELS.forEach((level, index) => {
             const row = Math.floor(index / levelsPerRow);
@@ -59,19 +59,15 @@ export default class LevelSelectScene extends Phaser.Scene {
             // Create button background - use image for current playable level
             let button;
             if (isCurrentPlayable) {
-                // Use the blueSquareButton image for current playable level
-                button = this.add.sprite(x, y, 'blueSquareButton');
-                button.setDisplaySize(buttonWidth, buttonHeight);
-                
-                // Add "PLAY NOW" text below the button to make it more visible
-                const playNowText = this.add.text(x, y + 20, 'PLAY NOW', {
-                    fontSize: '12px',
-                    color: '#FFDD00',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 2
-                });
-                playNowText.setOrigin(0.5);
+                // Use the blueSquareButton image with nine-slice for current playable level
+                button = this.add.nineslice(
+                    x, y,
+                    'blueSquareButton',
+                    null,
+                    buttonWidth, buttonHeight,
+                    15, 15, 15, 15  // Left, right, top, bottom slice points
+                );
+                button.setOrigin(0.5);
                 
                 // Add a simple glow effect (pulsing alpha)
                 this.tweens.add({
@@ -81,15 +77,26 @@ export default class LevelSelectScene extends Phaser.Scene {
                     yoyo: true,
                     repeat: -1
                 });
+            } else if (isCompleted) {
+                // Use greenSquareButton with nine-slice for completed levels
+                button = this.add.nineslice(
+                    x, y,
+                    'greenSquareButton',
+                    null,
+                    buttonWidth, buttonHeight,
+                    15, 15, 15, 15  // Left, right, top, bottom slice points
+                );
+                button.setTint(0x555555);
+                button.setOrigin(0.5);
             } else {
-                // Use rectangles for completed or locked levels
-                const buttonColor = isCompleted ? 0x00FF00 : (isUnlocked ? 0x0088FF : 0x555555);
+                // Use rectangles for locked levels
+                const buttonColor = 0x555555; // Gray for locked levels
                 button = this.add.rectangle(x, y, buttonWidth, buttonHeight, buttonColor, 0.8);
                 button.setStrokeStyle(2, 0xFFFFFF);
             }
             
             // Add button text
-            const buttonText = this.add.text(x, y, level.name, {
+            const buttonText = this.add.text(x, y , level.name, {
                 fontSize: '18px',
                 color: '#FFFFFF',
                 fontStyle: 'bold'
@@ -120,18 +127,22 @@ export default class LevelSelectScene extends Phaser.Scene {
                 
                 // Add hover effect
                 button.on('pointerover', () => {
-                    if (button.type === 'Sprite') {
-                        button.setTint(0xbbbbff);
-                    } else {
+                    if (typeof button.setFillStyle === 'function') {
+                        // Rectangle objects have setFillStyle
                         button.setFillStyle(0x66BBFF);
+                    } else {
+                        // Sprite or NineSlice objects use setTint
+                        button.setTint(0xbbbbff);
                     }
                 });
                 
                 button.on('pointerout', () => {
-                    if (button.type === 'Sprite') {
-                        button.clearTint();
-                    } else {
+                    if (typeof button.setFillStyle === 'function') {
+                        // Rectangle objects have setFillStyle
                         button.setFillStyle(0x0088FF);
+                    } else {
+                        // Sprite or NineSlice objects use clearTint
+                        button.clearTint();
                     }
                 });
                 
