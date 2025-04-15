@@ -785,6 +785,7 @@ export default class UIScene extends Phaser.Scene {
                             const isDroneDepoBonus = gameScene.gridManager.isAdjacentToBuildingType(cell.x, cell.y, 'droneDepo') && 
                                                      resource !== RESOURCES.ENERGY && 
                                                      resource !== RESOURCES.DRONES &&
+                                                     resource !== RESOURCES.REPUTATION &&
                                                      gameScene.rewardsManager && 
                                                      gameScene.rewardsManager.isRewardUnlocked('droneSupportReward');
                             
