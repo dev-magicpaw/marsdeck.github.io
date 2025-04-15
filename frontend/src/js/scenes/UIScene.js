@@ -1211,11 +1211,16 @@ export default class UIScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Create panel that covers most of the screen as specified (Keep it 10px from each edge!)
+        // Create panel that covers most of the screen (Keep it 10px from each edge!)
         const panelX = 10;
         const panelY = 10;
         const panelWidth = width - 2 * panelX;
         const panelHeight = height - 2 * panelY;
+        
+        // Create a dark overlay for better contrast
+        const darkOverlay = this.add.graphics();
+        darkOverlay.fillStyle(0x000000, 0.7);
+        darkOverlay.fillRect(0, 0, width, height);
         
         // Create the panel background using nine-slice with the requested texture
         const panel = this.add.nineslice(
@@ -1226,22 +1231,37 @@ export default class UIScene extends Phaser.Scene {
             30, 30, 30, 30                                 // slice sizes: left, right, top, bottom
         );
         panel.setOrigin(0.5);
-        panel.setTint(0x999999); // Apply a blue tint to match the game theme
+        panel.setTint(0x0b5394); // Deep blue tint for better contrast
         
-        // Title
-        this.add.text(
+        // Title with improved styling
+        const titleText = this.add.text(
             width / 2, 
             panelY + 40, 
             'SELECT YOUR REWARD', 
-            { fontSize: '32px', fontFamily: 'Arial', color: '#0b5394', align: 'center' }
+            { 
+                fontSize: '38px', 
+                fontFamily: 'Arial', 
+                color: '#ffdd00', 
+                align: 'center',
+                fontWeight: 'bold',
+                stroke: '#ff8800',
+                strokeThickness: 5,
+                shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 5, fill: true }
+            }
         ).setOrigin(0.5);
         
         // Instructions text
         this.add.text(
             width / 2, 
-            panelY + 75, 
-            'You may select one reward', 
-            { fontSize: '20px', fontFamily: 'Arial', color: '#ffcc00', align: 'center' }
+            panelY + 85, 
+            'Choose one powerful enhancement for your colony', 
+            { 
+                fontSize: '20px', 
+                fontFamily: 'Arial', 
+                color: '#ffffff', 
+                align: 'center',
+                fontWeight: 'bold'
+            }
         ).setOrigin(0.5);
         
         // Create container for all reward elements
@@ -1330,7 +1350,7 @@ export default class UIScene extends Phaser.Scene {
                 }
             }
             
-            // Slot background
+            // Slot background with improved styling
             const slotBg = this.add.nineslice(
                 slotX + slotWidth/2, slotsY + slotHeight/2,
                 textureKey,
@@ -1338,15 +1358,29 @@ export default class UIScene extends Phaser.Scene {
                 slotWidth, slotHeight,
                 15, 15, 35, 15
             );
-            // slotBg.setTint(0x3366aa);
+            slotBg.setOrigin(0.5);
             rewardsContainer.add(slotBg);
             
-            // Reward name
+            // Dark background for the description to improve readability
+            const descBg = this.add.graphics();
+            descBg.fillStyle(0x000000, 0.6);
+            descBg.fillRoundedRect(slotX + 20, slotsY + 190, slotWidth - 40, 140, 8); // Increased height from 110 to 140
+            rewardsContainer.add(descBg);
+            
+            // Reward name with improved styling
             const nameText = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + 18, 
+                slotsY + 20, 
                 reward.name, 
-                { fontSize: '20px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' } // Keep 20px font size
+                { 
+                    fontSize: '22px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff', 
+                    align: 'center', 
+                    fontWeight: 'bold',
+                    stroke: '#000000',
+                    strokeThickness: 3
+                }
             ).setOrigin(0.5);
             rewardsContainer.add(nameText);
             
@@ -1356,8 +1390,8 @@ export default class UIScene extends Phaser.Scene {
                 slotsY + 120,
                 reward.image
             );
-
-            // Set fixed height of 120px and calculate width based on aspect ratio
+            
+            // Set fixed height and calculate width based on aspect ratio
             const imageTexture = this.textures.get(reward.image);
             if (imageTexture && imageTexture.get()) {
                 const sourceWidth = imageTexture.get().width;
@@ -1365,104 +1399,204 @@ export default class UIScene extends Phaser.Scene {
                 
                 if (sourceWidth && sourceHeight) {
                     const aspectRatio = sourceWidth / sourceHeight;
-                    const displayHeight = 120;
+                    const displayHeight = 130;
                     const displayWidth = displayHeight * aspectRatio;
                     
                     // Apply the calculated dimensions
                     rewardImage.setDisplaySize(displayWidth, displayHeight);
                 } else {
-                    // Fallback to square if dimensions can't be determined
-                    rewardImage.setDisplaySize(120, 120);
+                    rewardImage.setDisplaySize(130, 130);
                 }
             } else {
-                // Fallback to square if texture can't be found
-                rewardImage.setDisplaySize(120, 120);
+                rewardImage.setDisplaySize(130, 130);
             }
-
+            
             rewardsContainer.add(rewardImage);
             
-            // Reward description
+            // Reward description with improved readability
             const descriptionText = this.add.text(
                 slotX + slotWidth/2, 
-                slotsY + 200, 
+                slotsY + 210, 
                 reward.description, 
                 { 
                     fontSize: '16px', 
                     fontFamily: 'Arial', 
                     color: '#ffffff', 
                     align: 'center',
-                    wordWrap: { width: slotWidth - 30 } 
+                    wordWrap: { width: slotWidth - 60 },
+                    lineSpacing: 5
                 }
-            ).setOrigin(0.5);
+            ).setOrigin(0.5, 0);
             rewardsContainer.add(descriptionText);
             
             // Select button
             const isUnlocked = reward.isUnlocked;
-            const unlockButtonVerticalShift = 45;
-            const unlockButtonHorizontalShift = 60;
-
+            
             if (isUnlocked) {
                 // If already unlocked, show an "UNLOCKED" label
                 const unlockedLabel = this.add.text(
                     slotX + slotWidth/2, 
-                    slotsY + slotHeight - 40,
+                    slotsY + slotHeight - 25, // Adjusted to match new button position
                     "UNLOCKED", 
                     { 
-                        fontSize: '16px', 
+                        fontSize: '18px', 
                         fontFamily: 'Arial', 
                         color: '#ffcc00', 
                         align: 'center',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        stroke: '#000000',
+                        strokeThickness: 2
                     }
                 ).setOrigin(0.5);
                 rewardsContainer.add(unlockedLabel);
             } else {
-                const selectButton = this.createActionButton(
-                    "UNLOCK", 
-                    reward.effect, 
-                    0x33cc33, 
-                    120, 
-                    40, 
-                    'blueGlossSquareButton'
+                // Create unlock button
+                const buttonWidth = 140;
+                const buttonHeight = 40;
+                const buttonBg = this.add.sprite(0, 0, 'blueGlossSquareButton');
+                buttonBg.setDisplaySize(buttonWidth, buttonHeight);
+                buttonBg.setOrigin(0, 0);
+                
+                const buttonText = this.add.text(
+                    buttonWidth / 2,
+                    buttonHeight / 2,
+                    'UNLOCK',
+                    { fontSize: '16px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
                 );
-                selectButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
-                selectButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
-                // Store the button reference in the reward object for later updates
-                reward.button = selectButton;
+                buttonText.setOrigin(0.5);
+                
+                const selectButton = this.add.container(
+                    slotX + slotWidth/2 - buttonWidth/2,
+                    slotsY + slotHeight - buttonHeight - 10  // Position 10px from bottom edge
+                );
+                selectButton.add(buttonBg);
+                selectButton.add(buttonText);
+                
+                // Make button interactive
+                selectButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+                selectButton.on('pointerdown', reward.effect);
+                selectButton.on('pointerover', () => {
+                    buttonBg.setTint(0xdddddd);
+                });
+                selectButton.on('pointerout', () => {
+                    buttonBg.clearTint();
+                });
+                
+                // Add to rewards container
                 rewardsContainer.add(selectButton);
+                
+                // Store for later reference
+                reward.button = selectButton;
             }
         });
         
         // TO NEXT MISSION button at the bottom center
-        const nextMissionButton = this.createActionButton(
-            "TO NEXT MISSION", 
-            () => {
-                // Clean up UI elements
-                panel.destroy();
-                rewardsContainer.destroy();
-                nextMissionButton.destroy();
-                
-                // Reset player's reputation for the next level
-                this.resourceManager.resources[RESOURCES.REPUTATION] = 0;
-                
-                // Re-enable victory checking for the next level
-                this.resourceManager.setVictoryCheckEnabled(true);
-                
-                // Start a new game
-                this.scene.stop('UIScene');
-                this.scene.stop('GameScene');
-                this.scene.start('GameScene');
-            }, 
-            0x0066aa, 
-            200, 
-            50, 
-            'blueGlossSquareButton'
+        const nextButtonWidth = 220;
+        const nextButtonHeight = 50;
+        const nextButtonBg = this.add.sprite(0, 0, 'blueGlossSquareButton');
+        nextButtonBg.setDisplaySize(nextButtonWidth, nextButtonHeight);
+        nextButtonBg.setOrigin(0, 0);
+        
+        const nextButtonText = this.add.text(
+            nextButtonWidth / 2,
+            nextButtonHeight / 2,
+            'TO NEXT MISSION',
+            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
         );
-        nextMissionButton.x = width / 2 - 100; // Center horizontally
-        nextMissionButton.y = height - panelY - 60; // Position at bottom of panel
+        nextButtonText.setOrigin(0.5);
+        
+        const nextMissionButton = this.add.container(
+            width / 2 - nextButtonWidth/2,
+            height - panelY - 70
+        );
+        nextMissionButton.add(nextButtonBg);
+        nextMissionButton.add(nextButtonText);
+        
+        // Make button interactive
+        nextMissionButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, nextButtonWidth, nextButtonHeight), Phaser.Geom.Rectangle.Contains);
+        nextMissionButton.on('pointerdown', () => {
+            // Clean up UI elements
+            panel.destroy();
+            darkOverlay.destroy();
+            rewardsContainer.destroy();
+            nextMissionButton.destroy();
+            
+            // Reset player's reputation for the next level
+            this.resourceManager.resources[RESOURCES.REPUTATION] = 0;
+            
+            // Re-enable victory checking for the next level
+            this.resourceManager.setVictoryCheckEnabled(true);
+            
+            // Start a new game
+            this.scene.stop('UIScene');
+            this.scene.stop('GameScene');
+            this.scene.start('GameScene');
+        });
+        nextMissionButton.on('pointerover', () => {
+            nextButtonBg.setTint(0xdddddd);
+        });
+        nextMissionButton.on('pointerout', () => {
+            nextButtonBg.clearTint();
+        });
     }
     
-    // New method to disable all reward buttons except the selected one
+    // Method to replace unlock button with label for clarity and consistency
+    replaceUnlockButtonWithLabel(rewardIndex, rewardName) {
+        // Find the rewards container
+        const rewardsContainer = this.children.list.find(child => 
+            child.type === 'Container' && 
+            child.name === 'rewardsContainer'
+        );
+        
+        if (!rewardsContainer) return;
+        
+        // Calculate position parameters (same as in showRewards)
+        const width = this.cameras.main.width;
+        const slotWidth = 250;
+        const slotHeight = 350;
+        const slotSpacing = 50;
+        const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
+        const startX = (width - totalSlotsWidth) / 2;
+        const slotX = startX + (rewardIndex * (slotWidth + slotSpacing));
+        const panelY = 10;
+        const slotsY = panelY + 120;
+        
+        // Find the button by approximate position
+        const buttonToReplace = rewardsContainer.list.find(child => 
+            child.type === 'Container' && 
+            child.x >= slotX && 
+            child.x < slotX + slotWidth &&
+            child.y >= slotsY + slotHeight - 70 && 
+            child.y < slotsY + slotHeight
+        );
+        
+        if (buttonToReplace) {
+            // Remove the button
+            rewardsContainer.remove(buttonToReplace, true);
+            
+            // Create and add the "UNLOCKED" label with improved styling
+            const unlockedLabel = this.add.text(
+                slotX + slotWidth/2, 
+                slotsY + slotHeight - 25, // Adjusted to match new button position
+                "UNLOCKED", 
+                { 
+                    fontSize: '18px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffcc00', 
+                    align: 'center',
+                    fontWeight: 'bold',
+                    stroke: '#000000',
+                    strokeThickness: 2
+                }
+            ).setOrigin(0.5);
+            
+            rewardsContainer.add(unlockedLabel);
+        } else {
+            console.warn(`Could not find UNLOCK button for reward index ${rewardIndex}`);
+        }
+    }
+    
+    // Disable all reward buttons except the selected one
     disableAllRewardsExcept(selectedIndex) {
         // Find the rewards container
         const rewardsContainer = this.children.list.find(child => 
@@ -1472,10 +1606,20 @@ export default class UIScene extends Phaser.Scene {
         
         if (!rewardsContainer) return;
         
-        // Disable all buttons in other reward slots
+        // Get reward data
         const availableRewards = levelManager.getAvailableRewards();
         let rewardIds = availableRewards && availableRewards.rewardIds ? 
                         availableRewards.rewardIds : [];
+        
+        // Calculate position parameters (same as in showRewards)
+        const width = this.cameras.main.width;
+        const slotWidth = 250;
+        const slotHeight = 350;
+        const slotSpacing = 50;
+        const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
+        const startX = (width - totalSlotsWidth) / 2;
+        const panelY = 10;
+        const slotsY = panelY + 120;
         
         rewardIds.forEach((rewardId, index) => {
             // Skip the selected reward
@@ -1487,275 +1631,44 @@ export default class UIScene extends Phaser.Scene {
             // Only process rewards that are not already unlocked
             if (this.rewardsManager.isRewardUnlocked(rewardId)) return;
             
-            // Calculate position (same calculation as in showRewards)
-            const width = this.cameras.main.width;
-            const slotWidth = 250;
-            const slotSpacing = 50;
-            const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
-            const startX = (width - totalSlotsWidth) / 2;
             const slotX = startX + (index * (slotWidth + slotSpacing));
-            const panelY = 10;
-            const slotsY = panelY + 120;
-            const slotHeight = 350;
-            const unlockButtonVerticalShift = 45;
-            const unlockButtonHorizontalShift = 60;
             
             // Find the button by approximate position
             const buttonToReplace = rewardsContainer.list.find(child => 
                 child.type === 'Container' && 
-                Math.abs(child.x - (slotX + slotWidth/2 - unlockButtonHorizontalShift)) < 10 &&
-                Math.abs(child.y - (slotsY + slotHeight - unlockButtonVerticalShift)) < 10
+                child.x >= slotX && 
+                child.x < slotX + slotWidth &&
+                child.y >= slotsY + slotHeight - 70 && 
+                child.y < slotsY + slotHeight
             );
             
             if (buttonToReplace) {
                 // Remove the button
                 rewardsContainer.remove(buttonToReplace, true);
                 
-                // Replace with a disabled button
-                const disabledButton = this.createDisabledButton(
-                    "UNLOCK", 
-                    "You can only select one reward", 
-                    120, 
-                    40, 
-                    'blueGlossSquareButton'
-                );
-                disabledButton.x = slotX + slotWidth/2 - unlockButtonHorizontalShift;
-                disabledButton.y = slotsY + slotHeight - unlockButtonVerticalShift;
-                rewardsContainer.add(disabledButton);
+                // Add "UNAVAILABLE" label
+                const disabledLabel = this.add.text(
+                    slotX + slotWidth/2, 
+                    slotsY + slotHeight - 25, // Adjust to be vertically centered in the button area
+                    "UNAVAILABLE", 
+                    { 
+                        fontSize: '16px', 
+                        fontFamily: 'Arial', 
+                        color: '#888888', 
+                        align: 'center',
+                        fontWeight: 'bold'
+                    }
+                ).setOrigin(0.5);
+                
+                rewardsContainer.add(disabledLabel);
+                
+                // Add a semi-transparent overlay to show it's disabled
+                const disabledOverlay = this.add.graphics();
+                disabledOverlay.fillStyle(0x000000, 0.5);
+                disabledOverlay.fillRect(slotX, slotsY, slotWidth, slotHeight);
+                rewardsContainer.add(disabledOverlay);
             }
         });
-    }
-
-    replaceUnlockButtonWithLabel(rewardIndex, rewardName) {
-        // Find the container that holds the reward slot
-        const rewardsContainer = this.children.list.find(child => 
-            child.type === 'Container' && 
-            child.name === 'rewardsContainer'
-        );
-        
-        if (!rewardsContainer) return;
-        
-        // Calculate the position where the button should be (same calculation as in the original code)
-        const width = this.cameras.main.width;
-        const slotWidth = 250;
-        const slotHeight = 350;
-        const slotSpacing = 50;
-        const totalSlotsWidth = (slotWidth * 3) + (slotSpacing * 2);
-        const startX = (width - totalSlotsWidth) / 2;
-        const slotX = startX + (rewardIndex * (slotWidth + slotSpacing));
-        const slotsY = this.children.list.find(child => 
-            child.type === 'Text' && 
-            child.text && 
-            child.text.startsWith('SELECT YOUR REWARD')
-        ).y + 80; // Approximate value to position properly
-        
-        // Find the button by checking all container children and identifying the matching button
-        // This is more reliable than position-based lookup
-        const buttonToRemove = rewardsContainer.list.find(child => 
-            child.type === 'Container' && 
-            child.list && 
-            child.list[1] && // Check if it has a text element
-            child.list[1].text === 'UNLOCK' &&
-            child.x >= slotX && // Check if it's in the approximate horizontal range for this slot
-            child.x < slotX + slotWidth
-        );
-        
-        if (buttonToRemove) {
-            rewardsContainer.remove(buttonToRemove, true);
-            
-            // Create and add the "UNLOCKED" label
-            const unlockedLabel = this.add.text(
-                slotX + slotWidth/2, 
-                slotsY + slotHeight - 40,
-                "UNLOCKED", 
-                { 
-                    fontSize: '16px', 
-                    fontFamily: 'Arial', 
-                    color: '#ffcc00', 
-                    align: 'center',
-                    fontWeight: 'bold'
-                }
-            ).setOrigin(0.5);
-            
-            rewardsContainer.add(unlockedLabel);
-        } else {
-            console.warn(`Could not find UNLOCK button for reward index ${rewardIndex}`);
-        }
-    }
-
-    updateRewardButtons(rewards, excludeIndex) {
-        // This method is no longer needed since we removed reputation costs
-        // Left as a stub for backward compatibility
-    }
-    
-    // Show card choices for player selection
-    showCardChoices(cards) {
-        // Clear any previous choices
-        this.choiceContainer.removeAll(true);
-        
-        if (cards.length === 0) {
-            this.choicePanelContainer.setVisible(false);
-            this.choicePanelBg.visible = false; // Hide background when no cards
-            return;
-        }
-        
-        // Show panel and background
-        this.choicePanelContainer.setVisible(true);
-        this.choicePanelBg.visible = true;
-        
-        cards.forEach((card, index) => {
-            const xPos = index * (this.cardWidth + this.cardSpacing);
-            
-            // Create card container
-            const cardContainer = this.add.container(xPos, 0);
-            
-            // Card background using NineSlice for better UI scaling
-            let cardBg;
-            
-            // Determine background texture based on card type
-            let textureKey = 'cardBackground';
-            if (card.cardType.cardType === 'prefab') {
-                textureKey = 'cardPrefabBackground';
-            } else if (card.cardType.cardType === 'event') {
-                textureKey = 'cardEventBackground';
-            }
-            
-            cardBg = this.add.nineslice(
-                0, 0,                // position
-                textureKey,          // texture key
-                null,                // frame (null for default)
-                this.cardWidth, this.cardHeight, // size
-                10, 10, 35, 15       // slice sizes: left, right, top, bottom
-            );
-            cardBg.setOrigin(0, 0);
-            
-            cardContainer.add(cardBg);
-            
-            // Make card interactive
-            cardBg.setInteractive();
-            cardBg.on('pointerdown', () => {
-                this.onCardChoiceClick(index);
-            });
-            
-            // Add card name
-            const cardName = card.cardType ? card.cardType.name : card.building.shortName;
-            const nameText = this.add.text(
-                this.cardWidth / 2, 
-                10, 
-                cardName, 
-                { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
-            );
-            nameText.setOrigin(0.5, 0);
-            cardContainer.add(nameText);
-            
-            // Handle specific card type content
-            if (card.type === 'building') {
-                // Building icon - use cardTexture if available, otherwise use building texture
-                const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
-                                   card.cardType.cardTexture : 
-                                   (card.building ? card.building.texture : 'placeholderTexture');
-                
-                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
-                icon.setDisplaySize(40, 40);
-                icon.setOrigin(0.5);
-                cardContainer.add(icon);
-                
-                // Show costs from card type if available
-                if (card.cardType && card.cardType.cost) {
-                    // Cost text
-                    let costY = 75;
-                    
-                    // Get base cost from card type with adjustments
-                    let displayCost = this.gameScene.calculateCardCost(card);
-                    
-                    for (const resource in displayCost) {
-                        if (displayCost[resource] > 0) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            
-                            // Check if player has enough of this resource
-                            const requiredAmount = displayCost[resource];
-                            const playerAmount = this.resourceManager.getResource(resource);
-                            const hasEnough = playerAmount >= requiredAmount;
-                            
-                            // Set color based on resource availability
-                            const textColor = hasEnough ? '#000000' : '#ff0000';
-                            
-                            const costText = this.add.text(
-                                5, 
-                                costY, 
-                                `${resourceName}: ${requiredAmount}`, 
-                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
-                            );
-                            cardContainer.add(costText);
-                            costY += 12;
-                        }
-                    }
-                }
-            } else if (card.type === 'event') {
-                // For event cards, display card texture if available
-                const iconTexture = card.cardType.cardTexture || 'placeholderTexture';
-                
-                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
-                icon.setDisplaySize(40, 40);
-                icon.setOrigin(0.5);
-                cardContainer.add(icon);
-                
-                // Show costs from card type if available
-                if (card.cardType && card.cardType.cost) {
-                    // Cost text
-                    let costY = 75;
-                    
-                    // Get base cost from card type with adjustments
-                    let displayCost = this.gameScene.calculateCardCost(card);
-                    
-                    for (const resource in displayCost) {
-                        if (displayCost[resource] > 0) {
-                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
-                            
-                            // Check if player has enough of this resource
-                            const requiredAmount = displayCost[resource];
-                            const playerAmount = this.resourceManager.getResource(resource);
-                            const hasEnough = playerAmount >= requiredAmount;
-                            
-                            // Set color based on resource availability
-                            const textColor = hasEnough ? '#000000' : '#ff0000';
-                            
-                            const costText = this.add.text(
-                                5, 
-                                costY, 
-                                `${resourceName}: ${requiredAmount}`, 
-                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
-                            );
-                            cardContainer.add(costText);
-                            costY += 12;
-                        }
-                    }
-                }
-            }
-            
-            this.choiceContainer.add(cardContainer);
-        });
-    }
-    
-    // Update card choices after removing a card
-    updateCardChoices(cards) {
-        // Clear existing choices
-        this.choiceContainer.removeAll(true);
-        
-        // Show remaining cards
-        this.showCardChoices(cards);
-    }
-    
-    // Hide card choices panel
-    hideCardChoices() {
-        this.choicePanelContainer.setVisible(false);
-        this.choicePanelBg.visible = false;
-    }
-    
-    // Handle card choice click
-    onCardChoiceClick(choiceIndex) {
-        // Tell the game scene which card was chosen
-        this.gameScene.selectCardChoice(choiceIndex);
     }
     
     // Update the actions panel based on selected entity
@@ -2107,5 +2020,175 @@ export default class UIScene extends Phaser.Scene {
                 this.updateActionsPanel();
             }
         }
+    }
+    
+    // Show card choices for player selection
+    showCardChoices(cards) {
+        // Clear any previous choices
+        this.choiceContainer.removeAll(true);
+        
+        if (cards.length === 0) {
+            this.choicePanelContainer.setVisible(false);
+            this.choicePanelBg.visible = false; // Hide background when no cards
+            return;
+        }
+        
+        // Show panel and background
+        this.choicePanelContainer.setVisible(true);
+        this.choicePanelBg.visible = true;
+        
+        cards.forEach((card, index) => {
+            const xPos = index * (this.cardWidth + this.cardSpacing);
+            
+            // Create card container
+            const cardContainer = this.add.container(xPos, 0);
+            
+            // Card background using NineSlice for better UI scaling
+            let cardBg;
+            
+            // Determine background texture based on card type
+            let textureKey = 'cardBackground';
+            if (card.cardType.cardType === 'prefab') {
+                textureKey = 'cardPrefabBackground';
+            } else if (card.cardType.cardType === 'event') {
+                textureKey = 'cardEventBackground';
+            }
+            
+            cardBg = this.add.nineslice(
+                0, 0,                // position
+                textureKey,          // texture key
+                null,                // frame (null for default)
+                this.cardWidth, this.cardHeight, // size
+                10, 10, 35, 15       // slice sizes: left, right, top, bottom
+            );
+            cardBg.setOrigin(0, 0);
+            
+            cardContainer.add(cardBg);
+            
+            // Make card interactive
+            cardBg.setInteractive();
+            cardBg.on('pointerdown', () => {
+                this.onCardChoiceClick(index);
+            });
+            
+            // Add card name
+            const cardName = card.cardType ? card.cardType.name : card.building.shortName;
+            const nameText = this.add.text(
+                this.cardWidth / 2, 
+                10, 
+                cardName, 
+                { fontSize: '12px', fontFamily: 'Arial', color: '#000000', align: 'center' }
+            );
+            nameText.setOrigin(0.5, 0);
+            cardContainer.add(nameText);
+            
+            // Handle specific card type content
+            if (card.type === 'building') {
+                // Building icon - use cardTexture if available, otherwise use building texture
+                const iconTexture = (card.cardType && card.cardType.cardTexture) ? 
+                                   card.cardType.cardTexture : 
+                                   (card.building ? card.building.texture : 'placeholderTexture');
+                
+                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
+                icon.setDisplaySize(40, 40);
+                icon.setOrigin(0.5);
+                cardContainer.add(icon);
+                
+                // Show costs from card type if available
+                if (card.cardType && card.cardType.cost) {
+                    // Cost text
+                    let costY = 75;
+                    
+                    // Get base cost from card type with adjustments
+                    let displayCost = this.gameScene.calculateCardCost(card);
+                    
+                    for (const resource in displayCost) {
+                        if (displayCost[resource] > 0) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            
+                            // Check if player has enough of this resource
+                            const requiredAmount = displayCost[resource];
+                            const playerAmount = this.resourceManager.getResource(resource);
+                            const hasEnough = playerAmount >= requiredAmount;
+                            
+                            // Set color based on resource availability
+                            const textColor = hasEnough ? '#000000' : '#ff0000';
+                            
+                            const costText = this.add.text(
+                                5, 
+                                costY, 
+                                `${resourceName}: ${requiredAmount}`, 
+                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                            );
+                            cardContainer.add(costText);
+                            costY += 12;
+                        }
+                    }
+                }
+            } else if (card.type === 'event') {
+                // For event cards, display card texture if available
+                const iconTexture = card.cardType.cardTexture || 'placeholderTexture';
+                
+                const icon = this.add.sprite(this.cardWidth / 2, 45, iconTexture);
+                icon.setDisplaySize(40, 40);
+                icon.setOrigin(0.5);
+                cardContainer.add(icon);
+                
+                // Show costs from card type if available
+                if (card.cardType && card.cardType.cost) {
+                    // Cost text
+                    let costY = 75;
+                    
+                    // Get base cost from card type with adjustments
+                    let displayCost = this.gameScene.calculateCardCost(card);
+                    
+                    for (const resource in displayCost) {
+                        if (displayCost[resource] > 0) {
+                            const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
+                            
+                            // Check if player has enough of this resource
+                            const requiredAmount = displayCost[resource];
+                            const playerAmount = this.resourceManager.getResource(resource);
+                            const hasEnough = playerAmount >= requiredAmount;
+                            
+                            // Set color based on resource availability
+                            const textColor = hasEnough ? '#000000' : '#ff0000';
+                            
+                            const costText = this.add.text(
+                                5, 
+                                costY, 
+                                `${resourceName}: ${requiredAmount}`, 
+                                { fontSize: '10px', fontFamily: 'Arial', color: textColor }
+                            );
+                            cardContainer.add(costText);
+                            costY += 12;
+                        }
+                    }
+                }
+            }
+            
+            this.choiceContainer.add(cardContainer);
+        });
+    }
+    
+    // Update card choices after removing a card
+    updateCardChoices(cards) {
+        // Clear existing choices
+        this.choiceContainer.removeAll(true);
+        
+        // Show remaining cards
+        this.showCardChoices(cards);
+    }
+    
+    // Hide card choices panel
+    hideCardChoices() {
+        this.choicePanelContainer.setVisible(false);
+        this.choicePanelBg.visible = false;
+    }
+    
+    // Handle card choice click
+    onCardChoiceClick(choiceIndex) {
+        // Tell the game scene which card was chosen
+        this.gameScene.selectCardChoice(choiceIndex);
     }
 } 

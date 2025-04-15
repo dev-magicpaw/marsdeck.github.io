@@ -338,6 +338,7 @@ export const CARD_TYPES = {
         description: 'Build a launch pad to send rockets for reputation',
         buildingId: 'launchPad',
         cardType: 'building',
+        cardTexture: 'launchPadIcon',
         cost: {
             [RESOURCES.CONCRETE]: 5,
             [RESOURCES.STEEL]: 2,
@@ -576,7 +577,7 @@ export const REWARDS = {
         },
         TESLA_COIL_PREFAB_STARTING_REWARD: {
             id: 'teslaCoilPrefabStartingReward',
-            name: '*Tesla Coil*',
+            name: 'Tesla Coil',
             description: 'Start with an Tesla Coil card in your hand. Being a prefab this card requires way less resources to build.',
             image: 'teslaCoil',
             applicationType: 'startingHand',
