@@ -816,5 +816,6 @@ export const REWARDS = {
 
 // Rewards that the player starts with (unlocked from the beginning)
 export const STARTING_REWARDS = [
-    'efficientSupplyChainReward'
+    'efficientSupplyChainReward',
+    'droneSupportReward',
 ]; 
