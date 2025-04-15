@@ -578,7 +578,7 @@ export const REWARDS = {
         TESLA_COIL_PREFAB_STARTING_REWARD: {
             id: 'teslaCoilPrefabStartingReward',
             name: 'Tesla Coil',
-            description: 'Start with an Tesla Coil card in your hand. Being a prefab this card requires way less resources to build.',
+            description: 'Start with a Tesla Coil card in your hand, Tesla Coil produces a lot of energy',
             image: 'teslaCoil',
             applicationType: 'startingHand',
             effects: [
@@ -650,7 +650,7 @@ export const REWARDS = {
         ARTIFICIAL_LIGHTS_DECK_REWARD: {
             id: 'artificialLightsDeckReward',
             name: 'Artificial Lights',
-            description: 'Add 3 Artificial Lights cards to your deck',
+            description: 'Add 3 Artificial Lights cards to your deck - makes the area pretty and brings respect to the colony',
             image: 'artificialLights',
             applicationType: 'deckCards',
             effects: [
@@ -680,7 +680,7 @@ export const REWARDS = {
         IMPROVED_ELECTRIC_GENERATION: {
             id: 'improvedElectricGenerationReward',
             name: 'Improved Electrics',
-            description: 'Wind Turbines produce 2 more energy. Solar panels produce +1 energy per each adjacent building.',
+            description: 'Wind Turbines produce 2 more energy. Solar panels produce +1 energy per each adjacent building',
             image: 'windTurbine',
             applicationType: 'buildingUpgrade',
             effects: [
@@ -744,7 +744,7 @@ export const REWARDS = {
         IMPROVED_LAUNCH_PAD: {
             id: 'improvedLaunchPadReward',
             name: 'Improved Launch Pad',
-            description: 'Launch Pads can now launch fast rockets',
+            description: 'Launch Pads can now launch fast rockets - trip takes only 1 turn but requires +50% fuel',
             image: 'rocketInFlight',
             applicationType: 'buildingUpgrade',
             effects: [
@@ -771,7 +771,7 @@ export const REWARDS = {
         HEAVY_LAUNCH_PAD: {
             id: 'heavyLaunchPadReward',
             name: 'Heavy Launch',
-            description: 'Launch Pads can now launch heavy rockets',
+            description: 'Launch Pads can now launch heavy rockets - can carry +50% more steel but requires +100% more fuel',
             image: 'rocketInFlight',
             applicationType: 'buildingUpgrade',
             effects: [
