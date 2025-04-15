@@ -681,7 +681,7 @@ export const REWARDS = {
             id: 'droneSupportReward',
             name: 'Drone Support',
             description: 'Any building adjacent to a Drone Depo has its production increased by 1',
-            image: 'droneDepoIcon',
+            image: 'mechIcon',
             applicationType: 'buildingUpgrade',
             effects: [
                 {
