@@ -677,6 +677,22 @@ export const REWARDS = {
     
     // Building upgrade rewards - improve building performance
     BUILDING_UPGRADE_REWARDS: {
+        DRON_SUPPORT: {
+            id: 'droneSupportReward',
+            name: 'Drone Support',
+            description: 'Any building adjacent to a Drone Depo has its production increased by 1',
+            image: 'droneDepoIcon',
+            applicationType: 'buildingUpgrade',
+            effects: [
+                {
+                    buildingId: 'any',
+                    adjacentBuildingId: 'droneDepo',
+                    adjacentBuildingBonus: {
+                        'any': 1
+                    }
+                }
+            ]
+        },
         IMPROVED_ELECTRIC_GENERATION: {
             id: 'improvedElectricGenerationReward',
             name: 'Improved Electrics',
