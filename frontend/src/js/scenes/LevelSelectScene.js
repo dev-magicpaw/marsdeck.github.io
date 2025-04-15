@@ -103,38 +103,12 @@ export default class LevelSelectScene extends Phaser.Scene {
         // Display unlocked rewards
         this.createRewardsDisplay();
         
-        // Add start game button (using current level)
-        const startButton = this.add.rectangle(width / 2, height - 80, 250, 60, 0x22CC22, 0.8);
-        startButton.setStrokeStyle(2, 0xFFFFFF);
-        startButton.setInteractive({ useHandCursor: true });
-        
-        const startText = this.add.text(width / 2, height - 80, 'START GAME', {
-            fontSize: '24px',
-            color: '#FFFFFF',
-            fontStyle: 'bold'
-        });
-        startText.setOrigin(0.5);
-        
-        // Add hover effect
-        startButton.on('pointerover', () => {
-            startButton.setFillStyle(0x44EE44);
-        });
-        
-        startButton.on('pointerout', () => {
-            startButton.setFillStyle(0x22CC22);
-        });
-        
-        // Start game when clicked
-        startButton.on('pointerdown', () => {
-            this.scene.start('GameScene');
-        });
-        
         // Add reset progress button
-        const resetButton = this.add.rectangle(width / 2, height - 20, 220, 40, 0xCC2222, 0.8);
+        const resetButton = this.add.rectangle(width / 2, height - 60, 220, 40, 0xCC2222, 0.8);
         resetButton.setStrokeStyle(2, 0xFFFFFF);
         resetButton.setInteractive({ useHandCursor: true });
         
-        const resetText = this.add.text(width / 2, height - 20, 'RESET ALL PROGRESS', {
+        const resetText = this.add.text(width / 2, height - 60, 'RESET ALL PROGRESS', {
             fontSize: '16px',
             color: '#FFFFFF',
             fontStyle: 'bold'
@@ -162,7 +136,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         
         // Position for rewards section (between level buttons and start button)
-        const rewardsY = 320;
+        const rewardsY = 350;
         
         // Add title for rewards section
         const rewardsTitle = this.add.text(width / 2, rewardsY, 'UNLOCKED REWARDS', {
