@@ -76,8 +76,18 @@ export default class LevelSelectScene extends Phaser.Scene {
                 lockText.setOrigin(0.5);
             }
             
-            // Only make unlocked levels interactive
-            if (isUnlocked) {
+            // Add "completed" text for completed levels
+            if (isCompleted) {
+                const completedText = this.add.text(x, y + 20, 'COMPLETED', {
+                    fontSize: '12px',
+                    color: '#FFFFFF',
+                    fontStyle: 'bold'
+                });
+                completedText.setOrigin(0.5);
+            }
+            
+            // Only make unlocked and not completed levels interactive
+            if (isUnlocked && !isCompleted) {
                 button.setInteractive({ useHandCursor: true });
                 
                 // Add hover effect
@@ -86,7 +96,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                 });
                 
                 button.on('pointerout', () => {
-                    button.setFillStyle(isCompleted ? 0x00FF00 : 0x0088FF);
+                    button.setFillStyle(0x0088FF);
                 });
                 
                 // Add click event
