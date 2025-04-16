@@ -97,7 +97,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                     buttonWidth, buttonHeight,
                     15, 15, 15, 15  // Left, right, top, bottom slice points
                 );
-                button.setTint(0x000000); // Light grey tint
+                button.setTint(0x333333); // Light grey tint
                 button.setOrigin(0.5);
             }
             

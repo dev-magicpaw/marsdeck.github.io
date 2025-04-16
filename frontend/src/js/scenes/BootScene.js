@@ -90,7 +90,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('blueSquareButton', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_large.png'));
         this.load.image('greenSquareButton', require('../../assets/images/ui_pack_space/Green/Double/bar_square_large.png'));
         this.load.image('redSquareButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_large.png'));
-        this.load.image('greySquareButton', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_outline_large.png'));
+        this.load.image('greySquareButton', require('../../assets/images/ui_pack_space/Grey/Double/bar_square_large_square.png'));
         
         // Load discard button texture
         this.load.image('discardButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_large.png'));
