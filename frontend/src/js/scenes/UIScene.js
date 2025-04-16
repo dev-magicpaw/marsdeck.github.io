@@ -1509,7 +1509,7 @@ export default class UIScene extends Phaser.Scene {
         const nextButtonText = this.add.text(
             nextButtonWidth / 2,
             nextButtonHeight / 2,
-            'TO NEXT MISSION',
+            'CONTINUE',
             { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
         );
         nextButtonText.setOrigin(0.5);
