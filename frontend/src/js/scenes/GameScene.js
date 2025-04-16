@@ -103,6 +103,11 @@ export default class GameScene extends Phaser.Scene {
         // Register resource listeners for rocket fueling
         this.setupResourceListeners();
         
+        // Show testing mode indicator if enabled
+        if (levelManager.LEVEL_PROGRESS.testingMode) {
+            this.createTestingModeIndicator();
+        }
+        
         // Present initial card choice for first turn
         this.time.delayedCall(500, () => {
             this.showCardChoices();
@@ -1265,5 +1270,18 @@ export default class GameScene extends Phaser.Scene {
             },
             repeat: flickerSequence.length - 1
         });
+    }
+
+    // Create a small indicator for testing mode
+    createTestingModeIndicator() {
+        const testingText = this.add.text(10, 10, '🧪 TESTING MODE', {
+            fontSize: '14px',
+            fontStyle: 'bold',
+            color: '#00FF00',
+            backgroundColor: '#000000',
+            padding: { x: 5, y: 3 }
+        });
+        testingText.setDepth(1000); // Ensure it's visible above other elements
+        testingText.setScrollFactor(0); // Fix to camera
     }
 } 
