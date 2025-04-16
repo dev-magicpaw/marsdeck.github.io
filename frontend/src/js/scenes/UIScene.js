@@ -1537,10 +1537,10 @@ export default class UIScene extends Phaser.Scene {
             // Re-enable victory checking for the next level
             this.resourceManager.setVictoryCheckEnabled(true);
             
-            // Start a new game
+            // Navigate to level select scene
             this.scene.stop('UIScene');
             this.scene.stop('GameScene');
-            this.scene.start('GameScene');
+            this.scene.start('LevelSelectScene');
         });
         nextMissionButton.on('pointerover', () => {
             nextButtonBg.setTint(0xdddddd);
