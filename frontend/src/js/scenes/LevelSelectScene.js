@@ -15,10 +15,82 @@ export default class LevelSelectScene extends Phaser.Scene {
         
         // Create rewards manager to access unlocked rewards
         this.rewardsManager = new RewardsManager(this);
+        
+        // Initialize testing mode flag (default: false)
+        if (levelManager.LEVEL_PROGRESS.testingMode === undefined) {
+            levelManager.LEVEL_PROGRESS.testingMode = false;
+        }
+        
+        // Setup keyboard inputs for testing mode toggle
+        this.input.keyboard.on('keydown-J', (event) => {
+            // Check if Command (metaKey) and Shift are also pressed
+            if (event.shiftKey && event.metaKey) {
+                // Toggle testing mode
+                levelManager.LEVEL_PROGRESS.testingMode = !levelManager.LEVEL_PROGRESS.testingMode;
+                // Save the setting
+                levelManager.saveLevelProgress();
+                // Show feedback to the player
+                this.showTestingModeStatus(levelManager.LEVEL_PROGRESS.testingMode);
+            }
+        });
     }
 
     create() {
         this.createLevelSelectionUI();
+    }
+    
+    // Show testing mode status message
+    showTestingModeStatus(isEnabled) {
+        // Create or update the testing mode indicator
+        const statusText = isEnabled ? 'TESTING MODE: ON' : 'TESTING MODE: OFF';
+        const statusColor = isEnabled ? '#00FF00' : '#FF0000';
+        
+        // Remove existing status text if it exists
+        if (this.testingModeText) {
+            this.testingModeText.destroy();
+        }
+        
+        // Show the new status
+        this.testingModeText = this.add.text(
+            this.cameras.main.width / 2,
+            30,
+            statusText,
+            {
+                fontSize: '18px',
+                fontStyle: 'bold',
+                color: statusColor,
+                backgroundColor: '#000000',
+                padding: { x: 10, y: 5 }
+            }
+        );
+        this.testingModeText.setOrigin(0.5);
+        
+        // Show temporary notification in the center
+        const notificationText = this.add.text(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2,
+            `Testing Mode ${isEnabled ? 'Enabled' : 'Disabled'}`,
+            {
+                fontSize: '32px',
+                fontStyle: 'bold',
+                color: statusColor,
+                backgroundColor: '#000000',
+                padding: { x: 20, y: 10 }
+            }
+        );
+        notificationText.setOrigin(0.5);
+        notificationText.setDepth(1000);
+        
+        // Make notification disappear after 1.5 seconds
+        this.tweens.add({
+            targets: notificationText,
+            alpha: 0,
+            duration: 1500,
+            ease: 'Power2',
+            onComplete: () => {
+                notificationText.destroy();
+            }
+        });
     }
     
     createLevelSelectionUI() {
@@ -36,6 +108,23 @@ export default class LevelSelectScene extends Phaser.Scene {
             fontStyle: 'bold'
         });
         title.setOrigin(0.5, 0);
+        
+        // Display testing mode status if enabled
+        if (levelManager.LEVEL_PROGRESS.testingMode) {
+            this.testingModeText = this.add.text(
+                width / 2,
+                30,
+                'TESTING MODE: ON',
+                {
+                    fontSize: '18px',
+                    fontStyle: 'bold',
+                    color: '#00FF00',
+                    backgroundColor: '#000000',
+                    padding: { x: 10, y: 5 }
+                }
+            );
+            this.testingModeText.setOrigin(0.5);
+        }
         
         // Create level buttons
         const buttonSpacing = 100;

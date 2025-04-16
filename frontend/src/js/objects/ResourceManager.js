@@ -8,6 +8,9 @@ export default class ResourceManager {
         const levelResources = levelManager.getStartingResourcesForCurrentLevel();
         this.resources = levelResources || { ...STARTING_RESOURCES };
         
+        // Apply testing mode resources if enabled
+        this.applyTestingModeResources();
+        
         // Resources that don't accumulate between turns (e.g., energy)
         this.nonAccumulatingResources = [];
         
@@ -19,6 +22,22 @@ export default class ResourceManager {
         
         // Flag to disable victory checking during rewards screen
         this.victoryCheckEnabled = true;
+    }
+    
+    // Apply testing mode resources if testing mode is enabled
+    applyTestingModeResources() {
+        if (levelManager.LEVEL_PROGRESS.testingMode) {
+            // Add 100 of each resource for testing
+            this.resources[RESOURCES.DRONES] = (this.resources[RESOURCES.DRONES] || 0) + 100;
+            this.resources[RESOURCES.ENERGY] = (this.resources[RESOURCES.ENERGY] || 0) + 100;
+            this.resources[RESOURCES.CONCRETE] = (this.resources[RESOURCES.CONCRETE] || 0) + 100;
+            this.resources[RESOURCES.IRON] = (this.resources[RESOURCES.IRON] || 0) + 100;
+            this.resources[RESOURCES.WATER] = (this.resources[RESOURCES.WATER] || 0) + 100;
+            this.resources[RESOURCES.STEEL] = (this.resources[RESOURCES.STEEL] || 0) + 100;
+            this.resources[RESOURCES.FUEL] = (this.resources[RESOURCES.FUEL] || 0) + 100;
+            
+            console.log('Testing mode enabled: Added 100 of each resource');
+        }
     }
     
     // Add a listener for changes to a specific resource
