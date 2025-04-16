@@ -30,7 +30,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         bg.setOrigin(0, 0);
         
         // Add title
-        const title = this.add.text(width / 2, 50, 'CARD CITY: SELECT LEVEL', {
+        const title = this.add.text(width / 2, 50, 'MARS DECK COLONY', {
             fontSize: '32px',
             color: '#FFFFFF',
             fontStyle: 'bold'
@@ -182,7 +182,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         resetButton.setOrigin(0.5);
         resetButton.setInteractive({ useHandCursor: true });
         
-        const resetText = this.add.text(width / 2, height - 60, 'RESET ALL PROGRESS', {
+        const resetText = this.add.text(width / 2, height - 60, 'RESET PROGRESS', {
             fontSize: '16px',
             color: '#FFFFFF',
             fontStyle: 'bold'
