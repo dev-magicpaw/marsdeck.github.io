@@ -4,7 +4,7 @@ import { RESOURCES, REWARDS } from './game-data';
 export const GAME_LEVELS = [
   {
     id: 'level1',
-    name: 'Tutorial Colony',
+    name: 'Brave New World',
     description: 'Learn the basics of colony building',
     mapId: 'TUTORIAL_MAP',
     turnLimit: 20,
@@ -33,7 +33,7 @@ export const GAME_LEVELS = [
   },
   {
     id: 'level2',
-    name: 'First Settlement',
+    name: 'First Steps',
     description: 'Establish your first sustainable colony',
     mapId: 'LEVEL_2_MAP',
     turnLimit: 20,
@@ -91,8 +91,8 @@ export const GAME_LEVELS = [
   },
   {
     id: 'level4',
-    name: 'Advanced Colony',
-    description: 'Develop advanced infrastructure and technology',
+    name: 'Rocky Road',
+    description: 'Develop a colony in a rocky environment',
     mapId: 'LEVEL_4_MAP',
     turnLimit: 20,
     reputationGoal: 40,
@@ -121,7 +121,7 @@ export const GAME_LEVELS = [
   {
     id: 'level5',
     name: 'Metropolis',
-    description: 'Build a massive, self-sustaining Mars metropolis',
+    description: 'Build a massive colony on an open plain',
     mapId: 'SAMPLE_MAP',  // You might want to create a new map for this level
     turnLimit:25,
     reputationGoal: 90,
