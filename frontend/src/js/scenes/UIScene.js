@@ -80,6 +80,12 @@ export default class UIScene extends Phaser.Scene {
         
         // Initial UI update
         this.refreshUI();
+        
+        // Show tutorial panel if this is level 1
+        console.log('levelManager.getCurrentLevel()', levelManager.getCurrentLevel());
+        if (levelManager.getCurrentLevel().id === 'level1') {
+            this.showTutorialPanel();
+        }
     }
     
     createLayout() {
@@ -2184,5 +2190,72 @@ export default class UIScene extends Phaser.Scene {
     onCardChoiceClick(choiceIndex) {
         // Tell the game scene which card was chosen
         this.gameScene.selectCardChoice(choiceIndex);
+    }
+    
+    // Show tutorial panel at the beginning of level 1
+    showTutorialPanel() {
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create container for all tutorial elements
+        this.tutorialContainer = this.add.container(0, 0);
+        
+        // Add dark overlay for better readability
+        const darkOverlay = this.add.graphics();
+        darkOverlay.fillStyle(0x000000, 0.7);
+        darkOverlay.fillRect(0, 0, width, height);
+        this.tutorialContainer.add(darkOverlay);
+        
+        // Calculate panel dimensions (adjust as needed for the image)
+        const panelWidth = 800 ;
+        const panelHeight = 600;
+        const panelX = (width - panelWidth) / 2;
+        const panelY = (height - panelHeight) / 2;
+        
+        // Create panel background for better readability
+        const panelBg = this.add.graphics();
+        panelBg.fillStyle(0x222222, 0.9);
+        panelBg.fillRoundedRect(panelX, panelY, panelWidth, panelHeight, 10);
+        this.tutorialContainer.add(panelBg);
+        
+        // Add tutorial image
+        const tutorialImage = this.add.image(
+            width / 2,
+            height / 2 - 20, // Shift up slightly to make room for button
+            'tutorialPanel'
+        );
+        
+        // Scale the image to fit within the panel
+        const scale = Math.min(
+            (panelWidth - 40) / tutorialImage.width,
+            (panelHeight - 80) / tutorialImage.height
+        );
+        tutorialImage.setScale(scale);
+        
+        this.tutorialContainer.add(tutorialImage);
+        
+        // Create "GOT IT" button
+        const buttonWidth = 150;
+        const buttonHeight = 40;
+        const buttonX = width / 2 - buttonWidth / 2;
+        const buttonY = panelY + panelHeight - buttonHeight - 20; // 20px from bottom of panel
+        
+        const gotItButton = this.createActionButton(
+            'GOT IT',
+            () => {
+                // Remove tutorial panel
+                this.tutorialContainer.destroy();
+            },
+            0x4488cc, // Blue color
+            buttonWidth,
+            buttonHeight,
+            'blueGlossSquareButton'
+        );
+        
+        gotItButton.setPosition(buttonX, buttonY);
+        this.tutorialContainer.add(gotItButton);
+        
+        // Make sure tutorial panel is on top
+        this.tutorialContainer.setDepth(1000);
     }
 } 
