@@ -78,6 +78,9 @@ export default class UIScene extends Phaser.Scene {
         // Create bottom panel with turn, reputation and end turn button
         this.createBottomPanel();
         
+        // Create help/tutorial button
+        this.createHelpButton();
+        
         // Initial UI update
         this.refreshUI();
         
@@ -2192,8 +2195,70 @@ export default class UIScene extends Phaser.Scene {
         this.gameScene.selectCardChoice(choiceIndex);
     }
     
+    // Create a small circular help button to bring back the tutorial
+    createHelpButton() {
+        const buttonSize = 36;  // Slightly larger for the square button
+        const paddingX = 10;
+        const paddingY = 5;
+        // Position in top-right corner
+        const x = this.cameras.main.width - buttonSize - paddingX;
+        const y = paddingY;
+        
+        // Create button container
+        const helpButton = this.add.container(x, y);
+        
+        // Create button using barRoundLargeSquare texture with nine-slice
+        const buttonBg = this.add.nineslice(
+            buttonSize/2, buttonSize/2,  // center position within container
+            'barRoundLargeSquare',       // texture key
+            null,                        // frame (null for default)
+            buttonSize, buttonSize,      // size
+            5, 5, 5, 5                   // slice sizes: left, right, top, bottom
+        );
+        buttonBg.setOrigin(0.5);
+        helpButton.add(buttonBg);
+        
+        // "i" text
+        const text = this.add.text(buttonSize/2, buttonSize/2, 'i', {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            color: '#ffffff'
+        });
+        text.setOrigin(0.5);
+        helpButton.add(text);
+        
+        // Make interactive
+        helpButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonSize, buttonSize), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effects
+        helpButton.on('pointerover', () => {
+            buttonBg.setTint(0x4477dd); // Light blue tint for hover
+        });
+        
+        helpButton.on('pointerout', () => {
+            buttonBg.clearTint(); // Clear tint on pointer out
+        });
+        
+        // Show tutorial panel on click
+        helpButton.on('pointerdown', () => {
+            this.showTutorialPanel();
+        });
+        
+        // Set depth to ensure it's visible
+        helpButton.setDepth(100);
+        
+        // Store reference
+        this.helpButton = helpButton;
+    }
+    
     // Show tutorial panel at the beginning of level 1
     showTutorialPanel() {
+        // If tutorial panel already exists, destroy it first
+        if (this.tutorialContainer) {
+            this.tutorialContainer.destroy();
+        }
+        
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         

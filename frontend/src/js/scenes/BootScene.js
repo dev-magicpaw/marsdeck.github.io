@@ -98,6 +98,8 @@ export default class BootScene extends Phaser.Scene {
         // Load victory panel background texture
         this.load.image('victoryPanelBackground', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_large_square.png'));
         this.load.image('panelGlassScrews', require('../../assets/images/ui_pack_space/Extra/Double/panel_glass_screws.png'));
+        this.load.image('barRoundLargeSquare', require('../../assets/images/ui_pack_space/Blue/Double/bar_round_large_square.png'));
+
 
         // Load tutorial
         this.load.image('tutorialPanel', require('../../assets/images/tutorial.png'));
