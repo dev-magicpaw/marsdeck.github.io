@@ -6,7 +6,7 @@ export const MAX_HAND_SIZE = 6; // Maximum cards in hand
 export const MAX_CARD_SLOTS = 8; // Maximum slots to display in the UI
 
 // The amount of reputation needed to win the game
-export const VICTORY_GOAL = 10;
+// export const VICTORY_GOAL = 10;
 
 // Resource types
 export const RESOURCES = {
@@ -21,16 +21,16 @@ export const RESOURCES = {
 };
 
 // Initial resource values when game starts
-export const STARTING_RESOURCES = {
-    [RESOURCES.IRON]: 0,
-    [RESOURCES.STEEL]: 200, 
-    [RESOURCES.CONCRETE]: 20,
-    [RESOURCES.WATER]: 0,
-    [RESOURCES.FUEL]: 100,
-    [RESOURCES.DRONES]: 10,
-    [RESOURCES.ENERGY]: 0,
-    [RESOURCES.REPUTATION]: 0
-};
+// export const STARTING_RESOURCES = {
+//     [RESOURCES.IRON]: 0,
+//     [RESOURCES.STEEL]: 200, 
+//     [RESOURCES.CONCRETE]: 20,
+//     [RESOURCES.WATER]: 0,
+//     [RESOURCES.FUEL]: 100,
+//     [RESOURCES.DRONES]: 10,
+//     [RESOURCES.ENERGY]: 0,
+//     [RESOURCES.REPUTATION]: 0
+// };
 
 // Terrain types and their properties
 export const TERRAIN_TYPES = {
@@ -243,8 +243,7 @@ export const CARD_TYPES = {
         cardTexture: 'droneDepo', // Optionaly a custom texture for the card can be used
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 2,
-            [RESOURCES.STEEL]: 1,
+            [RESOURCES.CONCRETE]: 3,
         },
     },
     IRON_MINE_CARD: {
@@ -291,8 +290,7 @@ export const CARD_TYPES = {
         buildingId: 'waterPump',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 2,
-            [RESOURCES.STEEL]: 1,
+            [RESOURCES.CONCRETE]: 3,
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 1
         },
@@ -305,6 +303,7 @@ export const CARD_TYPES = {
         cardType: 'building',
         cost: {
             [RESOURCES.CONCRETE]: 3,
+            [RESOURCES.STEEL]: 1,
             [RESOURCES.DRONES]: 1,
             [RESOURCES.ENERGY]: 2
         },
@@ -316,8 +315,7 @@ export const CARD_TYPES = {
         buildingId: 'windTurbine',
         cardType: 'building',
         cost: {
-            [RESOURCES.CONCRETE]: 3,
-            [RESOURCES.STEEL]: 1
+            [RESOURCES.CONCRETE]: 4,
         },
     },
     SOLAR_PANEL_CARD: {

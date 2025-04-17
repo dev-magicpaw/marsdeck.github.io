@@ -1,4 +1,4 @@
-import { RESOURCES, STARTING_RESOURCES } from '../config/game-data';
+import { RESOURCES } from '../config/game-data';
 import levelManager from './LevelManager';
 
 export default class ResourceManager {
@@ -6,7 +6,7 @@ export default class ResourceManager {
         this.scene = scene;
         // Get level-specific starting resources or fall back to default
         const levelResources = levelManager.getStartingResourcesForCurrentLevel();
-        this.resources = levelResources || { ...STARTING_RESOURCES };
+        this.resources = levelResources;// || { ...STARTING_RESOURCES };
         
         // Apply testing mode resources if enabled
         this.applyTestingModeResources();
