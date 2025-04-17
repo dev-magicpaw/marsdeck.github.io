@@ -2202,20 +2202,26 @@ export default class UIScene extends Phaser.Scene {
         
         // Add dark overlay for better readability
         const darkOverlay = this.add.graphics();
-        darkOverlay.fillStyle(0x000000, 0.7);
+        darkOverlay.fillStyle(0x000000, 0.9); 
         darkOverlay.fillRect(0, 0, width, height);
         this.tutorialContainer.add(darkOverlay);
         
         // Calculate panel dimensions (adjust as needed for the image)
-        const panelWidth = 800 ;
+        const panelWidth = 800;
         const panelHeight = 600;
         const panelX = (width - panelWidth) / 2;
         const panelY = (height - panelHeight) / 2;
         
-        // Create panel background for better readability
-        const panelBg = this.add.graphics();
-        panelBg.fillStyle(0x222222, 0.9);
-        panelBg.fillRoundedRect(panelX, panelY, panelWidth, panelHeight, 10);
+        // Create panel background using panelGlassScrews texture with dark tint
+        const panelBg = this.add.nineslice(
+            panelX + panelWidth/2, panelY + panelHeight/2, // center position
+            'panelGlassScrews',                            // texture key
+            null,                                          // frame (null for default)
+            panelWidth, panelHeight,                       // size
+            30, 30, 30, 30                                 // slice sizes: left, right, top, bottom
+        );
+        panelBg.setOrigin(0.5);
+        panelBg.setTint(0x222233); // Dark blue-gray tint
         this.tutorialContainer.add(panelBg);
         
         // Add tutorial image
