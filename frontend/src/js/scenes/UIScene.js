@@ -2314,8 +2314,56 @@ export default class UIScene extends Phaser.Scene {
         const gotItButton = this.createActionButton(
             'GOT IT',
             () => {
-                // Remove tutorial panel
-                this.tutorialContainer.destroy();
+                // Get help button position for tweening target
+                const buttonSize = 36;
+                const paddingX = 10;
+                const paddingY = 5;
+                const helpButtonX = this.cameras.main.width - buttonSize - paddingX + buttonSize/2;
+                const helpButtonY = paddingY + buttonSize/2;
+                
+                // Create a pivot point for the tutorial container at its center
+                const containerCenterX = width / 2;
+                const containerCenterY = height / 2;
+                this.tutorialContainer.setPosition(containerCenterX, containerCenterY);
+                
+                // Move all children to maintain visual position after changing container position
+                this.tutorialContainer.iterate(child => {
+                    child.x -= containerCenterX;
+                    child.y -= containerCenterY;
+                });
+                
+                // Fade out the "GOT IT" button immediately
+                this.tweens.add({
+                    targets: gotItButton,
+                    alpha: 0,
+                    duration: 200
+                });
+                
+                // Start with the container at scale 1
+                this.tutorialContainer.setScale(1);
+                
+                // Tween the tutorial panel to shrink into the help button
+                this.tweens.add({
+                    targets: this.tutorialContainer,
+                    x: helpButtonX,
+                    y: helpButtonY,
+                    scaleX: 0.05,
+                    scaleY: 0.05,
+                    duration: 300,
+                    ease: 'Cubic.easeIn',
+                    onComplete: () => {
+                        // Destroy the container when animation completes
+                        this.tutorialContainer.destroy();
+                    }
+                });
+                
+                // Fade out the overlay faster than the panel shrink
+                this.tweens.add({
+                    targets: darkOverlay,
+                    alpha: 0,
+                    duration: 250,
+                    ease: 'Cubic.easeOut'
+                });
             },
             0x4488cc, // Blue color
             buttonWidth,
