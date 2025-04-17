@@ -8,10 +8,6 @@ export default class BootScene extends Phaser.Scene {
     preload() {
         // Loading screen 
         this.createLoadingBar();
-
-        // Load assets here
-        this.load.image('cardTemplate', 'https://via.placeholder.com/120x180/888/fff?text=Card');
-        this.load.image('gridTile', 'https://via.placeholder.com/64x64/555/fff?text=Tile');
         
         // Load sci-fi terrain tiles
         this.load.image('terrainPlain1', require('../../assets/images/rts_sci_fi/Tile/scifiTile_41.png'));
@@ -67,11 +63,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('rocketUnFueled', require('../../assets/images/space_rockets/Missiles/spaceMissiles_008.png'));
         this.load.image('rocketFueled', require('../../assets/images/space_rockets/Missiles/spaceMissiles_009.png'));
         this.load.image('rocketInFlight', require('../../assets/images/space_rockets/Missiles/spaceMissiles_007.png'));
-        
-        // Terrain types
-        this.load.image('terrainMetal', 'https://via.placeholder.com/64x64/CD853F/fff?text=Metal');
-        this.load.image('terrainWater', 'https://via.placeholder.com/64x64/ADD8E6/fff?text=Water');
-        this.load.image('terrainMountain', 'https://via.placeholder.com/64x64/A0522D/fff?text=Mount');
         
         // Load card background
         this.load.image('cardBackground', require('../../assets/images/ui_pack_space/Blue/Default/button_square_header_large_rectangle.png'));
