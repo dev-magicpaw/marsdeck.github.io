@@ -133,6 +133,10 @@ export default class LevelSelectScene extends Phaser.Scene {
         const buttonWidth = 220;
         const buttonHeight = 80;
         
+        // Check if level5 is completed to show random level button
+        const isLevel5Completed = levelManager.LEVEL_PROGRESS.completedLevels['level5'];
+        
+        // First create the main level buttons
         GAME_LEVELS.forEach((level, index) => {
             const row = Math.floor(index / levelsPerRow);
             const col = index % levelsPerRow;
@@ -253,8 +257,66 @@ export default class LevelSelectScene extends Phaser.Scene {
         });
         
         // Add "Somewhere on Mars" button if level5 is completed
-        if (levelManager.LEVEL_PROGRESS.completedLevels['level5']) {
-            this.createRandomLevelButton();
+        if (isLevel5Completed) {
+            // Position in 2nd row, 3rd column (6th position)
+            const row = 1;
+            const col = 2;
+            const x = width / 2 + (col - 1) * (buttonWidth + 20);
+            const y = startY + row * buttonSpacing;
+            
+            // Create special button for random levels with purple color
+            const randomButton = this.add.nineslice(
+                x, y,
+                'blueSquareButton',
+                null,
+                buttonWidth, buttonHeight,
+                15, 15, 15, 15  // Left, right, top, bottom slice points
+            );
+            randomButton.setOrigin(0.5);
+            randomButton.setInteractive({ useHandCursor: true });
+            
+            // Add a pulsing glow effect
+            this.tweens.add({
+                targets: randomButton,
+                alpha: 0.8,
+                duration: 800,
+                yoyo: true,
+                repeat: -1
+            });
+            
+            // Add button title text
+            const buttonText = this.add.text(x, y - 15, 'SOMEWHERE', {
+                fontSize: '18px',
+                color: '#FFFFFF',
+                fontStyle: 'bold'
+            });
+            buttonText.setOrigin(0.5);
+            
+            // Add descriptive subtext
+            const subText = this.add.text(x, y + 15, 'ON MARS', {
+                fontSize: '18px',
+                color: '#FFFFFF',
+                fontStyle: 'bold'
+            });
+            subText.setOrigin(0.5);
+            
+            // Handle hover effects
+            randomButton.on('pointerover', () => {
+                randomButton.setTint(0xCC77FF); // Lighter purple on hover
+            });
+            
+            randomButton.on('pointerout', () => {
+                randomButton.setTint(0xAA55FF); // Return to original purple
+            });
+            
+            // Add click event
+            randomButton.on('pointerdown', () => {
+                // Generate random level with increasing difficulty using LevelManager
+                levelManager.generateRandomLevel();
+                
+                // Start the game
+                this.scene.start('GameScene');
+            });
         }
         
         // Display unlocked rewards
@@ -295,72 +357,6 @@ export default class LevelSelectScene extends Phaser.Scene {
         // Reset game progress when clicked
         resetButton.on('pointerdown', () => {
             this.resetGameProgress();
-        });
-    }
-    
-    // Create a button for randomly generated levels
-    createRandomLevelButton() {
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
-        
-        // Position button below all regular levels
-        const buttonY = 300;
-        const buttonWidth = 280;
-        const buttonHeight = 100;
-        
-        // Create special button for random levels with purple color
-        const randomButton = this.add.nineslice(
-            width / 2, buttonY,
-            'blueSquareButton',
-            null,
-            buttonWidth, buttonHeight,
-            15, 15, 15, 15  // Left, right, top, bottom slice points
-        );
-        randomButton.setOrigin(0.5);
-        randomButton.setTint(0xAA55FF); // Purple tint
-        randomButton.setInteractive({ useHandCursor: true });
-        
-        // Add pulsing glow effect
-        this.tweens.add({
-            targets: randomButton,
-            alpha: 0.8,
-            duration: 1200,
-            yoyo: true,
-            repeat: -1
-        });
-        
-        // Add button text
-        const buttonText = this.add.text(width / 2, buttonY - 15, 'SOMEWHERE ON MARS', {
-            fontSize: '22px',
-            color: '#FFFFFF',
-            fontStyle: 'bold'
-        });
-        buttonText.setOrigin(0.5);
-        
-        // Add descriptive subtext
-        const subText = this.add.text(width / 2, buttonY + 15, 'Random challenges await', {
-            fontSize: '16px',
-            color: '#FFDDFF',
-            fontStyle: 'italic'
-        });
-        subText.setOrigin(0.5);
-        
-        // Handle hover effects
-        randomButton.on('pointerover', () => {
-            randomButton.setTint(0xCC77FF); // Lighter purple on hover
-        });
-        
-        randomButton.on('pointerout', () => {
-            randomButton.setTint(0xAA55FF); // Return to original purple
-        });
-        
-        // Add click event
-        randomButton.on('pointerdown', () => {
-            // Generate random level with increasing difficulty using LevelManager
-            levelManager.generateRandomLevel();
-            
-            // Start the game
-            this.scene.start('GameScene');
         });
     }
     
