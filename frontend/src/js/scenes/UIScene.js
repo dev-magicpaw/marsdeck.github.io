@@ -1200,6 +1200,10 @@ export default class UIScene extends Phaser.Scene {
         const rewardsButton = this.createActionButton(
             'VIEW REWARDS',
             () => {
+                // Advance to next level and save progress before showing rewards
+                levelManager.advanceToNextLevel();
+                levelManager.saveLevelProgress();
+                
                 // Hide victory screen and show rewards
                 victoryContainer.setVisible(false);
                 panel.setVisible(false);
