@@ -1,4 +1,4 @@
-import { RESOURCES } from '../config/game-data';
+import { RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import { GAME_LEVELS } from '../config/level-configs';
 import * as MapConfigs from '../config/map-configs';
 
@@ -47,6 +47,12 @@ class LevelManager {
     const currentLevel = this.getCurrentLevel();
     if (!currentLevel) return null;
     
+    // Check if this is a random level with a custom map
+    if (currentLevel.isRandom && currentLevel.customMap) {
+      return currentLevel.customMap;
+    }
+    
+    // For standard levels, look up the map by ID
     const mapId = currentLevel.mapId;
     
     // Look up the map by ID directly in our dynamic collection
@@ -54,8 +60,9 @@ class LevelManager {
     
     // If the map doesn't exist, log a warning and return a default map
     if (!map) {
+      // TODO: raise an error instead of using a default map
       console.warn(`Map with ID "${mapId}" not found. Using default map.`);
-      return this.availableMaps['SAMPLE_MAP']; // Return default map
+      return this.availableMaps['TUTORIAL_MAP']; // Return default map
     }
     
     return map;
@@ -99,21 +106,22 @@ class LevelManager {
   generateRandomLevel() {
     // Calculate difficulty based on how many random levels have been played
     const randomLevelsPlayed = this.LEVEL_PROGRESS.randomLevelsCompleted || 0;
-    const difficulty = Math.min(1 + (randomLevelsPlayed * 0.1), 2); // Scale from 1.0 to 2.0
     
     // Generate random level id
     const randomId = 'random_' + Date.now();
     
-    // Select a random map from existing maps
-    const mapIds = ['LEVEL_1_MAP', 'LEVEL_2_MAP', 'LEVEL_3_MAP', 'LEVEL_4_MAP', 'LEVEL_5_MAP'];
-    const randomMapIndex = Math.floor(Math.random() * mapIds.length);
-    const mapId = mapIds[randomMapIndex];
+    // Calculate parameters based on the rules
+    const reputationGoal = 35 + (15 * randomLevelsPlayed); 
+    const turnLimit = 18 + (2 * randomLevelsPlayed);
     
-    // Generate reputation goal based on difficulty (15-150)
-    const reputationGoal = Math.floor(15 + (randomLevelsPlayed * 5) + (Math.random() * 10));
+    // Calculate terrain features count based on rules
+    const waterDeposits = Math.max(2, Math.floor(6 - (0.25 * randomLevelsPlayed)));
+    const metalDeposits = Math.max(4, Math.floor(12 - randomLevelsPlayed));
+    const mountains = 3 + 2 * randomLevelsPlayed;
     
-    // Generate turn limit (20-30)
-    const turnLimit = Math.floor(20 + (Math.random() * 10));
+    // Generate a random map with specific features
+    const gridSize = 8; // Default grid size
+    const randomMap = this.generateRandomMap(gridSize, metalDeposits, waterDeposits, mountains);
     
     // Create level name
     const locationNames = [
@@ -136,13 +144,14 @@ class LevelManager {
         id: randomId,
         name: `${location} ${levelType}`,
         description: `Challenge level: ${randomLevelsPlayed + 1}`,
-        mapId: mapId,
+        mapId: null, // We'll use our custom map instead
+        customMap: randomMap, // Store the custom map
         turnLimit: turnLimit,
         reputationGoal: reputationGoal,
         startingResources: {
             [RESOURCES.IRON]: 0,
-            [RESOURCES.STEEL]: Math.floor(10 / difficulty),
-            [RESOURCES.CONCRETE]: Math.floor(10 / difficulty),
+            [RESOURCES.STEEL]: 10,
+            [RESOURCES.CONCRETE]: 15,
             [RESOURCES.WATER]: 0,
             [RESOURCES.FUEL]: 0,
             [RESOURCES.DRONES]: 0,
@@ -170,6 +179,55 @@ class LevelManager {
     this.saveLevelProgress();
     
     return randomLevel;
+  }
+  
+  // Generate a random map with specific number of features
+  generateRandomMap(gridSize, metalCount, waterCount, mountainCount) {
+    // Create a map configuration
+    const mapConfig = {
+      gridSize: gridSize,
+      cells: []
+    };
+    
+    // Helper to check if a position already has a feature
+    const isPositionOccupied = (x, y) => {
+      return mapConfig.cells.some(cell => cell.x === x && cell.y === y);
+    };
+    
+    // Helper to place features randomly
+    const placeFeatures = (featureType, count) => {
+      let placedCount = 0;
+      let attempts = 0;
+      const maxAttempts = 100; // Prevent infinite loops
+      
+      while (placedCount < count && attempts < maxAttempts) {
+        const x = Math.floor(Math.random() * gridSize);
+        const y = Math.floor(Math.random() * gridSize);
+        
+        if (!isPositionOccupied(x, y)) {
+          mapConfig.cells.push({
+            x: x,
+            y: y,
+            feature: featureType
+          });
+          placedCount++;
+        }
+        
+        attempts++;
+      }
+      
+      return placedCount;
+    };
+    
+    // Place the terrain features in order of importance
+    const placedWater = placeFeatures(TERRAIN_FEATURES.WATER.id, waterCount);
+    const placedMetal = placeFeatures(TERRAIN_FEATURES.METAL.id, metalCount);
+    const placedMountains = placeFeatures(TERRAIN_FEATURES.MOUNTAIN.id, mountainCount);
+    
+    // Log placement success
+    console.log(`Random map generated with: ${placedWater}/${waterCount} water, ${placedMetal}/${metalCount} metal, ${placedMountains}/${mountainCount} mountains`);
+    
+    return mapConfig;
   }
   
   // Get the available rewards for the most recently completed level
