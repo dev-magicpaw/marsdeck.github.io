@@ -1183,8 +1183,8 @@ export default class UIScene extends Phaser.Scene {
             // Random level victory description
             const randomLevelsCompleted = levelManager.LEVEL_PROGRESS.randomLevelsCompleted || 0;
             const victoryText = `You've successfully established a new colony on Mars! ` +
-                              `With ${randomLevelsCompleted} challenge missions completed, ` +
-                              `your Mars colonization skills continue to improve.`;
+                                `Your Mars colonization skills continue to improve.` + 
+                                `You've completed ${randomLevelsCompleted} challenge missions so far.`;
             
             victoryContainer.add(this.add.text(
                 width / 2, 
