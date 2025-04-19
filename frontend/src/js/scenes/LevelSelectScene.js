@@ -37,6 +37,18 @@ export default class LevelSelectScene extends Phaser.Scene {
 
     create() {
         this.createLevelSelectionUI();
+        
+        // Check if we should show the random level tutorial
+        const isFinalLevelCompleted = levelManager.LEVEL_PROGRESS.completedLevels['level5'];
+        const tutorialShown = levelManager.LEVEL_PROGRESS.randomLevelTutorialShown;
+        
+        if (isFinalLevelCompleted && !tutorialShown) {
+            this.showRandomLevelTutorial();
+            
+            // Mark tutorial as shown
+            levelManager.LEVEL_PROGRESS.randomLevelTutorialShown = true;
+            levelManager.saveLevelProgress();
+        }
     }
     
     // Show testing mode status message
@@ -530,6 +542,10 @@ export default class LevelSelectScene extends Phaser.Scene {
             resourceBonuses: {}
         };
         
+        // Reset random level progress and tutorial flags
+        levelManager.LEVEL_PROGRESS.randomLevelsCompleted = 0;
+        levelManager.LEVEL_PROGRESS.randomLevelTutorialShown = false;
+        
         // Save the reset progress
         levelManager.saveLevelProgress();
         
@@ -552,6 +568,165 @@ export default class LevelSelectScene extends Phaser.Scene {
             confirmText.destroy();
             // Refresh the level selection UI
             this.scene.restart();
+        });
+    }
+    
+    // Show a tutorial panel explaining the random level feature
+    showRandomLevelTutorial() {
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create a panel covering the left half of the screen
+        const panelWidth = width / 2 - 40; // Slightly less than half to provide margins
+        const panelHeight = height / 2;
+        const panelX = 20; // Left margin
+        const panelY = height / 4; // Centered vertically
+        
+        // Create dark overlay for the left half of the screen
+        const darkOverlay = this.add.graphics();
+        darkOverlay.fillStyle(0x000000, 0.7);
+        darkOverlay.fillRect(0, 0, width / 2, height);
+        
+        // Create the panel background
+        const panel = this.add.nineslice(
+            panelX + panelWidth/2, 
+            panelY + panelHeight/2,
+            'panelGlassScrews',
+            null,
+            panelWidth, 
+            panelHeight,
+            30, 30, 30, 30
+        );
+        panel.setOrigin(0.5);
+        panel.setTint(0x3388dd); // Blue tint
+        
+        // Add title
+        const titleText = this.add.text(
+            panelX + panelWidth/2,
+            panelY + 50,
+            'NEW FEATURE UNLOCKED!',
+            {
+                fontSize: '24px',
+                fontFamily: 'Arial',
+                color: '#ffdd00',
+                align: 'center',
+                fontWeight: 'bold'
+            }
+        );
+        titleText.setOrigin(0.5);
+        
+        // Add subtitle highlighting "Somewhere on Mars"
+        const subtitleText = this.add.text(
+            panelX + panelWidth/2,
+            panelY + 90,
+            'SOMEWHERE ON MARS',
+            {
+                fontSize: '22px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                align: 'center',
+                fontWeight: 'bold'
+            }
+        );
+        subtitleText.setOrigin(0.5);
+        
+        // Add explanation text
+        const explanationText = this.add.text(
+            panelX + panelWidth/2,
+            panelY + 150,
+            'You can now play a sequence of progressively harder random generated levels. See how far you can manage to get!',
+            {
+                fontSize: '18px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                align: 'center',
+                wordWrap: { width: panelWidth - 60 }
+            }
+        );
+        explanationText.setOrigin(0.5, 0);
+        
+        // Add an arrow pointing to the random level button's position
+        const arrowX = width / 2 + 50;
+        const arrowY = panelY + 35;
+        const arrow = this.add.text(
+            arrowX,
+            arrowY,
+            '→',
+            {
+                fontSize: '120px',
+                fontFamily: 'Arial',
+                color: '#ffdd00'
+            }
+        );
+        arrow.setOrigin(0.5);
+        
+        // Create "GOT IT" button
+        const buttonWidth = 150;
+        const buttonHeight = 40;
+        const buttonX = panelX + panelWidth/2 - buttonWidth/2;
+        const buttonY = panelY + panelHeight - 60;
+        
+        const gotItButton = this.add.nineslice(
+            buttonX + buttonWidth/2,
+            buttonY + buttonHeight/2,
+            'blueGlossSquareButton',
+            null,
+            buttonWidth,
+            buttonHeight,
+            15, 15, 15, 15
+        );
+        gotItButton.setOrigin(0.5);
+        gotItButton.setInteractive({ useHandCursor: true });
+        
+        // Button text
+        const buttonText = this.add.text(
+            buttonX + buttonWidth/2,
+            buttonY + buttonHeight/2,
+            'GOT IT',
+            {
+                fontSize: '18px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                fontWeight: 'bold'
+            }
+        );
+        buttonText.setOrigin(0.5);
+        
+        // Add hover effect
+        gotItButton.on('pointerover', () => {
+            gotItButton.setTint(0xaaddff);
+        });
+        
+        gotItButton.on('pointerout', () => {
+            gotItButton.clearTint();
+        });
+        
+        // Close the tutorial panel when clicked
+        gotItButton.on('pointerdown', () => {
+            // Create a container with all the elements to animate them together
+            const container = this.add.container(0, 0);
+            container.add([darkOverlay, panel, titleText, subtitleText, explanationText, arrow, gotItButton, buttonText]);
+            
+            // Fade out animation
+            this.tweens.add({
+                targets: container,
+                alpha: 0,
+                duration: 300,
+                ease: 'Power2',
+                onComplete: () => {
+                    container.destroy();
+                }
+            });
+        });
+        
+        // Add a pulsing animation to the arrow to draw attention
+        this.tweens.add({
+            targets: arrow,
+            scaleX: 1.2,
+            scaleY: 1.2,
+            duration: 800,
+            yoyo: true,
+            repeat: -1
         });
     }
 } 
