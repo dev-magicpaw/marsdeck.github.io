@@ -122,7 +122,7 @@ export const GAME_LEVELS = [
     id: 'level5',
     name: 'Metropolis',
     description: 'Build a massive colony on an open plain',
-    mapId: 'SAMPLE_MAP',  // You might want to create a new map for this level
+    mapId: 'LEVEL_5_MAP',  // You might want to create a new map for this level
     turnLimit:25,
     reputationGoal: 90,
     startingResources: {
