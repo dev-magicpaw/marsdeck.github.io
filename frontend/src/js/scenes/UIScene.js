@@ -1223,6 +1223,11 @@ export default class UIScene extends Phaser.Scene {
         // Disable victory checking while in rewards screen
         this.resourceManager.setVictoryCheckEnabled(false);
         
+        // Hide the help button
+        if (this.helpButton) {
+            this.helpButton.setVisible(false);
+        }
+        
         // Create rewards panel
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -1549,6 +1554,11 @@ export default class UIScene extends Phaser.Scene {
             
             // Re-enable victory checking for the next level
             this.resourceManager.setVictoryCheckEnabled(true);
+            
+            // Show the help button again
+            if (this.helpButton) {
+                this.helpButton.setVisible(true);
+            }
             
             // Navigate to level select scene
             this.scene.stop('UIScene');
