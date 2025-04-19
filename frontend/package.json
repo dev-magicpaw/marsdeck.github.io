@@ -1,11 +1,13 @@
 {
-  "name": "mars-colony-card-game",
+  "name": "mars-deck",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --open",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +17,15 @@
     "phaser": "^3.55.2"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^6.10.0",
     "file-loader": "^6.2.0",
+    "gh-pages": "^6.3.0",
     "html-webpack-plugin": "^5.6.0",
     "style-loader": "^3.3.4",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
-  }
+  },
+  "homepage": "."
 }
