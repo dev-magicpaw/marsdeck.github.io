@@ -1120,7 +1120,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Show victory screen
-    showVictory(reputation, goal) {
+    showVictory(reputation, goal, isRandomLevel = false) {
         // Create panel
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -1178,7 +1178,51 @@ export default class UIScene extends Phaser.Scene {
         
         // Check if this is level5 to show special victory message
         const currentLevel = levelManager.getCurrentLevel();
-        if (currentLevel && currentLevel.id === FINAL_LEVEL_MAP) {
+        
+        if (isRandomLevel) {
+            // Random level victory description
+            const randomLevelsCompleted = levelManager.LEVEL_PROGRESS.randomLevelsCompleted || 0;
+            const victoryText = `You've successfully established a new colony on Mars! ` +
+                              `With ${randomLevelsCompleted} challenge missions completed, ` +
+                              `your Mars colonization skills continue to improve.`;
+            
+            victoryContainer.add(this.add.text(
+                width / 2, 
+                panelY + 300, 
+                victoryText, 
+                { 
+                    fontSize: '18px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff', 
+                    align: 'center',
+                    wordWrap: { width: panelWidth - 100 }
+                }
+            ).setOrigin(0.5));
+            
+            const continueButtonWidth = 200;
+            const continueButtonHeight = 40;
+            const continueButtonX = width / 2 - continueButtonWidth / 2;
+            const continueButtonY = panelY + 380;
+            const continueButton = this.createActionButton(
+                'CONTINUE EXPLORING',
+                () => {
+                    // Mark level as completed - this increments the counter
+                    levelManager.advanceToNextLevel();
+                    levelManager.saveLevelProgress();
+                    
+                    // Go directly to level select screen
+                    this.scene.stop('UIScene');
+                    this.scene.stop('GameScene');
+                    this.scene.start('LevelSelectScene');
+                },
+                0x228833, // Green color for positive action
+                continueButtonWidth,
+                continueButtonHeight
+            );
+            
+            continueButton.setPosition(continueButtonX, continueButtonY);
+            victoryContainer.add(continueButton);
+        } else if (currentLevel && currentLevel.id === FINAL_LEVEL_MAP) {
             // Special victory description for level5
             const victoryText = "You have proven yourself and helped build orbital infrastructure! " +
                               "You are now authorized to create colonies all over Mars. " +

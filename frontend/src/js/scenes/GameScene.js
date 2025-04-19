@@ -952,7 +952,8 @@ export default class GameScene extends Phaser.Scene {
         
         // Show victory screen in UIScene
         if (this.uiScene) {
-            this.uiScene.showVictory(reputation, this.currentLevel.reputationGoal);
+            const isRandomLevel = this.currentLevel.isRandom;
+            this.uiScene.showVictory(reputation, this.currentLevel.reputationGoal, isRandomLevel);
         }
     }
 
