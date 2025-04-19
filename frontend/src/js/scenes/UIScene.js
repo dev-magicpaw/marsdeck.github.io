@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BUILDINGS, CARD_TYPES, MAX_CARD_SLOTS, MAX_HAND_SIZE, RESOURCES, TERRAIN_FEATURES, TERRAIN_TYPES } from '../config/game-data';
+import { FINAL_LEVEL_MAP } from '../config/level-configs';
 import levelManager from '../objects/LevelManager';
 
 export default class UIScene extends Phaser.Scene {
@@ -1175,47 +1176,93 @@ export default class UIScene extends Phaser.Scene {
             { fontSize: '18px', fontFamily: 'Arial', color: '#aaddff', align: 'center' }
         ).setOrigin(0.5));
         
-        // Victory description
-        const victoryText = "Your Mars colony is thriving! Your leadership skills have " +
-                           "impressed the United Earth Government, and more resources " +
-                           "will be provided for your next mission.";
-        
-        victoryContainer.add(this.add.text(
-            width / 2, 
-            panelY + 300, 
-            victoryText, 
-            { 
-                fontSize: '18px', 
-                fontFamily: 'Arial', 
-                color: '#ffffff', 
-                align: 'center',
-                wordWrap: { width: panelWidth - 100 }
-            }
-        ).setOrigin(0.5));
-        
-        const rewardButtonWidth = 200;
-        const rewardButtonHeight = 40;
-        const rewardButtonX = width / 2 - rewardButtonWidth / 2;
-        const rewardButtonY = panelY + 380;
-        const rewardsButton = this.createActionButton(
-            'VIEW REWARDS',
-            () => {
-                // Advance to next level and save progress before showing rewards
-                levelManager.advanceToNextLevel();
-                levelManager.saveLevelProgress();
-                
-                // Hide victory screen and show rewards
-                victoryContainer.setVisible(false);
-                panel.setVisible(false);
-                this.showRewards();
-            },
-            0x228833, // Green color for positive action
-            rewardButtonWidth,
-            rewardButtonHeight
-        );
-        
-        rewardsButton.setPosition(rewardButtonX, rewardButtonY);
-        victoryContainer.add(rewardsButton);
+        // Check if this is level5 to show special victory message
+        const currentLevel = levelManager.getCurrentLevel();
+        if (currentLevel && currentLevel.id === FINAL_LEVEL_MAP) {
+            // Special victory description for level5
+            const victoryText = "You have proven yourself and helped build orbital infrastructure! " +
+                              "You are now authorized to create colonies all over Mars. " +
+                              "The future of humanity's expansion throughout the solar system begins here!";
+            
+            victoryContainer.add(this.add.text(
+                width / 2, 
+                panelY + 300, 
+                victoryText, 
+                { 
+                    fontSize: '18px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff', 
+                    align: 'center',
+                    wordWrap: { width: panelWidth - 100 }
+                }
+            ).setOrigin(0.5));
+            
+            const forwardButtonWidth = 200;
+            const forwardButtonHeight = 40;
+            const forwardButtonX = width / 2 - forwardButtonWidth / 2;
+            const forwardButtonY = panelY + 380;
+            const forwardButton = this.createActionButton(
+                'VENTURE FORWARD',
+                () => {
+                    // Mark level as completed
+                    levelManager.LEVEL_PROGRESS.completedLevels[currentLevel.id] = true;
+                    levelManager.saveLevelProgress();
+                    
+                    // Go directly to level select screen
+                    this.scene.stop('UIScene');
+                    this.scene.stop('GameScene');
+                    this.scene.start('LevelSelectScene');
+                },
+                0x228833, // Green color for positive action
+                forwardButtonWidth,
+                forwardButtonHeight
+            );
+            
+            forwardButton.setPosition(forwardButtonX, forwardButtonY);
+            victoryContainer.add(forwardButton);
+        } else {
+            // Regular victory description for other levels
+            const victoryText = "Your Mars colony is thriving! Your leadership skills have " +
+                             "impressed the United Earth Government, and more resources " +
+                             "will be provided for your next mission.";
+            
+            victoryContainer.add(this.add.text(
+                width / 2, 
+                panelY + 300, 
+                victoryText, 
+                { 
+                    fontSize: '18px', 
+                    fontFamily: 'Arial', 
+                    color: '#ffffff', 
+                    align: 'center',
+                    wordWrap: { width: panelWidth - 100 }
+                }
+            ).setOrigin(0.5));
+            
+            const rewardButtonWidth = 200;
+            const rewardButtonHeight = 40;
+            const rewardButtonX = width / 2 - rewardButtonWidth / 2;
+            const rewardButtonY = panelY + 380;
+            const rewardsButton = this.createActionButton(
+                'VIEW REWARDS',
+                () => {
+                    // Advance to next level and save progress before showing rewards
+                    levelManager.advanceToNextLevel();
+                    levelManager.saveLevelProgress();
+                    
+                    // Hide victory screen and show rewards
+                    victoryContainer.setVisible(false);
+                    panel.setVisible(false);
+                    this.showRewards();
+                },
+                0x228833, // Green color for positive action
+                rewardButtonWidth,
+                rewardButtonHeight
+            );
+            
+            rewardsButton.setPosition(rewardButtonX, rewardButtonY);
+            victoryContainer.add(rewardsButton);
+        }
     }
     
     // Show rewards panel with selectable rewards

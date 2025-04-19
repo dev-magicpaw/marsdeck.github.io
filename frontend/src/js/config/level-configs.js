@@ -1,5 +1,6 @@
 import { RESOURCES, REWARDS } from './game-data';
 
+export const FINAL_LEVEL_MAP = 'level5';
 // Level progression configuration
 export const GAME_LEVELS = [
   {
