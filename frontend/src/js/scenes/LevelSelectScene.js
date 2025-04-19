@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CARD_TYPES } from '../config/game-data';
+import { CARD_TYPES, RESOURCES } from '../config/game-data';
 import { GAME_LEVELS } from '../config/level-configs';
 import levelManager from '../objects/LevelManager';
 import RewardsManager from '../objects/RewardsManager';
@@ -252,6 +252,11 @@ export default class LevelSelectScene extends Phaser.Scene {
             }
         });
         
+        // Add "Somewhere on Mars" button if level5 is completed
+        if (levelManager.LEVEL_PROGRESS.completedLevels['level5']) {
+            this.createRandomLevelButton();
+        }
+        
         // Display unlocked rewards
         this.createRewardsDisplay();
         
@@ -291,6 +296,149 @@ export default class LevelSelectScene extends Phaser.Scene {
         resetButton.on('pointerdown', () => {
             this.resetGameProgress();
         });
+    }
+    
+    // Create a button for randomly generated levels
+    createRandomLevelButton() {
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Position button below all regular levels
+        const buttonY = 300;
+        const buttonWidth = 280;
+        const buttonHeight = 100;
+        
+        // Create special button for random levels with purple color
+        const randomButton = this.add.nineslice(
+            width / 2, buttonY,
+            'blueSquareButton',
+            null,
+            buttonWidth, buttonHeight,
+            15, 15, 15, 15  // Left, right, top, bottom slice points
+        );
+        randomButton.setOrigin(0.5);
+        randomButton.setTint(0xAA55FF); // Purple tint
+        randomButton.setInteractive({ useHandCursor: true });
+        
+        // Add pulsing glow effect
+        this.tweens.add({
+            targets: randomButton,
+            alpha: 0.8,
+            duration: 1200,
+            yoyo: true,
+            repeat: -1
+        });
+        
+        // Add button text
+        const buttonText = this.add.text(width / 2, buttonY - 15, 'SOMEWHERE ON MARS', {
+            fontSize: '22px',
+            color: '#FFFFFF',
+            fontStyle: 'bold'
+        });
+        buttonText.setOrigin(0.5);
+        
+        // Add descriptive subtext
+        const subText = this.add.text(width / 2, buttonY + 15, 'Random challenges await', {
+            fontSize: '16px',
+            color: '#FFDDFF',
+            fontStyle: 'italic'
+        });
+        subText.setOrigin(0.5);
+        
+        // Handle hover effects
+        randomButton.on('pointerover', () => {
+            randomButton.setTint(0xCC77FF); // Lighter purple on hover
+        });
+        
+        randomButton.on('pointerout', () => {
+            randomButton.setTint(0xAA55FF); // Return to original purple
+        });
+        
+        // Add click event
+        randomButton.on('pointerdown', () => {
+            // Generate random level with increasing difficulty
+            this.generateRandomLevel();
+            
+            // Start the game
+            this.scene.start('GameScene');
+        });
+    }
+    
+    // Generate a randomly configured level with progressive difficulty
+    generateRandomLevel() {
+        // Calculate difficulty based on how many random levels have been played
+        const randomLevelsPlayed = levelManager.LEVEL_PROGRESS.randomLevelsCompleted || 0;
+        const difficulty = Math.min(1 + (randomLevelsPlayed * 0.1), 2); // Scale from 1.0 to 2.0
+        
+        // Generate random level id
+        const randomId = 'random_' + Date.now();
+        
+        // Select a random map from existing maps
+        const mapIds = ['LEVEL_1_MAP', 'LEVEL_2_MAP', 'LEVEL_3_MAP', 'LEVEL_4_MAP', 'LEVEL_5_MAP'];
+        const randomMapIndex = Math.floor(Math.random() * mapIds.length);
+        const mapId = mapIds[randomMapIndex];
+        
+        // Generate reputation goal based on difficulty (15-150)
+        const reputationGoal = Math.floor(15 + (randomLevelsPlayed * 5) + (Math.random() * 10));
+        
+        // Generate turn limit (20-30)
+        const turnLimit = Math.floor(20 + (Math.random() * 10));
+        
+        // Create level name
+        const locationNames = [
+            'Olympus Mons', 'Valles Marineris', 'Syrtis Major', 'Hellas Basin', 
+            'Arsia Mons', 'Elysium Planitia', 'Tharsis Ridge', 'Utopia Planitia',
+            'Meridiani Planum', 'Arcadia Planitia', 'Terra Cimmeria', 'Amazonis Planitia'
+        ];
+        const locationIndex = Math.floor(Math.random() * locationNames.length);
+        const location = locationNames[locationIndex];
+        
+        const levelTypes = [
+            'Outpost', 'Settlement', 'Mining Colony', 'Research Base', 
+            'Habitat Dome', 'Supply Depot', 'Frontier Base', 'Command Center'
+        ];
+        const typeIndex = Math.floor(Math.random() * levelTypes.length);
+        const levelType = levelTypes[typeIndex];
+        
+        // Create random level config
+        const randomLevel = {
+            id: randomId,
+            name: `${location} ${levelType}`,
+            description: `Challenge level: ${randomLevelsPlayed + 1}`,
+            mapId: mapId,
+            turnLimit: turnLimit,
+            reputationGoal: reputationGoal,
+            startingResources: {
+                [RESOURCES.IRON]: 0,
+                [RESOURCES.STEEL]: 10,
+                [RESOURCES.CONCRETE]: 10,
+                [RESOURCES.WATER]: 0,
+                [RESOURCES.FUEL]: 0,
+                [RESOURCES.DRONES]: 0,
+                [RESOURCES.ENERGY]: 0,
+                [RESOURCES.REPUTATION]: 0
+            },
+            rewards: {
+                rewardIds: [],
+                resources: {}
+            },
+            nextLevelId: null,
+            isRandom: true
+        };
+        
+        // Set this as the current level
+        levelManager.LEVEL_PROGRESS.currentLevelId = randomId;
+        levelManager.LEVEL_PROGRESS.customLevel = randomLevel;
+        
+        // Initialize the counter if it doesn't exist
+        if (!levelManager.LEVEL_PROGRESS.randomLevelsCompleted) {
+            levelManager.LEVEL_PROGRESS.randomLevelsCompleted = 0;
+        }
+        
+        // Save to level manager
+        levelManager.saveLevelProgress();
+        
+        return randomLevel;
     }
     
     // Create display for unlocked rewards

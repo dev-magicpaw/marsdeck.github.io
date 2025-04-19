@@ -31,6 +31,13 @@ class LevelManager {
   // Helper function to get current level configuration
   getCurrentLevel() {
     const currentLevelId = this.LEVEL_PROGRESS.currentLevelId;
+    
+    // First check if this is a custom random level
+    if (currentLevelId.startsWith('random_') && this.LEVEL_PROGRESS.customLevel) {
+      return this.LEVEL_PROGRESS.customLevel;
+    }
+    
+    // Otherwise, find the level in the predefined levels
     return GAME_LEVELS.find(level => level.id === currentLevelId);
   }
 
@@ -53,9 +60,27 @@ class LevelManager {
     return map;
   }
 
-  // Helper function to advance to the next level
+  // Helper function to advance to the next level or handle random levels
   advanceToNextLevel() {
     const currentLevel = this.getCurrentLevel();
+    
+    // Special handling for random levels
+    if (currentLevel && currentLevel.isRandom) {
+      // Mark the current random level as completed
+      this.LEVEL_PROGRESS.completedLevels[currentLevel.id] = true;
+      
+      // Increment the counter for random levels completed
+      if (!this.LEVEL_PROGRESS.randomLevelsCompleted) {
+        this.LEVEL_PROGRESS.randomLevelsCompleted = 1;
+      } else {
+        this.LEVEL_PROGRESS.randomLevelsCompleted++;
+      }
+      
+      // Don't set nextLevelId since player will return to level select
+      return true;
+    }
+    
+    // Handle standard levels
     if (currentLevel && currentLevel.nextLevelId) {
       // Mark current level as completed
       this.LEVEL_PROGRESS.completedLevels[currentLevel.id] = true;
