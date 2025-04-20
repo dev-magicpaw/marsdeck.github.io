@@ -4,20 +4,33 @@ export const TUTORIAL_MAP = {
     gridSize: 8,
     cells: [
         // Metal deposits in specific locations
+        { x: 0, y: 3, feature: TERRAIN_FEATURES.METAL.id },
         { x: 0, y: 5, feature: TERRAIN_FEATURES.METAL.id },
-        { x: 0, y: 4, feature: TERRAIN_FEATURES.METAL.id },
         { x: 1, y: 5, feature: TERRAIN_FEATURES.METAL.id },
         { x: 2, y: 4, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 2, y: 7, feature: TERRAIN_FEATURES.METAL.id },
         { x: 3, y: 5, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 6, y: 0, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 6, y: 1, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 6, y: 6, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 7, y: 0, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 7, y: 5, feature: TERRAIN_FEATURES.METAL.id },
+        { x: 7, y: 7, feature: TERRAIN_FEATURES.METAL.id },
         
         // Water deposits
         { x: 0, y: 0, feature: TERRAIN_FEATURES.WATER.id },
+        { x: 1, y: 7, feature: TERRAIN_FEATURES.WATER.id },
+        { x: 2, y: 1, feature: TERRAIN_FEATURES.WATER.id },
+        { x: 2, y: 6, feature: TERRAIN_FEATURES.WATER.id },
         { x: 4, y: 0, feature: TERRAIN_FEATURES.WATER.id },
         { x: 5, y: 4, feature: TERRAIN_FEATURES.WATER.id },
+        { x: 7, y: 2, feature: TERRAIN_FEATURES.WATER.id },
         
         // Mountain range across the middle
         { x: 0, y: 2, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 0, y: 6, feature: TERRAIN_FEATURES.MOUNTAIN.id },
         { x: 2, y: 0, feature: TERRAIN_FEATURES.MOUNTAIN.id },
+        { x: 5, y: 7, feature: TERRAIN_FEATURES.MOUNTAIN.id },
     ]
 };
 
