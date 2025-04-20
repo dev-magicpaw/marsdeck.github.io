@@ -36,6 +36,19 @@ export default class UIScene extends Phaser.Scene {
         
         // Timers and animations
         this.messageTimer = null;
+        this.messageDisplayTime = 3000; // 3 seconds
+        this.panelHeight = 150;
+        
+        // End turn button effect configuration
+        this.buttonEffectConfig = {
+            color: 0x4488ff,      // Light blue color
+            alpha: { start: 0.8, end: 0 },
+            scale: { start: 0.3, end: 1.5 },
+            speed: 150,           // Particles speed
+            lifespan: 600,        // Duration in milliseconds
+            quantity: 15,         // Number of particles per emission
+            blendMode: 'ADD'      // ADD for glow effect
+        };
     }
 
     init(data) {
@@ -475,21 +488,20 @@ export default class UIScene extends Phaser.Scene {
         this.endTurnButton.setY(this.endTurnButton.y - buttonHeight/2); // Center vertically
         this.endTurnButton.add(buttonBg);
         this.endTurnButton.add(buttonText);
-        
         this.endTurnButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
-        
         this.endTurnButton.on('pointerdown', () => {
+            // Play the end turn button effect
+            this.playEndTurnButtonEffect();
+            
+            // End the turn
             this.gameScene.endTurn();
         });
-        
         this.endTurnButton.on('pointerover', () => {
             buttonBg.setTint(0xaaccff); // Light blue tint for hover
         });
-        
         this.endTurnButton.on('pointerout', () => {
             buttonBg.clearTint(); // Clear tint on pointer out
         });
-        
         // Store the button background for enabling/disabling
         this.endTurnButtonBg = buttonBg;
         
@@ -2481,5 +2493,59 @@ export default class UIScene extends Phaser.Scene {
         
         // Make sure tutorial panel is on top
         this.tutorialContainer.setDepth(1000);
+    }
+    
+    // Create particle emitter for the END TURN button effect
+    createEndTurnButtonEffect() {
+        // We'll create the emitter on demand when it's needed
+        // No initialization required here
+    }
+    
+    // Play the END TURN button effect
+    playEndTurnButtonEffect() {
+        try {
+            // Position for the effect (center of the button)
+            const buttonX = this.endTurnButton.x + 50; 
+            const buttonY = this.endTurnButton.y + 15;
+            
+            // Create a simple circle particle effect
+            for (let i = 0; i < this.buttonEffectConfig.quantity; i++) {
+                // Create a sprite for each particle
+                const particle = this.add.sprite(buttonX, buttonY, 'particleGlow');
+                
+                // Apply tint
+                particle.setTint(this.buttonEffectConfig.color);
+                
+                // Set initial scale
+                particle.setScale(this.buttonEffectConfig.scale.start);
+                
+                // Set blend mode
+                particle.setBlendMode(this.buttonEffectConfig.blendMode);
+                
+                // Set initial alpha
+                particle.setAlpha(this.buttonEffectConfig.alpha.start);
+                
+                // Calculate random angle and distance
+                const angle = Math.random() * Math.PI * 2;
+                const speed = this.buttonEffectConfig.speed * (0.5 + Math.random() * 0.5);
+                
+                // Animate the particle
+                this.tweens.add({
+                    targets: particle,
+                    x: buttonX + Math.cos(angle) * speed,
+                    y: buttonY + Math.sin(angle) * speed,
+                    scale: this.buttonEffectConfig.scale.end,
+                    alpha: this.buttonEffectConfig.alpha.end,
+                    duration: this.buttonEffectConfig.lifespan,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        // Remove particle when animation is done
+                        particle.destroy();
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error creating button effect:', error);
+        }
     }
 } 
