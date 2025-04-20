@@ -9,7 +9,7 @@ module.exports = {
     output: {
         filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist'),
-        publicPath: './',
+        publicPath: '/',
         clean: true
     },
     optimization: {
@@ -33,7 +33,11 @@ module.exports = {
     },
     devServer: {
         static: './dist',
-        hot: true
+        hot: true,
+        historyApiFallback: true,
+        devMiddleware: {
+            publicPath: '/'
+        }
     },
     module: {
         rules: [
@@ -57,6 +61,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
+                { from: 'src/assets', to: 'assets' },
                 { from: 'src/assets/.nojekyll', to: '' }
             ]
         })

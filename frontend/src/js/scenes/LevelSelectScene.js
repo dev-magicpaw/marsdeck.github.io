@@ -337,11 +337,14 @@ export default class LevelSelectScene extends Phaser.Scene {
         // Add reset progress button
         const resetButtonWidth = 220;
         const resetButtonHeight = 40;
+        const resetButtonX = resetButtonWidth / 2 + 10;
+        const resetButtonY = resetButtonHeight / 2 + 10;
+        const resetButtonTint = 0x555555;
         
         // Use redSquareButton with nine-slice for reset button
         const resetButton = this.add.nineslice(
-            width / 2,
-            height - 60,
+            resetButtonX,
+            resetButtonY,
             'redSquareButton',
             null,
             resetButtonWidth, resetButtonHeight,
@@ -349,8 +352,10 @@ export default class LevelSelectScene extends Phaser.Scene {
         );
         resetButton.setOrigin(0.5);
         resetButton.setInteractive({ useHandCursor: true });
+        resetButton.setTint(resetButtonTint);
+
         
-        const resetText = this.add.text(width / 2, height - 60, 'RESET PROGRESS', {
+        const resetText = this.add.text(resetButtonX, resetButtonY, 'RESET PROGRESS', {
             fontSize: '16px',
             color: '#FFFFFF',
             fontStyle: 'bold'
@@ -363,7 +368,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         });
         
         resetButton.on('pointerout', () => {
-            resetButton.clearTint();
+            resetButton.setTint(resetButtonTint);
         });
         
         // Reset game progress when clicked
