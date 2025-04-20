@@ -1,6 +1,49 @@
 # Mars Colony Card Game
 
-A web-based card game where you build a robotic colony on Mars. Manage resources, construct buildings, and expand your colony to score points.
+A web-based card game where you build and manage a Mars colony.
+
+## Development
+
+### Prerequisites
+- Node.js (v14+)
+- npm
+
+### Installation
+```bash
+npm install
+```
+
+### Running locally
+```bash
+npm start
+```
+This will start a development server and open the game in your default browser.
+
+### Building for production
+```bash
+npm run build
+```
+
+## Deployment to GitHub Pages
+
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+### Automatic Deployment
+Push to the main branch and the GitHub workflow will automatically build and deploy to the gh-pages branch.
+
+### Manual Deployment
+You can also deploy manually:
+```bash
+npm run deploy
+```
+
+### Accessing the Game
+Once deployed, the game is available at: https://[your-github-username].github.io/[repository-name]/
+
+## Technology Stack
+- Phaser 3 - Game framework
+- Webpack - Asset bundling
+- GitHub Actions - CI/CD pipeline
 
 ## Game Overview
 
