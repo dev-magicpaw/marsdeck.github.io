@@ -30,15 +30,15 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('droneDepo', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_06.png'));
         this.load.image('fuelRefinery', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_15.png'));
         this.load.image('ironMine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_07.png'));
-        this.load.image('launchPad', require('../../assets/images/ui_pack_space/Extra/Double/button_square_depth.png'));
+        this.load.image('launchPad', require('../../assets/images/hud/extra_button_square_depth.png'));
         this.load.image('launchPadIcon', require('../../assets/images/game_icons/launch_pad.png'));
-        this.load.image('launchPadSurrounding', require('../../assets/images/ui_pack_space/Extra/Double/button_square_depth.png'));
+        this.load.image('launchPadSurrounding', require('../../assets/images/hud/extra_button_square_depth.png'));
         this.load.image('solarPanel', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_12.png'));
         this.load.image('steelworks', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_08.png'));
         this.load.image('waterPump', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_11.png'));
         this.load.image('teslaCoil', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_16.png'));
         this.load.image('windTurbine', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_01.png'));
-        this.load.image('windTurbineSurrounding', require('../../assets/images/ui_pack_space/Extra/Double/panel_square_screws_upside_down.png'));
+        this.load.image('windTurbineSurrounding', require('../../assets/images/hud/extra_panel_square_screws_upside_down.png'));
         this.load.image('artificialLights', require('../../assets/images/rts_sci_fi/Structure/scifiStructure_13.png'));
         // Load unit icons
         this.load.image('droneIcon', require('../../assets/images/rts_sci_fi/Unit/scifiUnit_29.png'));
@@ -57,7 +57,7 @@ export default class BootScene extends Phaser.Scene {
 
 
         // Load illegal tile shading sprite
-        this.load.image('illegalTileShade', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_large_square.png'));
+        this.load.image('illegalTileShade', require('../../assets/images/hud/extra_bar_shadow_square_large_square.png'));
 
         // Load rocket sprites
         this.load.image('rocketUnFueled', require('../../assets/images/space_rockets/Missiles/spaceMissiles_008.png'));
@@ -65,31 +65,31 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('rocketInFlight', require('../../assets/images/space_rockets/Missiles/spaceMissiles_007.png'));
         
         // Load card background
-        this.load.image('cardBackground', require('../../assets/images/ui_pack_space/Blue/Default/button_square_header_large_rectangle.png'));
-        this.load.image('cardPrefabBackground', require('../../assets/images/ui_pack_space/Yellow/Default/button_square_header_large_rectangle.png'));
-        this.load.image('cardEventBackground', require('../../assets/images/ui_pack_space/Green/Default/button_square_header_large_rectangle.png'));
+        this.load.image('cardBackground', require('../../assets/images/hud/blue_button_square_header_large_rectangle.png'));
+        this.load.image('cardPrefabBackground', require('../../assets/images/hud/yellow_button_square_header_large_rectangle.png'));
+        this.load.image('cardEventBackground', require('../../assets/images/hud/green_button_square_header_large_rectangle.png'));
 
         
         // Load card slot background
-        this.load.image('cardSlotBackground', require('../../assets/images/ui_pack_space/Extra/Double/bar_shadow_square_outline_large.png'));
+        this.load.image('cardSlotBackground', require('../../assets/images/hud/extra_bar_shadow_square_outline_large.png'));
         
         // Load hand limit indicator
-        this.load.image('handLimitIndicator', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_small_square.png'));
+        this.load.image('handLimitIndicator', require('../../assets/images/hud/red_bar_square_gloss_small_square.png'));
         
         // Load end turn button texture
-        this.load.image('blueGlossSquareButton', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_gloss_large.png'));
-        this.load.image('blueSquareButton', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_large.png'));
-        this.load.image('greenSquareButton', require('../../assets/images/ui_pack_space/Green/Double/bar_square_large.png'));
-        this.load.image('redSquareButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_large.png'));
-        this.load.image('greySquareButton', require('../../assets/images/ui_pack_space/Grey/Double/bar_square_large_square.png'));
+        this.load.image('blueGlossSquareButton', require('../../assets/images/hud/blue_bar_square_gloss_large.png'));
+        this.load.image('blueSquareButton', require('../../assets/images/hud/blue_bar_square_large.png'));
+        this.load.image('greenSquareButton', require('../../assets/images/hud/green_bar_square_large.png'));
+        this.load.image('redSquareButton', require('../../assets/images/hud/red_bar_square_large.png'));
+        this.load.image('greySquareButton', require('../../assets/images/hud/grey_bar_square_large_square.png'));
         
         // Load discard button texture
-        this.load.image('discardButton', require('../../assets/images/ui_pack_space/Red/Double/bar_square_gloss_large.png'));
+        this.load.image('discardButton', require('../../assets/images/hud/red_bar_square_gloss_large.png'));
         
         // Load victory panel background texture
-        this.load.image('victoryPanelBackground', require('../../assets/images/ui_pack_space/Blue/Double/bar_square_large_square.png'));
-        this.load.image('panelGlassScrews', require('../../assets/images/ui_pack_space/Extra/Double/panel_glass_screws.png'));
-        this.load.image('barRoundLargeSquare', require('../../assets/images/ui_pack_space/Blue/Double/bar_round_large_square.png'));
+        this.load.image('victoryPanelBackground', require('../../assets/images/hud/blue_bar_square_large_square.png'));
+        this.load.image('panelGlassScrews', require('../../assets/images/hud/extra_panel_glass_screws.png'));
+        this.load.image('barRoundLargeSquare', require('../../assets/images/hud/blue_bar_round_large_square.png'));
 
 
         // Load tutorial
