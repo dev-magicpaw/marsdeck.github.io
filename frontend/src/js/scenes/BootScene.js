@@ -94,6 +94,7 @@ export default class BootScene extends Phaser.Scene {
 
         // Load tutorial
         this.load.image('tutorialPanel', require('../../assets/images/tutorial.png'));
+        this.load.image('tutorialPanel2', require('../../assets/images/tutorial2.png'));
         
         // Use existing texture for particle effects
         this.load.image('particleGlow', require('../../assets/images/hud/blue_bar_round_large_square.png'));

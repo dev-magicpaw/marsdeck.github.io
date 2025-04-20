@@ -2370,7 +2370,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
     // Show tutorial panel at the beginning of level 1
-    showTutorialPanel() {
+    showTutorialPanel(secondPanel = false) {
         // If tutorial panel already exists, destroy it first
         if (this.tutorialContainer) {
             this.tutorialContainer.destroy();
@@ -2406,11 +2406,11 @@ export default class UIScene extends Phaser.Scene {
         panelBg.setTint(0x222233); // Dark blue-gray tint
         this.tutorialContainer.add(panelBg);
         
-        // Add tutorial image
+        // Add tutorial image based on which panel we're showing
         const tutorialImage = this.add.image(
             width / 2,
             height / 2 - 20, // Shift up slightly to make room for button
-            'tutorialPanel'
+            secondPanel ? 'tutorialPanel2' : 'tutorialPanel'
         );
         
         // Scale the image to fit within the panel
@@ -2422,74 +2422,111 @@ export default class UIScene extends Phaser.Scene {
         
         this.tutorialContainer.add(tutorialImage);
         
-        // Create "GOT IT" button
+        // Button configuration
         const buttonWidth = 150;
         const buttonHeight = 40;
-        const buttonX = width / 2 - buttonWidth / 2;
         const buttonY = panelY + panelHeight - buttonHeight - 20; // 20px from bottom of panel
         
-        const gotItButton = this.createActionButton(
-            'GOT IT',
-            () => {
-                // Get help button position for tweening target
-                const buttonSize = 36;
-                const paddingX = 10;
-                const paddingY = 5;
-                const helpButtonX = this.cameras.main.width - buttonSize - paddingX + buttonSize/2;
-                const helpButtonY = paddingY + buttonSize/2;
-                
-                // Create a pivot point for the tutorial container at its center
-                const containerCenterX = width / 2;
-                const containerCenterY = height / 2;
-                this.tutorialContainer.setPosition(containerCenterX, containerCenterY);
-                
-                // Move all children to maintain visual position after changing container position
-                this.tutorialContainer.iterate(child => {
-                    child.x -= containerCenterX;
-                    child.y -= containerCenterY;
-                });
-                
-                // Fade out the "GOT IT" button immediately
-                this.tweens.add({
-                    targets: gotItButton,
-                    alpha: 0,
-                    duration: 200
-                });
-                
-                // Start with the container at scale 1
-                this.tutorialContainer.setScale(1);
-                
-                // Tween the tutorial panel to shrink into the help button
-                this.tweens.add({
-                    targets: this.tutorialContainer,
-                    x: helpButtonX,
-                    y: helpButtonY,
-                    scaleX: 0.05,
-                    scaleY: 0.05,
-                    duration: 300,
-                    ease: 'Cubic.easeIn',
-                    onComplete: () => {
-                        // Destroy the container when animation completes
-                        this.tutorialContainer.destroy();
-                    }
-                });
-                
-                // Fade out the overlay faster than the panel shrink
-                this.tweens.add({
-                    targets: darkOverlay,
-                    alpha: 0,
-                    duration: 250,
-                    ease: 'Cubic.easeOut'
-                });
-            },
-            0x4488cc, // Blue color
-            buttonWidth,
-            buttonHeight,
-            'blueGlossSquareButton'
-        );
-        
-        gotItButton.setPosition(buttonX, buttonY);
-        this.tutorialContainer.add(gotItButton);
+        if (secondPanel) {
+            // Create "BACK" button (left side)
+            const backButtonX = width / 2 - buttonWidth - 10;
+            const backButton = this.createActionButton(
+                'BACK',
+                () => {
+                    // Go back to the first panel
+                    this.showTutorialPanel(false);
+                },
+                0x4488cc, // Blue color
+                buttonWidth,
+                buttonHeight,
+                'blueGlossSquareButton'
+            );
+            
+            backButton.setPosition(backButtonX, buttonY);
+            this.tutorialContainer.add(backButton);
+            
+            // Create "GOT IT" button (right side)
+            const gotItButtonX = width / 2 + 10;
+            const gotItButton = this.createActionButton(
+                'GOT IT',
+                () => {
+                    // Get help button position for tweening target
+                    const buttonSize = 36;
+                    const paddingX = 10;
+                    const paddingY = 5;
+                    const helpButtonX = this.cameras.main.width - buttonSize - paddingX + buttonSize/2;
+                    const helpButtonY = paddingY + buttonSize/2;
+                    
+                    // Create a pivot point for the tutorial container at its center
+                    const containerCenterX = width / 2;
+                    const containerCenterY = height / 2;
+                    this.tutorialContainer.setPosition(containerCenterX, containerCenterY);
+                    
+                    // Move all children to maintain visual position after changing container position
+                    this.tutorialContainer.iterate(child => {
+                        child.x -= containerCenterX;
+                        child.y -= containerCenterY;
+                    });
+                    
+                    // Fade out the buttons immediately
+                    this.tweens.add({
+                        targets: [backButton, gotItButton],
+                        alpha: 0,
+                        duration: 200
+                    });
+                    
+                    // Start with the container at scale 1
+                    this.tutorialContainer.setScale(1);
+                    
+                    // Tween the tutorial panel to shrink into the help button
+                    this.tweens.add({
+                        targets: this.tutorialContainer,
+                        x: helpButtonX,
+                        y: helpButtonY,
+                        scaleX: 0.05,
+                        scaleY: 0.05,
+                        duration: 300,
+                        ease: 'Cubic.easeIn',
+                        onComplete: () => {
+                            // Destroy the container when animation completes
+                            this.tutorialContainer.destroy();
+                        }
+                    });
+                    
+                    // Fade out the overlay faster than the panel shrink
+                    this.tweens.add({
+                        targets: darkOverlay,
+                        alpha: 0,
+                        duration: 250,
+                        ease: 'Cubic.easeOut'
+                    });
+                },
+                0x4488cc, // Blue color
+                buttonWidth,
+                buttonHeight,
+                'blueGlossSquareButton'
+            );
+            
+            gotItButton.setPosition(gotItButtonX, buttonY);
+            this.tutorialContainer.add(gotItButton);
+        } else {
+            // Create "NEXT" button for first panel
+            const nextButtonX = width / 2 - buttonWidth / 2;
+            const nextButton = this.createActionButton(
+                'NEXT',
+                () => {
+                    // Switch to the second tutorial panel
+                    this.showTutorialPanel(true);
+                },
+                0x4488cc, // Blue color
+                buttonWidth,
+                buttonHeight,
+                'blueGlossSquareButton'
+            );
+            
+            nextButton.setPosition(nextButtonX, buttonY);
+            this.tutorialContainer.add(nextButton);
+        }
         
         // Make sure tutorial panel is on top
         this.tutorialContainer.setDepth(1000);
