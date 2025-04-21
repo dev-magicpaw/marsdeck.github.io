@@ -688,8 +688,11 @@ export default class UIScene extends Phaser.Scene {
             // Get base cost from card type with adjustments
             let displayCost = this.gameScene.calculateCardCost(card);
             
+            // Check if the card has any costs
+            let hasCosts = false;
             for (const resource in displayCost) {
                 if (displayCost[resource] > 0) {
+                    hasCosts = true;
                     const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                     
                     // Check if player has enough of this resource
@@ -709,6 +712,17 @@ export default class UIScene extends Phaser.Scene {
                     cardContainer.add(costText);
                     costY += 12;
                 }
+            }
+            
+            // If no costs were added, show "No cost" text
+            if (!hasCosts) {
+                const noCostText = this.add.text(
+                    5, 
+                    75, 
+                    'No cost', 
+                    { fontSize: '10px', fontFamily: 'Arial', color: '#000000' }
+                );
+                cardContainer.add(noCostText);
             }
         }
         
@@ -882,9 +896,11 @@ export default class UIScene extends Phaser.Scene {
                 // Get base cost from card type with adjustments
                 let displayCost = this.gameScene.calculateCardCost(card);
                 
-                // Show adjusted cost
+                // Check if there are any costs
+                let hasCosts = false;
                 for (const resource in displayCost) {
                     if (displayCost[resource] > 0) {
+                        hasCosts = true;
                         // Check if we have enough resources
                         const required = displayCost[resource];
                         const available = this.resourceManager.getResource(resource);
@@ -896,6 +912,11 @@ export default class UIScene extends Phaser.Scene {
                     }
                 }
                 
+                // If no costs, display "No cost"
+                if (!hasCosts) {
+                    content += "No cost\n";
+                }
+
                 // Add building-specific info
                 let additionalText = "\n";
                 // additionalText += building.description + "\n\n";
@@ -972,9 +993,11 @@ export default class UIScene extends Phaser.Scene {
             // Get costs with adjustments
             let displayCost = this.gameScene.calculateCardCost(card);
             
-            // Show cost
+            // Check if there are any costs
+            let hasCosts = false;
             for (const resource in displayCost) {
                 if (displayCost[resource] > 0) {
+                    hasCosts = true;
                     // Check if we have enough resources
                     const required = displayCost[resource];
                     const available = this.resourceManager.getResource(resource);
@@ -990,6 +1013,11 @@ export default class UIScene extends Phaser.Scene {
                         content += `${resourceName}: ${required} (have ${available})\n`;
                     }
                 }
+            }
+            
+            // If no costs, display "No cost"
+            if (!hasCosts) {
+                content += "No cost\n";
             }
 
             // Add effect description
@@ -2222,8 +2250,11 @@ export default class UIScene extends Phaser.Scene {
                     // Get base cost from card type with adjustments
                     let displayCost = this.gameScene.calculateCardCost(card);
                     
+                    // Check if the card has any costs
+                    let hasCosts = false;
                     for (const resource in displayCost) {
                         if (displayCost[resource] > 0) {
+                            hasCosts = true;
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                             
                             // Check if player has enough of this resource
@@ -2244,6 +2275,17 @@ export default class UIScene extends Phaser.Scene {
                             costY += 12;
                         }
                     }
+                    
+                    // If no costs were added, show "No cost" text
+                    if (!hasCosts) {
+                        const noCostText = this.add.text(
+                            5, 
+                            75, 
+                            'No cost', 
+                            { fontSize: '10px', fontFamily: 'Arial', color: '#000000' }
+                        );
+                        cardContainer.add(noCostText);
+                    }
                 }
             } else if (card.type === 'event') {
                 // For event cards, display card texture if available
@@ -2262,8 +2304,11 @@ export default class UIScene extends Phaser.Scene {
                     // Get base cost from card type with adjustments
                     let displayCost = this.gameScene.calculateCardCost(card);
                     
+                    // Check if the card has any costs
+                    let hasCosts = false;
                     for (const resource in displayCost) {
                         if (displayCost[resource] > 0) {
+                            hasCosts = true;
                             const resourceName = resource.charAt(0).toUpperCase() + resource.slice(1);
                             
                             // Check if player has enough of this resource
@@ -2283,6 +2328,17 @@ export default class UIScene extends Phaser.Scene {
                             cardContainer.add(costText);
                             costY += 12;
                         }
+                    }
+                    
+                    // If no costs were added, show "No cost" text
+                    if (!hasCosts) {
+                        const noCostText = this.add.text(
+                            5, 
+                            75, 
+                            'No cost', 
+                            { fontSize: '10px', fontFamily: 'Arial', color: '#000000' }
+                        );
+                        cardContainer.add(noCostText);
                     }
                 }
             }
