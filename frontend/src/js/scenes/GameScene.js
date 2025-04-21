@@ -6,6 +6,7 @@ import GridManager from '../objects/GridManager';
 import levelManager from '../objects/LevelManager';
 import ResourceManager from '../objects/ResourceManager';
 import RewardsManager from '../objects/RewardsManager';
+import { trackLevelStarted } from '../utils/analytics';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -30,6 +31,11 @@ export default class GameScene extends Phaser.Scene {
         
         // Get current level information
         this.currentLevel = levelManager.getCurrentLevel();
+        
+        // Track level started
+        if (this.currentLevel) {
+            trackLevelStarted(this.currentLevel.id);
+        }
         
         // Get turn limit from level config
         this.maxTurns = levelManager.getCurrentTurnLimit();

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import levelManager from '../objects/LevelManager';
+import { trackGameFirstOpen } from '../utils/analytics';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -110,6 +111,8 @@ export default class BootScene extends Phaser.Scene {
             levelManager.LEVEL_PROGRESS.currentLevelId = 'level1';
             levelManager.saveLevelProgress();
             
+            trackGameFirstOpen();
+
             // Start the game scene directly with the tutorial level
             this.scene.start('GameScene');
         } else {
