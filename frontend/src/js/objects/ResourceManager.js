@@ -34,9 +34,7 @@ export default class ResourceManager {
             this.resources[RESOURCES.IRON] = (this.resources[RESOURCES.IRON] || 0) + 100;
             this.resources[RESOURCES.WATER] = (this.resources[RESOURCES.WATER] || 0) + 100;
             this.resources[RESOURCES.STEEL] = (this.resources[RESOURCES.STEEL] || 0) + 100;
-            this.resources[RESOURCES.FUEL] = (this.resources[RESOURCES.FUEL] || 0) + 100;
-            
-            console.log('Testing mode enabled: Added 100 of each resource');
+            this.resources[RESOURCES.FUEL] = (this.resources[RESOURCES.FUEL] || 0) + 100;            
         }
     }
     

@@ -220,12 +220,9 @@ class LevelManager {
     };
     
     // Place the terrain features in order of importance
-    const placedWater = placeFeatures(TERRAIN_FEATURES.WATER.id, waterCount);
-    const placedMetal = placeFeatures(TERRAIN_FEATURES.METAL.id, metalCount);
-    const placedMountains = placeFeatures(TERRAIN_FEATURES.MOUNTAIN.id, mountainCount);
-    
-    // Log placement success
-    console.log(`Random map generated with: ${placedWater}/${waterCount} water, ${placedMetal}/${metalCount} metal, ${placedMountains}/${mountainCount} mountains`);
+    placeFeatures(TERRAIN_FEATURES.WATER.id, waterCount);
+    placeFeatures(TERRAIN_FEATURES.METAL.id, metalCount);
+    placeFeatures(TERRAIN_FEATURES.MOUNTAIN.id, mountainCount);
     
     return mapConfig;
   }

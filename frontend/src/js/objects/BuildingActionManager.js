@@ -36,12 +36,6 @@ export default class BuildingActionManager {
         
         // If this is a launch action and there's a rocket in flight from this pad
         if (actionId === 'launchRocket' || actionId === 'FastLaunch' || actionId === 'HeavyLaunch') {
-            // Log diagnostics to check the state
-            console.log(`isActionOnCooldown:Launch action check for ${cellId}:`, {
-                rocketInFlight: this.rocketInFlight[cellId],
-                cell: this.scene.gridManager.getCell(x, y)
-            });
-            
             // The bug may be that rocketInFlight state isn't being properly cleared
             // Let's make sure it's in sync with the cell's hasRocket state
             const cell = this.scene.gridManager.getCell(x, y);
@@ -53,7 +47,6 @@ export default class BuildingActionManager {
                 console.warn("isActionOnCooldown: cell: ", cell);
             }
             
-            console.log(`isActionOnCooldown: Rocket in flight for ${cellId}:`, this.rocketInFlight[cellId]);
             return this.rocketInFlight[cellId] === true;
         }
         
@@ -71,7 +64,6 @@ export default class BuildingActionManager {
                 const rocketsInFlight = this.scene.gridManager.rocketsInFlight;
                 for (const rocket of rocketsInFlight) {
                     if (rocket.x === x && rocket.y === y) {
-                        console.log(`Rocket in flight for ${cellId}, returns in ${rocket.returnsAtTurn - this.scene.currentTurn} turns`);
                         return rocket.returnsAtTurn - this.scene.currentTurn;
                     }
                 }
@@ -108,7 +100,6 @@ export default class BuildingActionManager {
         if (action.action === 'launchRocket' || action.action === 'FastLaunch' || action.action === 'HeavyLaunch') {
             const cellId = `${x},${y}`;
             this.rocketInFlight[cellId] = true;
-            console.log(`performAction: this.rocketInFlight ?  ${this.rocketInFlight[cellId]} for cell: ${x},${y}`);
             this.scene.gridManager.launchRocket(x, y, action.cooldown);
             // Trigger specific action handling (like animations)
             let launchType = 'regular';

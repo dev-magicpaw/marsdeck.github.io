@@ -99,7 +99,6 @@ export default class UIScene extends Phaser.Scene {
         this.refreshUI();
         
         // Show tutorial panel if this is level 1
-        console.log('levelManager.getCurrentLevel()', levelManager.getCurrentLevel());
         if (levelManager.getCurrentLevel().id === 'level1') {
             this.showTutorialPanel();
         }

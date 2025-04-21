@@ -220,7 +220,6 @@ export default class GridManager {
         
         // Update cell state
         cell.hasRocket = false;
-        console.log(`launchRocket: Rocket launched. cell.hasRocket: ${cell.hasRocket} for cell: ${x},${y}`);
         cell.rocketState = null;
         
         return true;
@@ -233,7 +232,6 @@ export default class GridManager {
         // Find rockets that should return this turn
         for (let i = 0; i < this.rocketsInFlight.length; i++) {
             if (this.rocketsInFlight[i].returnsAtTurn === this.scene.currentTurn) {
-                console.log(`Rocket returning at turn ${this.scene.currentTurn} to position ${this.rocketsInFlight[i].x},${this.rocketsInFlight[i].y}`);
                 returningRockets.push(this.rocketsInFlight[i]);
                 this.rocketsInFlight.splice(i, 1);
                 i--; // Adjust index after removal
@@ -244,14 +242,12 @@ export default class GridManager {
         for (const rocket of returningRockets) {
             const cell = this.getCell(rocket.x, rocket.y);
             if (cell && cell.building === 'launchPad') {
-                console.log(`processRocketReturns: Rocket returning to launch pad at ${rocket.x},${rocket.y}`);
                 cell.hasRocket = true;
                 cell.justLanded = true; // Mark that this rocket just landed for animation
                 this.updateRocketState(rocket.x, rocket.y);
                 
                 // Clear the rocket in flight status in BuildingActionManager
                 if (this.scene.buildingActionManager) {
-                    console.log(`Clearing rocket in flight for ${rocket.x},${rocket.y}`);
                     this.scene.buildingActionManager.clearRocketInFlight(rocket.x, rocket.y);
                 }
             }
