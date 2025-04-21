@@ -318,7 +318,7 @@ export const CARD_TYPES = {
     LAUNCH_PAD_CARD: {
         id: 'launchPadCard',
         name: 'Launch Pad',
-        description: 'Build a launch pad to send rockets for reputation',
+        description: 'Build a launch pad to send rocket shipments to the orbit earning reputation',
         buildingId: 'launchPad',
         cardType: 'building',
         cardTexture: 'launchPadIcon',
@@ -350,7 +350,7 @@ export const CARD_TYPES = {
     ARTIFICIAL_LIGHTS_CARD: {
         id: 'artificialLightsCard',
         name: 'Artificial Lights',
-        description: 'Build artificial lights - makes the area pretty and brings respect to the colony',
+        description: 'Build artificial lights - makes the area pretty and continuously brings respect to the colony',
         buildingId: 'artificialLights',
         cardType: 'building',
         cost: {
@@ -590,7 +590,7 @@ export const REWARDS = {
         RESOURCE_SUPPLY_EVENT_DECK_REWARD: {
             id: 'resourceSupplyEventDeckReward',
             name: 'Resource Supply Event',
-            description: 'Add two Resource Supply Event cards to your deck',
+            description: 'Add two Resource Supply Event cards to your deck. Increase the supply of steel and concrete by 5 each',
             image: 'resourceSupplyIcon',
             applicationType: 'deckCards',
             effects: [
@@ -603,7 +603,7 @@ export const REWARDS = {
         BARTER_EVENT_DECK_REWARD: {
             id: 'barterEventDeckReward',
             name: 'Barter Event',
-            description: 'Add two Barter Event cards to your deck',
+            description: 'Add two Barter Event cards to your deck. Trade 10 concrete for 3 steel and 3 fuel',
             image: 'barterIcon',
             applicationType: 'deckCards',
             effects: [
@@ -616,7 +616,7 @@ export const REWARDS = {
         RAW_EXPORT_EVENT_DECK_REWARD: {
             id: 'rawExportEventDeckReward',
             name: 'Raw Export Event',
-            description: 'Add two Raw Export Event cards to your deck',
+            description: 'Add two Raw Export Event cards to your deck. Export 10 water for 5 fuel and 15 iron for 5 fuel',
             image: 'rawExportIcon',
             applicationType: 'deckCards',
             effects: [
@@ -646,7 +646,7 @@ export const REWARDS = {
         CHARITY_EVENT_DECK_REWARD: {
             id: 'charityEventDeckReward',
             name: 'Charity Event',
-            description: 'Add 4 Charity Event cards to your deck',
+            description: 'Add 4 Charity Event cards to your deck. Provide resources to another colony for 5 reputation',
             image: 'charityIcon',
             applicationType: 'deckCards',
             effects: [
