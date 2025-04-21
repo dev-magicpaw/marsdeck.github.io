@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import levelManager from '../objects/LevelManager';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -101,8 +102,20 @@ export default class BootScene extends Phaser.Scene {
     }
 
     create() {
-        // Transition to the level selection scene
-        this.scene.start('LevelSelectScene');
+        // Try to load progress from localStorage
+        const isFirstTimeUser = !levelManager.loadLevelProgress();
+        
+        if (isFirstTimeUser) {
+            // For first time users, go directly to the tutorial level (level1)
+            levelManager.LEVEL_PROGRESS.currentLevelId = 'level1';
+            levelManager.saveLevelProgress();
+            
+            // Start the game scene directly with the tutorial level
+            this.scene.start('GameScene');
+        } else {
+            // For returning users, go to level selection
+            this.scene.start('LevelSelectScene');
+        }
     }
 
     createLoadingBar() {
