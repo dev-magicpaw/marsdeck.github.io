@@ -43,4 +43,11 @@ export const trackGameFirstOpen = () => {
  */
 export const trackLevelStarted = (levelId) => {
   sendEvent('level_started', { level_id: levelId });
+};
+
+/**
+ * Track when the credits are viewed
+ */
+export const trackCreditsViewed = () => {
+  sendEvent('credits_viewed');
 }; 

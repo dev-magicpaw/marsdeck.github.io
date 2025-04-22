@@ -3,6 +3,7 @@ import { CARD_TYPES } from '../config/game-data';
 import { GAME_LEVELS } from '../config/level-configs';
 import levelManager from '../objects/LevelManager';
 import RewardsManager from '../objects/RewardsManager';
+import { trackCreditsViewed } from '../utils/analytics';
 
 export default class LevelSelectScene extends Phaser.Scene {
     constructor() {
@@ -375,6 +376,47 @@ export default class LevelSelectScene extends Phaser.Scene {
         resetButton.on('pointerdown', () => {
             this.resetGameProgress();
         });
+        
+        // Add Credits button to the bottom right
+        const creditsButtonWidth = 120;
+        const creditsButtonHeight = 40;
+        const creditsButtonX = width - creditsButtonWidth / 2 - 10;
+        const creditsButtonY = height - creditsButtonHeight / 2 - 10;
+        const creditsButtonTint = 0x3333333;
+        
+        // Use blueSquareButton with nine-slice for credits button
+        const creditsButton = this.add.nineslice(
+            creditsButtonX,
+            creditsButtonY,
+            'blueSquareButton',
+            null,
+            creditsButtonWidth, creditsButtonHeight,
+            15, 15, 15, 15  // Left, right, top, bottom slice points
+        );
+        creditsButton.setOrigin(0.5);
+        creditsButton.setInteractive({ useHandCursor: true });
+        creditsButton.setTint(creditsButtonTint);
+        
+        const creditsText = this.add.text(creditsButtonX, creditsButtonY, 'CREDITS', {
+            fontSize: '16px',
+            color: '#FFFFFF',
+            fontStyle: 'bold'
+        });
+        creditsText.setOrigin(0.5);
+        
+        // Add hover effect for credits button
+        creditsButton.on('pointerover', () => {
+            creditsButton.setTint(0xaaaaaa);
+        });
+        
+        creditsButton.on('pointerout', () => {
+            creditsButton.setTint(creditsButtonTint);
+        });
+        
+        // Show credits panel when clicked
+        creditsButton.on('pointerdown', () => {
+            this.showCreditsPanel();
+        });
     }
     
     // Create display for unlocked rewards
@@ -732,6 +774,157 @@ export default class LevelSelectScene extends Phaser.Scene {
             duration: 800,
             yoyo: true,
             repeat: -1
+        });
+    }
+    
+    // Show credits panel
+    showCreditsPanel() {
+        // Track analytics event
+        trackCreditsViewed();
+        
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create container for all credits elements
+        this.creditsContainer = this.add.container(0, 0);
+        this.creditsContainer.setDepth(100); // Ensure it appears above everything else
+        
+        // Add dark overlay for better readability
+        const darkOverlay = this.add.graphics();
+        darkOverlay.fillStyle(0x000000, 0.8);
+        darkOverlay.fillRect(0, 0, width, height);
+        
+        // Make the dark overlay interactive to block clicks on elements behind
+        const hitArea = new Phaser.Geom.Rectangle(0, 0, width, height);
+        darkOverlay.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+        
+        // Prevent click-through by consuming all pointer events on the overlay
+        darkOverlay.on('pointerdown', function(pointer, localX, localY, event) {
+            // Stop event propagation to prevent clicks on elements behind
+            event.stopPropagation();
+        });
+        
+        // Also block other pointer events
+        darkOverlay.on('pointerup', function(pointer, localX, localY, event) {
+            event.stopPropagation();
+        });
+        
+        darkOverlay.on('pointermove', function(pointer, localX, localY, event) {
+            event.stopPropagation();
+        });
+        
+        darkOverlay.on('pointerover', function(pointer, localX, localY, event) {
+            event.stopPropagation();
+        });
+        
+        this.creditsContainer.add(darkOverlay);
+        
+        // Calculate panel dimensions
+        const panelWidth = 800;
+        const panelHeight = 800;
+        const panelX = (width - panelWidth) / 2;
+        const panelY = (height - panelHeight) / 2;
+        
+        // Create panel background using panelGlassScrews texture
+        const panelBg = this.add.nineslice(
+            panelX + panelWidth/2, panelY + panelHeight/2,
+            'panelGlassScrews',
+            null,
+            panelWidth, panelHeight,
+            30, 30, 30, 30
+        );
+        panelBg.setOrigin(0.5);
+        panelBg.setTint(0x222222);
+        this.creditsContainer.add(panelBg);
+        
+        // Add title
+        const titleText = this.add.text(
+            width / 2, 
+            panelY + 40, 
+            'CREDITS', 
+            { fontSize: '32px', fontFamily: 'Arial', color: '#ffffff', align: 'center', fontWeight: 'bold' }
+        );
+        titleText.setOrigin(0.5);
+        this.creditsContainer.add(titleText);
+        
+        // Credits content
+        const creditsContent = [
+            "Mars Deck Colony",
+            "",
+            "Game Design & Development",
+            "Magic Paw",
+            "",
+            "Special Thanks",
+            "To all the beta testers for their feedback and suggestions!",
+            "And my wife for her patience and support",
+            "",
+            "Art Assets",
+            "UI pack: https://kenney.nl/assets/ui-pack-sci-fi",
+            "Sci-fi RTS: https://kenney.nl/assets/sci-fi-rts",
+            "Rockets pack: https://kenney.nl/assets/space-shooter-extension",
+            "Mine wagon icon: https://game-icons.net/1x1/delapouite/mine-wagon.html",
+            "Mine truck icon: https://game-icons.net/1x1/delapouite/mine-truck.html",
+            "Battle Mech icon: https://game-icons.net/1x1/delapouite/battle-mech.html",
+            "Electrical resistance icon: https://game-icons.net/1x1/delapouite/electrical-resistance.html",
+            "Gas pump icon: https://game-icons.net/1x1/delapouite/gas-pump.html",
+            "Drop icon: https://game-icons.net/1x1/lorc/drop.html", 
+        ];
+        
+        // Add credits text with proper formatting
+        const creditsText = this.add.text(
+            width / 2,
+            panelY + 100,
+            creditsContent,
+            { 
+                fontSize: '18px', 
+                fontFamily: 'Arial', 
+                color: '#ffffff', 
+                align: 'center',
+                lineSpacing: 10
+            }
+        );
+        creditsText.setOrigin(0.5, 0);
+        this.creditsContainer.add(creditsText);
+        
+        // Create Back button
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonY = panelY + panelHeight - buttonHeight - 30; // 30px from bottom of panel
+        
+        // Create "BACK" button
+        const backButton = this.add.nineslice(
+            width / 2,
+            buttonY,
+            'blueGlossSquareButton',
+            null,
+            buttonWidth, buttonHeight,
+            15, 15, 15, 15
+        );
+        backButton.setOrigin(0.5);
+        backButton.setInteractive({ useHandCursor: true });
+        this.creditsContainer.add(backButton);
+        
+        const backText = this.add.text(
+            width / 2,
+            buttonY,
+            'BACK',
+            { fontSize: '18px', fontFamily: 'Arial', color: '#ffffff', fontWeight: 'bold' }
+        );
+        backText.setOrigin(0.5);
+        this.creditsContainer.add(backText);
+        
+        // Add hover effect
+        backButton.on('pointerover', () => {
+            backButton.setTint(0xdddddd);
+        });
+        
+        backButton.on('pointerout', () => {
+            backButton.clearTint();
+        });
+        
+        // Close credits panel when Back is clicked
+        backButton.on('pointerdown', () => {
+            this.creditsContainer.destroy();
         });
     }
 } 
