@@ -102,6 +102,52 @@ export default class UIScene extends Phaser.Scene {
         if (levelManager.getCurrentLevel().id === 'level1') {
             this.showTutorialPanel();
         }
+        
+        // Initialize the selected choice index
+        this.selectedChoiceIndex = null;
+        
+        // Add listener for clicks outside cards to deselect card choice
+        this.input.on('pointerdown', (pointer) => {
+            // Only process if we have a selected card choice
+            if (this.selectedChoiceIndex !== null && this.grabButton) {
+                // Check if the click was on the GRAB button (don't deselect in that case)
+                if (this.grabButton) {
+                    const buttonBounds = this.grabButton.getBounds();
+                    if (buttonBounds.contains(pointer.x, pointer.y)) {
+                        return;
+                    }
+                }
+                
+                // Check if the click was on a card choice (don't deselect in that case)
+                let clickedOnCard = false;
+                if (this.choiceContainer && this.choiceContainer.visible && this.choiceContainer.list.length > 0) {
+                    for (let i = 0; i < this.choiceContainer.list.length; i++) {
+                        const cardContainer = this.choiceContainer.list[i];
+                        if (cardContainer) {
+                            const cardBounds = cardContainer.getBounds();
+                            // Transform to world coordinates
+                            const worldBounds = new Phaser.Geom.Rectangle(
+                                cardBounds.x,
+                                cardBounds.y,
+                                cardBounds.width,
+                                cardBounds.height
+                            );
+                            
+                            if (worldBounds.contains(pointer.x, pointer.y)) {
+                                clickedOnCard = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!clickedOnCard) {
+                    // Clear selection and info panel
+                    this.clearCardChoiceSelection();
+                    this.clearInfoPanel();
+                }
+            }
+        });
     }
     
     createLayout() {
@@ -730,6 +776,9 @@ export default class UIScene extends Phaser.Scene {
     
     // Handle card click
     onCardClick(cardIndex) {
+        // Clear any card choice selection
+        this.clearCardChoiceSelection();
+        
         // Update selected card index
         this.selectedCardIndex = cardIndex;
         
@@ -2173,6 +2222,7 @@ export default class UIScene extends Phaser.Scene {
     showCardChoices(cards) {
         // Clear any previous choices
         this.choiceContainer.removeAll(true);
+        this.clearCardChoiceSelection();
         
         if (cards.length === 0) {
             this.choicePanelContainer.setVisible(false);
@@ -2201,6 +2251,16 @@ export default class UIScene extends Phaser.Scene {
                 textureKey = 'cardEventBackground';
             }
             
+            // Create a simpler sprite for better interactivity
+            const hitArea = this.add.rectangle(0, 0, this.cardWidth, this.cardHeight, 0xffffff, 0);
+            hitArea.setOrigin(0, 0);
+            hitArea.setInteractive();
+            hitArea.on('pointerdown', () => {
+                // Display card info but don't select it yet
+                this.onCardChoiceClick(index);
+            });
+            cardContainer.add(hitArea);
+            
             cardBg = this.add.nineslice(
                 0, 0,                // position
                 textureKey,          // texture key
@@ -2209,14 +2269,7 @@ export default class UIScene extends Phaser.Scene {
                 10, 10, 35, 15       // slice sizes: left, right, top, bottom
             );
             cardBg.setOrigin(0, 0);
-            
             cardContainer.add(cardBg);
-            
-            // Make card interactive
-            cardBg.setInteractive();
-            cardBg.on('pointerdown', () => {
-                this.onCardChoiceClick(index);
-            });
             
             // Add card name
             const cardName = card.cardType ? card.cardType.name : card.building.shortName;
@@ -2346,25 +2399,178 @@ export default class UIScene extends Phaser.Scene {
         });
     }
     
+    // Show info for a card choice without selecting it yet
+    onCardChoiceClick(choiceIndex) {
+        if (this.gameScene && this.gameScene.cardChoices && 
+            choiceIndex >= 0 && choiceIndex < this.gameScene.cardChoices.length) {
+            
+            const selectedCard = this.gameScene.cardChoices[choiceIndex];
+            
+            // Clear any previous selection
+            this.clearCardChoiceSelection();
+            
+            // Show card info in the info panel
+            this.showSelectedCard(selectedCard);
+            
+            // Store the selected choice index
+            this.selectedChoiceIndex = choiceIndex;
+            
+            // Add GRAB button below the selected card
+            this.addGrabButtonToChoice(choiceIndex);
+        }
+    }
+    
     // Update card choices after removing a card
     updateCardChoices(cards) {
-        // Clear existing choices
+        // Store the previously selected choice index
+        const previousSelectedIndex = this.selectedChoiceIndex;
+        
+        // Clear existing choices and grab button
+        this.clearCardChoiceSelection();
         this.choiceContainer.removeAll(true);
         
         // Show remaining cards
         this.showCardChoices(cards);
+        
+        // If there was a previously selected card and it's still valid, reselect it
+        if (previousSelectedIndex !== null && previousSelectedIndex < cards.length) {
+            // Select the card at this index again
+            this.onCardChoiceClick(previousSelectedIndex);
+        }
     }
     
     // Hide card choices panel
     hideCardChoices() {
+        // Clear any active card choice selection
+        this.clearCardChoiceSelection();
+        
         this.choicePanelContainer.setVisible(false);
         this.choicePanelBg.visible = false;
     }
     
     // Handle card choice click
     onCardChoiceClick(choiceIndex) {
-        // Tell the game scene which card was chosen
-        this.gameScene.selectCardChoice(choiceIndex);
+        // Instead of immediately selecting the card, show its info in the info panel
+        if (this.gameScene && this.gameScene.cardChoices && 
+            choiceIndex >= 0 && choiceIndex < this.gameScene.cardChoices.length) {
+            
+            const selectedCard = this.gameScene.cardChoices[choiceIndex];
+            
+            // Clear any previous selection
+            this.clearCardChoiceSelection();
+            
+            // Show card info in the info panel
+            this.showSelectedCard(selectedCard);
+            
+            // Store the selected choice index
+            this.selectedChoiceIndex = choiceIndex;
+            
+            // Add GRAB button below the selected card
+            this.addGrabButtonToChoice(choiceIndex);
+        }
+    }
+    
+    // Add GRAB button below a card choice
+    addGrabButtonToChoice(choiceIndex) {
+        // Remove any existing GRAB buttons
+        if (this.grabButton) {
+            this.grabButton.destroy();
+            this.grabButton = null;
+        }
+        
+        const cardContainer = this.choiceContainer.getAt(choiceIndex);
+        if (!cardContainer) return;
+        
+        // Position the button below the card
+        const buttonWidth = 80;
+        const buttonHeight = 70;
+        
+        // Calculate position in global space
+        const globalX = cardContainer.x + this.choiceContainer.x + this.choicePanelContainer.x + (this.cardWidth / 2);
+        const globalY = cardContainer.y + this.choiceContainer.y + this.choicePanelContainer.y + this.cardHeight - 30;
+        
+        // Create a standalone button not tied to any container for better visibility
+        this.grabButton = this.add.container(globalX, globalY);
+        
+        // Button background with more vibrant color
+        const buttonBg = this.add.graphics();
+        buttonBg.fillStyle(0x129510, 1); // Bright green
+        buttonBg.fillRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+        
+        // Add border for better visibility
+        buttonBg.lineStyle(2, 0xFFFFFF, 1);
+        buttonBg.strokeRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+        
+        this.grabButton.add(buttonBg);
+        
+        // Button text
+        const buttonText = this.add.text(
+            0, 
+            0, 
+            'GRAB', 
+            { fontSize: '16px', fontFamily: 'Arial', color: '#FFFFFF', align: 'center', fontWeight: 'bold' }
+        );
+        buttonText.setOrigin(0.5);
+        this.grabButton.add(buttonText);
+        
+        // Make button interactive
+        this.grabButton.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effect
+        this.grabButton.on('pointerover', () => {
+            buttonBg.clear();
+            buttonBg.fillStyle(0x16AE13, 1); // Lighter green
+            buttonBg.fillRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+            buttonBg.lineStyle(2, 0xFFFFFF, 1);
+            buttonBg.strokeRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+        });
+        
+        this.grabButton.on('pointerout', () => {
+            buttonBg.clear();
+            buttonBg.fillStyle(0x129510, 1); // Back to original green
+            buttonBg.fillRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+            buttonBg.lineStyle(2, 0xFFFFFF, 1);
+            buttonBg.strokeRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 8);
+        });
+        
+        // Add click handler
+        this.grabButton.on('pointerdown', () => {
+            this.onGrabButtonClick(choiceIndex);
+        });
+        
+        // Ensure the button is above everything else
+        this.grabButton.setDepth(100);
+    }
+    
+    // Handle GRAB button click
+    onGrabButtonClick(choiceIndex) {
+        // Make sure we have a valid game scene and choice index
+        if (this.gameScene && choiceIndex !== null && 
+            choiceIndex >= 0 && choiceIndex < this.gameScene.cardChoices.length) {
+            
+            // Actually select the card and add it to the player's hand
+            this.gameScene.selectCardChoice(choiceIndex);
+            
+            // Reset the selection
+            this.selectedChoiceIndex = null;
+            
+            // Remove the GRAB button
+            if (this.grabButton) {
+                this.grabButton.destroy();
+                this.grabButton = null;
+            }
+        }
+    }
+    
+    // Clear any card choice selection (hide GRAB button)
+    clearCardChoiceSelection() {
+        this.selectedChoiceIndex = null;
+        
+        // Remove GRAB button if it exists
+        if (this.grabButton) {
+            this.grabButton.destroy();
+            this.grabButton = null;
+        }
     }
     
     // Create a small circular help button to bring back the tutorial

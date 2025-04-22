@@ -262,6 +262,11 @@ export default class GameScene extends Phaser.Scene {
         
         // Clear info panel and refresh UI regardless of what was selected
         if (this.uiScene) {
+            // Clear any card choice selection if available
+            if (this.uiScene.clearCardChoiceSelection) {
+                this.uiScene.clearCardChoiceSelection();
+            }
+            
             this.uiScene.clearInfoPanel();
             this.uiScene.refreshUI();
         }
@@ -509,6 +514,11 @@ export default class GameScene extends Phaser.Scene {
         
         // Show cell info in UI
         if (this.uiScene) {
+            // Clear any card choice selection first
+            if (this.uiScene.clearCardChoiceSelection) {
+                this.uiScene.clearCardChoiceSelection();
+            }
+            
             this.uiScene.showCellInfo(cell, this);
             this.uiScene.selectedCardIndex = null; // Clear selected card in UI too
         }
