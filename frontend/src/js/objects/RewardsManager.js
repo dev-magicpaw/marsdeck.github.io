@@ -150,29 +150,6 @@ export default class RewardsManager {
             }
         }
         
-        // Check for secondary effects that might need additional categorization
-        if (reward.effects) {
-            for (const effect of reward.effects) {
-                // If there's a cardId but no count, it's likely a starting hand card
-                if (effect.cardId && !effect.count && !this.unlockedRewards.startingHand.includes(rewardId)) {
-                    this.unlockedRewards.startingHand.push(rewardId);
-                    added = true;
-                }
-                
-                // If there's a cardId with a count, it's likely a deck card
-                if (effect.cardId && effect.count && !this.unlockedRewards.deckCards.includes(rewardId)) {
-                    this.unlockedRewards.deckCards.push(rewardId);
-                    added = true;
-                }
-                
-                // If there's a buildingId and resourceBonus, it's a building upgrade
-                if (effect.buildingId && effect.resourceBonus && !this.unlockedRewards.buildingUpgrade.includes(rewardId)) {
-                    this.unlockedRewards.buildingUpgrade.push(rewardId);
-                    added = true;
-                }
-            }
-        }
-        
         return added;
     }
     

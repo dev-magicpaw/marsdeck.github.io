@@ -25,9 +25,9 @@ export const sendEvent = (eventName, eventParameters = {}) => {
   });
   
   // Log event in development for debugging
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Analytics event:', eventName, eventParameters);
-  }
+  // if (process.env.NODE_ENV !== 'production') {
+  console.log('Analytics event:', eventName, eventParameters);
+  // }
 };
 
 /**

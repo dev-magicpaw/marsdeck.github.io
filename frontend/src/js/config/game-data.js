@@ -543,7 +543,8 @@ export const REWARDS = {
             applicationType: 'startingHand',
             effects: [
                 {
-                    cardId: 'ironMinePrefabCard'
+                    cardId: 'ironMinePrefabCard',
+                    count: 1
                 }
             ]
         },
@@ -555,7 +556,8 @@ export const REWARDS = {
             applicationType: 'startingHand',
             effects: [
                 {
-                    cardId: 'steelworksPrefabCard'
+                    cardId: 'steelworksPrefabCard',
+                    count: 1
                 }
             ]
         },
@@ -567,14 +569,15 @@ export const REWARDS = {
             applicationType: 'startingHand',
             effects: [
                 {
-                    cardId: 'teslaCoilPrefabCard'
+                    cardId: 'teslaCoilPrefabCard',
+                    count: 1
                 }
             ]
         },
-        DRONE_EVENT_DECK_REWARD: {
-            id: 'droneEventDeckReward',
+        DRONE_EVENT_STARTING_REWARD: {
+            id: 'droneEventStartingReward',
             name: 'Drone Event',
-            description: 'Add two Drone Event cards to your deck',
+            description: 'Start with a Drone Event card in your hand',
             image: 'droneIcon',
             applicationType: 'startingHand',
             effects: [
@@ -584,10 +587,10 @@ export const REWARDS = {
                 }
             ]
         },
-        RESOURCE_SUPPLY_EVENT_DECK_REWARD: {
-            id: 'resourceSupplyEventDeckReward',
+        RESOURCE_SUPPLY_EVENT_STARTING_REWARD: {
+            id: 'resourceSupplyEventStartingReward',
             name: 'Resource Supply Event',
-            description: 'Add two Resource Supply Event cards to your deck. Increase the supply of steel and concrete by 5 each',
+            description: 'Start with a Resource Supply Event card in your hand',
             image: 'resourceSupplyIcon',
             applicationType: 'startingHand',
             effects: [
@@ -597,10 +600,10 @@ export const REWARDS = {
                 }
             ]
         },
-        BARTER_EVENT_DECK_REWARD: {
-            id: 'barterEventDeckReward',
+        BARTER_EVENT_STARTING_REWARD: {
+            id: 'barterEventStartingReward',
             name: 'Barter Event',
-            description: 'Add two Barter Event cards to your deck. Trade 10 concrete for 3 steel and 3 fuel',
+            description: 'Start with a Barter Event card in your hand',
             image: 'barterIcon',
             applicationType: 'startingHand',
             effects: [
@@ -610,10 +613,10 @@ export const REWARDS = {
                 }
             ]
         },
-        RAW_EXPORT_EVENT_DECK_REWARD: {
-            id: 'rawExportEventDeckReward',
+        RAW_EXPORT_EVENT_STARTING_REWARD: {
+            id: 'rawExportEventStartingReward',
             name: 'Raw Export Event',
-            description: 'Add two Raw Export Event cards to your deck. Export 10 water for 5 fuel and 15 iron for 5 fuel',
+            description: 'Start with a Raw Export Event card in your hand',
             image: 'rawExportIcon',
             applicationType: 'startingHand',
             effects: [
