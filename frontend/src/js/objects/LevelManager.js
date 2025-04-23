@@ -1,4 +1,4 @@
-import { RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { RESOURCES, SAVE_DATA_VERSION, TERRAIN_FEATURES } from '../config/game-data';
 import { GAME_LEVELS } from '../config/level-configs';
 import * as MapConfigs from '../config/map-configs';
 
@@ -12,7 +12,8 @@ class LevelManager {
       persistentRewards: {
         rewardIds: [], // Array of reward IDs that player has permanently unlocked
         resourceBonuses: {} // Permanently increased starting resources
-      }
+      },
+      version: SAVE_DATA_VERSION // Store the version with saved data
     };
     
     // Store all available maps from the imported MapConfigs
@@ -278,6 +279,8 @@ class LevelManager {
 
   // Save level progress to localStorage
   saveLevelProgress() {
+    // Ensure the correct version is saved
+    this.LEVEL_PROGRESS.version = SAVE_DATA_VERSION;
     localStorage.setItem('levelProgress', JSON.stringify(this.LEVEL_PROGRESS));
   }
 
@@ -285,7 +288,18 @@ class LevelManager {
   loadLevelProgress() {
     const savedProgress = localStorage.getItem('levelProgress');
     if (savedProgress) {
-      Object.assign(this.LEVEL_PROGRESS, JSON.parse(savedProgress));
+      const parsedProgress = JSON.parse(savedProgress);
+      
+      // Check if saved version matches current version
+      if (!parsedProgress.version || parsedProgress.version !== SAVE_DATA_VERSION) {
+        console.warn(`Save data version mismatch. Expected: ${SAVE_DATA_VERSION}, Found: ${parsedProgress.version || 'none'}. Resetting progress.`);
+        // Version mismatch or missing version - clear saved data
+        localStorage.removeItem('levelProgress');
+        return false;
+      }
+      
+      // Version matches, load the saved progress
+      Object.assign(this.LEVEL_PROGRESS, parsedProgress);
       return true;
     }
     return false;

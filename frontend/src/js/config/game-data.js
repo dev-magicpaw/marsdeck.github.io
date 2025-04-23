@@ -4,6 +4,7 @@ export const CELL_SIZE = 64; // Size of each grid cell in pixels
 export const MAX_TURNS = 30; // Game ends after this many turns
 export const MAX_HAND_SIZE = 6; // Maximum cards in hand
 export const MAX_CARD_SLOTS = 8; // Maximum slots to display in the UI
+export const SAVE_DATA_VERSION = '1.0'; // Version of the save data schema
 
 // Resource types
 export const RESOURCES = {
@@ -569,21 +570,17 @@ export const REWARDS = {
                     cardId: 'teslaCoilPrefabCard'
                 }
             ]
-        }
-    },
-    
-    // Deck cards rewards - add cards to the player's deck
-    DECK_CARDS_REWARDS: {
+        },
         DRONE_EVENT_DECK_REWARD: {
             id: 'droneEventDeckReward',
             name: 'Drone Event',
             description: 'Add two Drone Event cards to your deck',
             image: 'droneIcon',
-            applicationType: 'deckCards',
+            applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'scrapDronesEvent',
-                    count: 2
+                    count: 1 // 2
                 }
             ]
         },
@@ -592,11 +589,11 @@ export const REWARDS = {
             name: 'Resource Supply Event',
             description: 'Add two Resource Supply Event cards to your deck. Increase the supply of steel and concrete by 5 each',
             image: 'resourceSupplyIcon',
-            applicationType: 'deckCards',
+            applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'resourceSupplyEvent',
-                    count: 2
+                    count: 1 // 2
                 }
             ]
         },
@@ -605,11 +602,11 @@ export const REWARDS = {
             name: 'Barter Event',
             description: 'Add two Barter Event cards to your deck. Trade 10 concrete for 3 steel and 3 fuel',
             image: 'barterIcon',
-            applicationType: 'deckCards',
+            applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'barterEvent',
-                    count: 3
+                    count: 1 // 3
                 }
             ]
         },
@@ -618,18 +615,22 @@ export const REWARDS = {
             name: 'Raw Export Event',
             description: 'Add two Raw Export Event cards to your deck. Export 10 water for 5 fuel and 15 iron for 5 fuel',
             image: 'rawExportIcon',
-            applicationType: 'deckCards',
+            applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'exportWaterEvent',
-                    count: 2
+                    count: 1 // 2
                 },
                 {
                     cardId: 'exportIronEvent',
-                    count: 2
+                    count: 1 // 3
                 }
             ]
-        },
+        }
+    },
+    
+    // Deck cards rewards - add cards to the player's deck
+    DECK_CARDS_REWARDS: {
         ARTIFICIAL_LIGHTS_DECK_REWARD: {
             id: 'artificialLightsDeckReward',
             name: 'Artificial Lights',
