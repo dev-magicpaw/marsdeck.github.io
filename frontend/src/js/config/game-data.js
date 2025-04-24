@@ -775,7 +775,7 @@ export const REWARDS = {
             id: 'heavyLaunchPadReward',
             name: 'Heavy Launch',
             description: 'Launch Pads can now launch heavy rockets - can carry +50% more steel but requires +100% more fuel',
-            image: 'rocketInFlight',
+            image: 'rocketFueled',
             applicationType: 'buildingUpgrade',
             effects: [
                 {
