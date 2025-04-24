@@ -605,33 +605,33 @@ export const REWARDS = {
         RESOURCE_SUPPLY_EVENT_STARTING_REWARD: {
             id: 'resourceSupplyEventStartingReward',
             name: 'Resource Supply Event',
-            description: 'Start with a Resource Supply Event card in your hand',
+            description: 'Start with a Resource Supply Event card in your hand. Increase the supply of steel and concrete.\nCan be repeated every 3 turns',
             image: 'resourceSupplyIcon',
             applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'resourceSupplyEvent',
-                    count: 1 // 2
+                    count: 1
                 }
             ]
         },
         BARTER_EVENT_STARTING_REWARD: {
             id: 'barterEventStartingReward',
             name: 'Barter Event',
-            description: 'Start with a Barter Event card in your hand',
+            description: 'Start with a Barter Event card in your hand. Trade concrete for steel and fuel.\nTrades can be repeated every 2 turns',
             image: 'barterIcon',
             applicationType: 'startingHand',
             effects: [
                 {
                     cardId: 'barterEvent',
-                    count: 1 // 3
+                    count: 1
                 }
             ]
         },
         RAW_EXPORT_EVENT_STARTING_REWARD: {
             id: 'rawExportEventStartingReward',
             name: 'Raw Export Event',
-            description: 'Start with a Raw Export Event card in your hand',
+            description: 'Start with a Raw Export Event cards in your hand to trade water and iron for fuel.\nTrades can be repeated every 2 turns',
             image: 'rawExportIcon',
             applicationType: 'startingHand',
             effects: [
@@ -648,7 +648,7 @@ export const REWARDS = {
         CHARITY_EVENT_STARTING_REWARD: {
             id: 'charityEventStartingReward',
             name: 'Charity Event',
-            description: 'Add 4 Charity Event cards to your deck. Provide resources to another colony for 5 reputation',
+            description: 'Add a Charity Event card to your starting hand. Provide resources to another colony for 5 reputation.\nCan be repeated after 1 turn',
             image: 'charityIcon',
             applicationType: 'startingHand',
             effects: [
