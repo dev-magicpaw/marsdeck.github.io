@@ -1036,6 +1036,12 @@ export default class UIScene extends Phaser.Scene {
         } else if (card.type === 'event') {
             // Handle event card info display
             let content = card.cardType.description + '\n\n';
+            
+            // If card is repeatable, show that info
+            if (card.cardType.repeatable) {
+                content += `Can be repeated after ${card.cardType.repeatable.cooldown} turn${card.cardType.repeatable.cooldown > 1 ? 's' : ''}\n\n`;
+            }
+            
             content += "Cost:\n";
 
             // Get costs with adjustments

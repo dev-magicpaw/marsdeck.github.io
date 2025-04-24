@@ -428,7 +428,10 @@ export const CARD_TYPES = {
                 resource: RESOURCES.CONCRETE,
                 amount: 5
             }
-        ]
+        ],
+        repeatable: {
+            cooldown: 3
+        }
     },
     BARTER_EVENT: {
         id: 'barterEvent',
@@ -450,7 +453,10 @@ export const CARD_TYPES = {
                 resource: RESOURCES.FUEL,
                 amount: 3
             }
-        ]
+        ],
+        repeatable: {
+            cooldown: 2
+        }
     },
     EXPORT_WATER_EVENT: {
         id: 'exportWaterEvent',
@@ -467,7 +473,10 @@ export const CARD_TYPES = {
                 resource: RESOURCES.FUEL,
                 amount: 5
             }
-        ]
+        ],
+        repeatable: {
+            cooldown: 2
+        }
     },
     EXPORT_IRON_EVENT: {
         id: 'exportIronEvent',
@@ -484,7 +493,10 @@ export const CARD_TYPES = {
                 resource: RESOURCES.FUEL,
                 amount: 5
             }
-        ]
+        ],
+        repeatable: {
+            cooldown: 2
+        }
     },
     CHARITY_EVENT: {
         id: 'charityEvent',
@@ -505,7 +517,10 @@ export const CARD_TYPES = {
                 resource: RESOURCES.REPUTATION,
                 amount: 5
             }
-        ]
+        ],
+        repeatable: {
+            cooldown: 1
+        }
     },
 
 };
@@ -622,11 +637,24 @@ export const REWARDS = {
             effects: [
                 {
                     cardId: 'exportWaterEvent',
-                    count: 1 // 2
+                    count: 1 
                 },
                 {
                     cardId: 'exportIronEvent',
-                    count: 1 // 3
+                    count: 1
+                }
+            ]
+        },
+        CHARITY_EVENT_STARTING_REWARD: {
+            id: 'charityEventStartingReward',
+            name: 'Charity Event',
+            description: 'Add 4 Charity Event cards to your deck. Provide resources to another colony for 5 reputation',
+            image: 'charityIcon',
+            applicationType: 'startingHand',
+            effects: [
+                {
+                    cardId: 'charityEvent',
+                    count: 1
                 }
             ]
         }
@@ -644,19 +672,6 @@ export const REWARDS = {
                 {
                     cardId: 'artificialLightsCard',
                     count: 3
-                }
-            ]
-        },
-        CHARITY_EVENT_DECK_REWARD: {
-            id: 'charityEventDeckReward',
-            name: 'Charity Event',
-            description: 'Add 4 Charity Event cards to your deck. Provide resources to another colony for 5 reputation',
-            image: 'charityIcon',
-            applicationType: 'deckCards',
-            effects: [
-                {
-                    cardId: 'charityEvent',
-                    count: 4
                 }
             ]
         }

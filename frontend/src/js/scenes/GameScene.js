@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BUILDINGS, CELL_SIZE, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
+import { BUILDINGS, CELL_SIZE, MAX_CARD_SLOTS, RESOURCES, TERRAIN_FEATURES } from '../config/game-data';
 import BuildingActionManager from '../objects/BuildingActionManager';
 import CardManager from '../objects/CardManager';
 import GridManager from '../objects/GridManager';
@@ -16,6 +16,7 @@ export default class GameScene extends Phaser.Scene {
         this.illegalTileSprites = []; // Store references to illegal tile shading sprites
         this.developerMode = false; // Flag for developer mode
         this.coordinateTexts = []; // Store references to coordinate text objects
+        this.repeatableCards = []; // Repeatable cards tracker - stores cards waiting to return to hand
     }
 
     init() {
@@ -602,8 +603,23 @@ export default class GameScene extends Phaser.Scene {
             this.uiScene.showMessage(`Added ${resourceMessages.join(', ')}`);
         }
         
-        // Discard the card from hand
-        this.cardManager.playCard(cardIndex);
+        // Check if this card is repeatable
+        if (card.cardType.repeatable) {
+            // Remove the card from hand but don't discard it
+            const playedCard = this.cardManager.playCard(cardIndex);
+            
+            // Add to the repeatable cards list with its cooldown
+            this.repeatableCards.push({
+                card: playedCard,
+                cooldown: card.cardType.repeatable.cooldown
+            });
+            
+            // Show a message that the card will return
+            this.uiScene.showMessage(`${card.cardType.name} will return in ${card.cardType.repeatable.cooldown} turn${card.cardType.repeatable.cooldown > 1 ? 's' : ''}`);
+        } else {
+            // Discard the card from hand (non-repeatable event)
+            this.cardManager.playCard(cardIndex);
+        }
         
         // Clear selection and update UI
         this.selectedCard = null;
@@ -648,6 +664,51 @@ export default class GameScene extends Phaser.Scene {
                     }
                 }
             }
+        }
+        
+        // Process repeatable cards cooldowns
+        if (this.repeatableCards.length > 0) {
+            const cardsToReturn = [];
+            
+            // Decrease cooldown for each card
+            this.repeatableCards.forEach((item, index) => {
+                item.cooldown--;
+                
+                // If cooldown is over, card should return to hand
+                if (item.cooldown <= 0) {
+                    cardsToReturn.push({
+                        index: index,
+                        card: item.card
+                    });
+                }
+            });
+            
+            // Sort in reverse order to avoid index issues when removing
+            cardsToReturn.sort((a, b) => b.index - a.index);
+            
+            // Return cards that are ready (if hand has space)
+            cardsToReturn.forEach(returnItem => {
+                // Remove from repeatable cards list
+                this.repeatableCards.splice(returnItem.index, 1);
+                
+                // Check if hand has space for the card
+                if (this.cardManager.hand.length < MAX_CARD_SLOTS) {
+                    // Add card back to hand
+                    this.cardManager.hand.push(returnItem.card);
+                    
+                    // Show message
+                    this.uiScene.showMessage(`${returnItem.card.cardType.name} returned to your hand`);
+                } else {
+                    // Hand is full, delay the card return
+                    this.repeatableCards.push({
+                        card: returnItem.card,
+                        cooldown: 1 // Try again next turn
+                    });
+                    
+                    // Show message
+                    this.uiScene.showMessage(`${returnItem.card.cardType.name} delayed (hand full)`);
+                }
+            });
         }
         
         // Increment turn counter
