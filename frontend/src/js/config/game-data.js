@@ -605,7 +605,7 @@ export const REWARDS = {
         RESOURCE_SUPPLY_EVENT_STARTING_REWARD: {
             id: 'resourceSupplyEventStartingReward',
             name: 'Resource Supply Event',
-            description: 'Start with a Resource Supply Event card in your hand. Increase the supply of steel and concrete.\nCan be repeated every 3 turns',
+            description: 'Start with a Resource Supply Event card in your hand. Increase the supply of steel and concrete.\nRepeat every 3 turns',
             image: 'resourceSupplyIcon',
             applicationType: 'startingHand',
             effects: [
@@ -631,7 +631,7 @@ export const REWARDS = {
         RAW_EXPORT_EVENT_STARTING_REWARD: {
             id: 'rawExportEventStartingReward',
             name: 'Raw Export Event',
-            description: 'Start with a Raw Export Event cards in your hand to trade water and iron for fuel.\nTrades can be repeated every 2 turns',
+            description: 'Start with Raw Export Event cards in your hand, trade water/iron for fuel.\nTrades can be repeated every 2 turns',
             image: 'rawExportIcon',
             applicationType: 'startingHand',
             effects: [
@@ -648,7 +648,7 @@ export const REWARDS = {
         CHARITY_EVENT_STARTING_REWARD: {
             id: 'charityEventStartingReward',
             name: 'Charity Event',
-            description: 'Add a Charity Event card to your starting hand. Provide resources to another colony for 5 reputation.\nCan be repeated after 1 turn',
+            description: 'Add a Charity Event card to your starting hand. Help another colony for 5 reputation.\nRepeat each turn',
             image: 'charityIcon',
             applicationType: 'startingHand',
             effects: [
