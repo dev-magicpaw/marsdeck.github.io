@@ -95,6 +95,9 @@ export default class UIScene extends Phaser.Scene {
         // Create help/tutorial button
         this.createHelpButton();
         
+        // Create contacts button
+        this.createContactsButton();
+        
         // Initial UI update
         this.refreshUI();
         
