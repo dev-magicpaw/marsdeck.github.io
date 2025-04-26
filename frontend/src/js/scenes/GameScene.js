@@ -6,7 +6,7 @@ import GridManager from '../objects/GridManager';
 import levelManager from '../objects/LevelManager';
 import ResourceManager from '../objects/ResourceManager';
 import RewardsManager from '../objects/RewardsManager';
-import { trackLevelStarted } from '../utils/analytics';
+import { trackLevelCompleted, trackLevelFailed, trackLevelStarted } from '../utils/analytics';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -1006,28 +1006,26 @@ export default class GameScene extends Phaser.Scene {
     }
     
     gameOver() {
-        const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
-                
-        // Show game over screen in UI
+        trackLevelFailed(this.currentLevel.id);
+        
         if (this.uiScene) {
+            const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
             this.uiScene.showGameOver(reputation);
         }
     }
     
     // Player victory when reputation goal is reached
     playerVictory() {
-        // Get current reputation
+        trackLevelCompleted(this.currentLevel.id);
+
         const reputation = this.resourceManager.getResource(RESOURCES.REPUTATION);
-    
+
         // Don't advance the level immediately - that will happen after viewing rewards
         
         // Stop game input
         this.input.enabled = false;
         
-        // Show victory message
         this.uiScene.showMessage(`VICTORY! You've reached ${reputation} reputation points`);
-        
-        // Show victory screen in UIScene
         if (this.uiScene) {
             const isRandomLevel = this.currentLevel.isRandom;
             this.uiScene.showVictory(reputation, this.currentLevel.reputationGoal, isRandomLevel);
