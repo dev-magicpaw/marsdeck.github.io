@@ -39,6 +39,9 @@ export default class LevelSelectScene extends Phaser.Scene {
     create() {
         this.createLevelSelectionUI();
         
+        // Add contacts button in the bottom left corner
+        this.createContactsButton();
+        
         // Check if we should show the random level tutorial
         const isFinalLevelCompleted = levelManager.LEVEL_PROGRESS.completedLevels['level5'];
         const tutorialShown = levelManager.LEVEL_PROGRESS.randomLevelTutorialShown;
@@ -382,7 +385,6 @@ export default class LevelSelectScene extends Phaser.Scene {
         const creditsButtonHeight = 40;
         const creditsButtonX = width - creditsButtonWidth / 2 - 10;
         const creditsButtonY = height - creditsButtonHeight / 2 - 10;
-        const creditsButtonTint = 0x3333333;
         
         // Use blueSquareButton with nine-slice for credits button
         const creditsButton = this.add.nineslice(
@@ -395,7 +397,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         );
         creditsButton.setOrigin(0.5);
         creditsButton.setInteractive({ useHandCursor: true });
-        creditsButton.setTint(creditsButtonTint);
+        creditsButton.setTint(0x444455);
         
         const creditsText = this.add.text(creditsButtonX, creditsButtonY, 'CREDITS', {
             fontSize: '16px',
@@ -406,11 +408,11 @@ export default class LevelSelectScene extends Phaser.Scene {
         
         // Add hover effect for credits button
         creditsButton.on('pointerover', () => {
-            creditsButton.setTint(0xaaaaaa);
+            creditsButton.setTint(0x555566);
         });
         
         creditsButton.on('pointerout', () => {
-            creditsButton.setTint(creditsButtonTint);
+            creditsButton.setTint(0x444455);
         });
         
         // Show credits panel when clicked
@@ -867,7 +869,8 @@ export default class LevelSelectScene extends Phaser.Scene {
             "Battle Mech icon: https://game-icons.net/1x1/delapouite/battle-mech.html",
             "Electrical resistance icon: https://game-icons.net/1x1/delapouite/electrical-resistance.html",
             "Gas pump icon: https://game-icons.net/1x1/delapouite/gas-pump.html",
-            "Drop icon: https://game-icons.net/1x1/lorc/drop.html", 
+            "Drop icon: https://game-icons.net/1x1/lorc/drop.html",
+            "Flat paw print icon: https://game-icons.net/1x1/lorc/flat-paw-print.html",
         ];
         
         // Add credits text with proper formatting
@@ -926,5 +929,274 @@ export default class LevelSelectScene extends Phaser.Scene {
         backButton.on('pointerdown', () => {
             this.creditsContainer.destroy();
         });
+    }
+
+    // Create a contacts button in the bottom left corner
+    createContactsButton() {
+        const buttonSize = 48;
+        const paddingX = 10;
+        const paddingY = 10;
+        // Position in bottom-left corner
+        const x = paddingX + buttonSize/2;
+        const y = this.cameras.main.height - paddingY - buttonSize/2;
+        
+        const contactsButton = this.add.container(x, y);        
+        const buttonBg = this.add.nineslice(
+            0, 0,                        // center position within container
+            'blueSquareButton',          // texture key - square instead of round
+            null,                        // frame (null for default)
+            buttonSize, buttonSize,      // size
+            5, 5, 5, 5                   // slice sizes: left, right, top, bottom
+        );
+        buttonBg.setOrigin(0.5);
+        buttonBg.setTint(0x444455);
+        contactsButton.add(buttonBg);
+        
+        // Add magic paw icon
+        const icon = this.add.image(0, 0, 'magicPaw');
+        icon.setScale(buttonSize / icon.width * 0.6); // Scale to fit the button
+        icon.setOrigin(0.5);
+        icon.setTint(0xFFA500); // Orange
+        contactsButton.add(icon);
+        
+        // Make interactive
+        contactsButton.setInteractive(new Phaser.Geom.Rectangle(-buttonSize/2, -buttonSize/2, buttonSize, buttonSize), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effects
+        contactsButton.on('pointerover', () => {
+            buttonBg.setTint(0x555566);
+        });
+        
+        contactsButton.on('pointerout', () => {
+            buttonBg.setTint(0x444455);
+        });
+        
+        // Show contacts panel on click
+        contactsButton.on('pointerdown', () => {
+            this.showContactsPanel();
+        });
+        
+        // Set depth to ensure it's visible
+        contactsButton.setDepth(100);
+        
+        // Store reference
+        this.contactsButton = contactsButton;
+    }
+    
+    // Show contacts panel
+    showContactsPanel() {
+        // If contacts panel already exists, destroy it first
+        if (this.contactsContainer) {
+            this.contactsContainer.destroy();
+            this.contactsContainer = null;
+            return; // Toggle off if already visible
+        }
+        
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        // Create container for all contacts elements
+        this.contactsContainer = this.add.container(0, 0);
+        
+        // Add semi-transparent overlay
+        const overlay = this.add.graphics();
+        overlay.fillStyle(0x000000, 0.7); 
+        overlay.fillRect(0, 0, width, height);
+        overlay.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+        overlay.on('pointerdown', () => {
+            // Click outside panel closes it
+            this.contactsContainer.destroy();
+            this.contactsContainer = null;
+        });
+        this.contactsContainer.add(overlay);
+        
+        // Calculate panel dimensions
+        const panelWidth = 600;
+        const panelHeight = 500;
+        const panelX = (width - panelWidth) / 2;
+        const panelY = (height - panelHeight) / 2;
+        
+        // Create panel background using panelGlassScrews texture with nine-slice
+        const panelBg = this.add.nineslice(
+            panelX + panelWidth/2, panelY + panelHeight/2, // center position
+            'panelGlassScrews',                            // texture key
+            null,                                          // frame (null for default)
+            panelWidth, panelHeight,                       // size
+            30, 30, 30, 30                                 // slice sizes: left, right, top, bottom
+        );
+        panelBg.setOrigin(0.5);
+        panelBg.setTint(0x333344); // Dark blue-gray tint
+        
+        // Make panel interactive to stop event propagation
+        panelBg.setInteractive(new Phaser.Geom.Rectangle(-panelWidth/2, -panelHeight/2, panelWidth, panelHeight), Phaser.Geom.Rectangle.Contains);
+        panelBg.on('pointerdown', (pointer) => {
+            pointer.event.stopPropagation();
+        });
+        
+        this.contactsContainer.add(panelBg);
+        
+        // Add title
+        const title = this.add.text(
+            panelX + panelWidth/2, 
+            panelY + 30, 
+            'Magic Paw studio', 
+            {
+                fontSize: '24px',
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                color: '#ffffff'
+            }
+        );
+        title.setOrigin(0.5, 0.5);
+        this.contactsContainer.add(title);
+        
+        // Add sample contact entries (can be customized as needed)
+        const contactsData = [
+            { name: 'Mars Colony HQ', role: 'Administration' },
+            { name: 'Resource Management', role: 'Supply Chain' },
+            { name: 'Engineering Team', role: 'Construction' },
+            { name: 'Medical Staff', role: 'Healthcare' },
+            { name: 'Research Division', role: 'R&D' }
+        ];
+        
+        // Create contact entries
+        const startY = panelY + 80;
+        const spacing = 70;
+        
+        contactsData.forEach((contact, index) => {
+            const entryY = startY + (index * spacing);
+            
+            // Container for contact entry
+            const contactEntry = this.add.container(panelX + 30, entryY);
+            
+            // Icon background
+            const iconBg = this.add.nineslice(
+                0, 0,
+                'blueSquareButton',
+                null,
+                50, 50,
+                5, 5, 5, 5
+            );
+            iconBg.setOrigin(0, 0.5);
+            contactEntry.add(iconBg);
+            
+            // Icon
+            const icon = this.add.image(25, 0, 'magicPaw');
+            icon.setScale(40 / icon.width);
+            icon.setOrigin(0.5);
+            contactEntry.add(icon);
+            
+            // Contact name
+            const nameText = this.add.text(
+                70, 
+                -10, 
+                contact.name, 
+                {
+                    fontSize: '18px',
+                    fontFamily: 'Arial',
+                    color: '#ffffff'
+                }
+            );
+            nameText.setOrigin(0, 0.5);
+            contactEntry.add(nameText);
+            
+            // Contact role/department
+            const roleText = this.add.text(
+                70, 
+                15, 
+                contact.role, 
+                {
+                    fontSize: '14px',
+                    fontFamily: 'Arial',
+                    color: '#aaaaaa'
+                }
+            );
+            roleText.setOrigin(0, 0.5);
+            contactEntry.add(roleText);
+            
+            // Make entry interactive
+            contactEntry.setInteractive(new Phaser.Geom.Rectangle(0, -25, panelWidth - 60, 50), Phaser.Geom.Rectangle.Contains);
+            contactEntry.on('pointerover', () => {
+                nameText.setColor('#ffcc00');
+            });
+            contactEntry.on('pointerout', () => {
+                nameText.setColor('#ffffff');
+            });
+            contactEntry.on('pointerdown', () => {
+                const message = this.add.text(
+                    width / 2,
+                    height / 2,
+                    `Connecting to ${contact.name}...`,
+                    {
+                        fontSize: '20px',
+                        fontFamily: 'Arial',
+                        color: '#ffffff',
+                        backgroundColor: '#000000',
+                        padding: { x: 15, y: 10 }
+                    }
+                );
+                message.setOrigin(0.5);
+                message.setDepth(1000);
+                
+                // Make message disappear after 1.5 seconds
+                this.tweens.add({
+                    targets: message,
+                    alpha: 0,
+                    duration: 1500,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        message.destroy();
+                    }
+                });
+            });
+            
+            this.contactsContainer.add(contactEntry);
+        });
+        
+        // Close button
+        const closeButtonX = panelX + panelWidth/2;
+        const closeButtonY = panelY + panelHeight - 30;
+        
+        // Create button background
+        const buttonBg = this.add.nineslice(
+            closeButtonX, closeButtonY,
+            'blueSquareButton',
+            null,
+            100, 30,
+            5, 5, 5, 5
+        );
+        buttonBg.setOrigin(0.5);
+        this.contactsContainer.add(buttonBg);
+        
+        // Add text to button
+        const closeText = this.add.text(
+            closeButtonX, 
+            closeButtonY, 
+            'CLOSE', 
+            {
+                fontSize: '16px',
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                color: '#ffffff'
+            }
+        );
+        closeText.setOrigin(0.5, 0.5);
+        this.contactsContainer.add(closeText);
+        
+        // Make button interactive
+        buttonBg.setInteractive();
+        buttonBg.on('pointerover', () => {
+            buttonBg.setTint(0x3366cc);
+        });
+        buttonBg.on('pointerout', () => {
+            buttonBg.clearTint();
+        });
+        buttonBg.on('pointerdown', () => {
+            this.contactsContainer.destroy();
+            this.contactsContainer = null;
+        });
+        
+        // Set depth to ensure it's visible
+        this.contactsContainer.setDepth(200);
     }
 } 

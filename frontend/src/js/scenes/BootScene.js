@@ -71,7 +71,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('cardPrefabBackground', require('../../assets/images/hud/yellow_button_square_header_large_rectangle.png'));
         this.load.image('cardEventBackground', require('../../assets/images/hud/green_button_square_header_large_rectangle.png'));
 
-        
         // Load card slot background
         this.load.image('cardSlotBackground', require('../../assets/images/hud/extra_bar_shadow_square_outline_large.png'));
         
@@ -93,13 +92,13 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('panelGlassScrews', require('../../assets/images/hud/extra_panel_glass_screws.png'));
         this.load.image('barRoundLargeSquare', require('../../assets/images/hud/blue_bar_round_large_square.png'));
 
-
         // Load tutorial
         this.load.image('tutorialPanel', require('../../assets/images/tutorial.png'));
         this.load.image('tutorialPanel2', require('../../assets/images/tutorial2.png'));
         
         // Use existing texture for particle effects
         this.load.image('particleGlow', require('../../assets/images/hud/blue_bar_round_large_square.png'));
+        this.load.image('magicPaw', require('../../assets/images/game_icons/magic_paw.png'));
     }
 
     create() {
