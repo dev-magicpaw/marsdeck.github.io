@@ -1,5 +1,6 @@
 import { REWARDS, STARTING_REWARDS } from '../config/game-data';
 import levelManager from './LevelManager';
+import { trackRewardUnlocked } from '../utils/analytics';
 
 export default class RewardsManager {
     constructor(scene) {
@@ -260,6 +261,11 @@ export default class RewardsManager {
         if (added) {
             // Save to level manager's persistent rewards
             this.saveRewardsToLevelManager();
+            
+            // Track the reward unlock event with analytics
+            const currentLevel = levelManager.getCurrentLevel();
+            trackRewardUnlocked(rewardId, currentLevel.id);
+            
             return true;
         }
         

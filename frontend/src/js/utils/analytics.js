@@ -25,7 +25,7 @@ export const sendEvent = (eventName, eventParameters = {}) => {
     });
   }
 
-  shouldLog = process.env.NODE_ENV !== 'production'
+  const shouldLog = process.env.NODE_ENV !== 'production'
   if (shouldLog) {
     console.log('Analytics event:', eventName, eventParameters);
   }
