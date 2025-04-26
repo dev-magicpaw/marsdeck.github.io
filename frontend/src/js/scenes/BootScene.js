@@ -99,6 +99,7 @@ export default class BootScene extends Phaser.Scene {
         // Use existing texture for particle effects
         this.load.image('particleGlow', require('../../assets/images/hud/blue_bar_round_large_square.png'));
         this.load.image('magicPaw', require('../../assets/images/game_icons/magic_paw.png'));
+        this.load.image('magicPawStudio', require('../../assets/images/game_icons/magic_paw_magic_circle.png'));
     }
 
     create() {

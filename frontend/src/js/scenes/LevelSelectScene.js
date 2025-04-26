@@ -989,6 +989,13 @@ export default class LevelSelectScene extends Phaser.Scene {
         if (this.contactsContainer) {
             this.contactsContainer.destroy();
             this.contactsContainer = null;
+            
+            // Also remove iframe if it exists
+            if (this.mailchimpIframe) {
+                document.body.removeChild(this.mailchimpIframe);
+                this.mailchimpIframe = null;
+            }
+            
             return; // Toggle off if already visible
         }
         
@@ -1007,12 +1014,18 @@ export default class LevelSelectScene extends Phaser.Scene {
             // Click outside panel closes it
             this.contactsContainer.destroy();
             this.contactsContainer = null;
+            
+            // Remove iframe
+            if (this.mailchimpIframe) {
+                document.body.removeChild(this.mailchimpIframe);
+                this.mailchimpIframe = null;
+            }
         });
         this.contactsContainer.add(overlay);
         
         // Calculate panel dimensions
-        const panelWidth = 600;
-        const panelHeight = 500;
+        const panelWidth = 500;
+        const panelHeight = 600;
         const panelX = (width - panelWidth) / 2;
         const panelY = (height - panelHeight) / 2;
         
@@ -1050,50 +1063,243 @@ export default class LevelSelectScene extends Phaser.Scene {
         title.setOrigin(0.5, 0.5);
         this.contactsContainer.add(title);
         
-        // Close button
-        const closeButtonX = panelX + panelWidth/2;
-        const closeButtonY = panelY + panelHeight - 30;
-        
-        // Create button background
-        const buttonBg = this.add.nineslice(
-            closeButtonX, closeButtonY,
-            'blueSquareButton',
-            null,
-            100, 30,
-            5, 5, 5, 5
+        // Add studio logo image between title and message
+        const logoImage = this.add.image(
+            panelX + panelWidth/2,
+            panelY + 300,
+            'magicPawStudio'
         );
-        buttonBg.setOrigin(0.5);
-        this.contactsContainer.add(buttonBg);
+        logoImage.setScale(0.2); // Adjust scale as needed
+        logoImage.setOrigin(0.5);
+        this.contactsContainer.add(logoImage);
         
-        // Add text to button
-        const closeText = this.add.text(
-            closeButtonX, 
-            closeButtonY, 
-            'CLOSE', 
+        // Add message text under the image
+        const messageText = this.add.text(
+            panelX + panelWidth/2, 
+            panelY + 120,
+            "Hey, we hope you are enjoying the game!\nIf you have any suggestion or feedback, reach out to us at\ndev.magicpaw@gmail.com\nEnjoy the game", 
             {
                 fontSize: '16px',
                 fontFamily: 'Arial',
-                fontWeight: 'bold',
-                color: '#ffffff'
+                color: '#ffffff',
+                align: 'center',
+                lineSpacing: 6
             }
         );
-        closeText.setOrigin(0.5, 0.5);
-        this.contactsContainer.add(closeText);
+        messageText.setOrigin(0.5, 0.5);
+        this.contactsContainer.add(messageText);
         
-        // Make button interactive
-        buttonBg.setInteractive();
-        buttonBg.on('pointerover', () => {
-            buttonBg.setTint(0x3366cc);
-        });
-        buttonBg.on('pointerout', () => {
-            buttonBg.clearTint();
-        });
-        buttonBg.on('pointerdown', () => {
+        // Add close button
+        const closeButtonX = panelX + panelWidth - 25;
+        const closeButtonY = panelY + 25;
+        
+        const closeButton = this.add.text(
+            closeButtonX,
+            closeButtonY,
+            'X',
+            {
+                fontSize: '20px',
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                color: '#FFFFFF'
+            }
+        );
+        closeButton.setOrigin(0.5);
+        closeButton.setInteractive({ useHandCursor: true });
+        closeButton.on('pointerdown', () => {
             this.contactsContainer.destroy();
             this.contactsContainer = null;
+            
+            // Remove iframe
+            if (this.mailchimpIframe) {
+                document.body.removeChild(this.mailchimpIframe);
+                this.mailchimpIframe = null;
+            }
         });
+        this.contactsContainer.add(closeButton);
         
         // Set depth to ensure it's visible
         this.contactsContainer.setDepth(200);
+        
+        // Calculate iframe dimensions
+        const iframeWidth = panelWidth - 100;
+        const iframeHeight = 250;
+        
+        // Position iframe centered horizontally and at bottom of panel with margin
+        const iframeX = panelX + (panelWidth - iframeWidth) / 2 + 25;
+        const iframeY = panelY + panelHeight - iframeHeight + 125; // 30px margin from bottom
+        
+        // Create an iframe for the Mailchimp form (DOM element)
+        this.createMailchimpIframe(iframeX, iframeY, iframeWidth, iframeHeight);
+    }
+    
+    // Create mailchimp iframe with minimal required code
+    createMailchimpIframe(x, y, width, height) {
+        // Get the canvas element position to align the iframe
+        const canvas = this.game.canvas;
+        const rect = canvas.getBoundingClientRect();
+        
+        // Create the iframe element
+        const iframe = document.createElement('iframe');
+        
+        // Set iframe attributes
+        iframe.style.position = 'absolute';
+        iframe.style.left = (rect.left + x) + 'px';
+        iframe.style.top = (rect.top + y) + 'px';
+        iframe.style.width = width + 'px';
+        iframe.style.height = height + 'px';
+        iframe.style.border = 'none';
+        iframe.style.backgroundColor = 'transparent';
+        iframe.style.zIndex = '1000';
+        
+        // The minimal HTML content for the Mailchimp form
+        const formHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: transparent;
+                        margin: 0;
+                        padding: 15px;
+                        color: white;
+                    }
+                    form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+                    label {
+                        display: block;
+                        margin-bottom: 5px;
+                        font-size: 16px;
+                    }
+                    input[type="email"] {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        font-size: 16px;
+                        box-sizing: border-box;
+                    }
+                    input[type="submit"] {
+                        background-color: #0A86E4;
+                        color: white;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                        align-self: center;
+                    }
+                    input[type="submit"]:hover {
+                        background-color: #0A76C4;
+                    }
+                    .response {
+                        padding: 10px;
+                        margin-top: 10px;
+                        border-radius: 4px;
+                        display: none;
+                    }
+                    .success {
+                        background-color: #E8F7E8;
+                        color: #186318;
+                    }
+                    .error {
+                        background-color: #FCE8E8;
+                        color: #AD2121;
+                    }
+                    .hidden {
+                        position: absolute;
+                        left: -5000px;
+                    }
+                </style>
+            </head>
+            <body>
+                <form action="https://fun.us11.list-manage.com/subscribe/post?u=3b9ef224e83ac062300c06edc&amp;id=6071c48df6&amp;f_id=00ea20e1f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+                    <div>
+                        <label for="mce-EMAIL">Subscribe to our mailing list</label>
+                        <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required placeholder="Enter your email address">
+                    </div>
+                    
+                    <div class="hidden">
+                        <!-- Real people should not fill this in and expect good things - do not remove this or risk form bot signups -->
+                        <input type="text" name="b_3b9ef224e83ac062300c06edc_6071c48df6" tabindex="-1" value="">
+                    </div>
+                    
+                    <input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button" value="Subscribe">
+                    
+                    <div class="response success" id="success-response">
+                        Thank you for subscribing!
+                    </div>
+                    
+                    <div class="response error" id="error-response">
+                        Please enter a valid email address.
+                    </div>
+                </form>
+                
+                <script>
+                    // Simple form validation and response handling
+                    document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function(e) {
+                        const email = document.getElementById('mce-EMAIL').value;
+                        
+                        if (!email || !email.includes('@') || !email.includes('.')) {
+                            e.preventDefault();
+                            document.getElementById('error-response').style.display = 'block';
+                            document.getElementById('success-response').style.display = 'none';
+                        } else {
+                            document.getElementById('success-response').style.display = 'block';
+                            document.getElementById('error-response').style.display = 'none';
+                            // Form will submit normally to Mailchimp
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        `;
+        
+        // Add iframe to the document
+        document.body.appendChild(iframe);
+        
+        // Set content (once iframe is loaded)
+        iframe.onload = function() {
+            // Get iframe document
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            
+            // Write HTML content
+            iframeDoc.open();
+            iframeDoc.write(formHtml);
+            iframeDoc.close();
+        };
+        
+        // Initially load a blank page
+        iframe.src = 'about:blank';
+        
+        // Store reference to the iframe
+        this.mailchimpIframe = iframe;
+        
+        // Handle window resize to keep iframe positioned correctly
+        const resizeHandler = () => {
+            if (this.mailchimpIframe) {
+                const rect = canvas.getBoundingClientRect();
+                this.mailchimpIframe.style.left = (rect.left + x) + 'px';
+                this.mailchimpIframe.style.top = (rect.top + y) + 'px';
+            }
+        };
+        
+        window.addEventListener('resize', resizeHandler);
+        
+        // Clean up event listener when panel is closed
+        this.events.once('shutdown', () => {
+            window.removeEventListener('resize', resizeHandler);
+            if (this.mailchimpIframe) {
+                document.body.removeChild(this.mailchimpIframe);
+                this.mailchimpIframe = null;
+            }
+        });
     }
 } 
