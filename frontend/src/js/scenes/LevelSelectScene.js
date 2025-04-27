@@ -1066,10 +1066,10 @@ export default class LevelSelectScene extends Phaser.Scene {
         // Add studio logo image between title and message
         const logoImage = this.add.image(
             panelX + panelWidth/2,
-            panelY + 300,
+            panelY + 320,
             'magicPawStudio'
         );
-        logoImage.setScale(0.2); // Adjust scale as needed
+        logoImage.setScale(0.5); // Adjust scale as needed
         logoImage.setOrigin(0.5);
         this.contactsContainer.add(logoImage);
         
@@ -1077,7 +1077,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         const messageText = this.add.text(
             panelX + panelWidth/2, 
             panelY + 120,
-            "Hey, we hope you are enjoying the game!\nIf you have any suggestion or feedback, reach out to us at\ndev.magicpaw@gmail.com\nEnjoy the game", 
+            "Hey, we hope you are having some fun!\nIf you have any suggestion or feedback, reach out to us at\ndev.magicpaw@gmail.com\nEnjoy the game", 
             {
                 fontSize: '16px',
                 fontFamily: 'Arial',
